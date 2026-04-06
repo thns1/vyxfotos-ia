@@ -12,6 +12,7 @@ const upload = multer({ dest: 'uploads/' });
 
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 
 // Rota de Health Check
 app.get('/api/health', (req, res) => {
@@ -82,6 +83,15 @@ app.post('/api/generate', upload.single('selfieFile'), async (req, res) => {
         console.error("[API] Erro ao processar requisição:", error.message);
         res.status(500).json({ success: false, error: "Erro interno do Motor de Imagens." });
     }
+});
+
+// ============================================
+// PONTE DE MARKETING: Recebe fotos do Robô
+// ============================================
+app.post('/api/marketing/upload', upload.single('image'), (req, res) => {
+    if (!req.file) return res.status(400).json({ error: "Nenhum arquivo enviado." });
+    const publicUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    res.json({ url: publicUrl });
 });
 
 app.listen(port, () => {
