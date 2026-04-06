@@ -1,0 +1,29 @@
+{
+  "name": "vyxfotos-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "@fal-ai/client": "^1.9.5",
+    "@fal-ai/serverless-client": "^0.15.0",
+    "@gradio/client": "^2.1.0",
+    "axios": "^1.7.5",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^8.0.4",
+    "replicate": "^1.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  },
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}

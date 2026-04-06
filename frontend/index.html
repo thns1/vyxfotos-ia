@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR" class="lenis lenis-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vyxfotos.IA | Estúdios de Filmes via Inteligência</title>
+    <!-- Midnight Luxe Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@1,600;1,800;1,900&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-[#0D0D12] text-[#FAF8F5] antialiased">
+    <!-- SVG Noise Global (Filtro Cinematográfico) -->
+    <svg style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;opacity:0.05;">
+        <filter id="noiseFilter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" stitchTiles="stitch"/>
+        </filter>
+        <rect width="100%" height="100%" filter="url(#noiseFilter)"/>
+    </svg>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
