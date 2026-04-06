@@ -27,9 +27,10 @@ const TESTIMONIALS = [
 ];
 
 const FAQS = [
-  { q: "Qual o prazo para as fotos ficarem prontas?", a: "Imediatamente. Nosso servidor de IA renderiza seu ensaio fotográfico em cerca de 3 minutos, após a confirmação do pagamento Kiwify." },
-  { q: "Como eu recebo as fotos finais?", a: "Você receberá o acesso exclusivo e o link para download direto no seu e-mail assim que o pagamento for aprovado." },
-  { q: "Será que vai parecer comigo?", a: "Nossa tecnologia mapeia as micro-expressões do seu rosto. O resultado é idêntico a você, como se estivesse fisicamente no cenário." }
+  { q: "Como o serviço da Vyxfotos funciona?", a: "O processo é simples e autônomo. Você seleciona o cenário exato que deseja para a estética da sua marca, envia uma selfie sua com o rosto iluminado, e nós renderizamos o retrato. Assim que você confirmar a compra da licença que mais se adequa a você, nosso ecossistema gera instantaneamente os arquivos originais limpos em ultra-resolução (4K) e manda anexado direto no seu e-mail." },
+  { q: "Qual o prazo para as fotos ficarem prontas?", a: "Imediatamente. Nosso servidor de Inteligência Artificial renderiza e escala seu ensaio fotográfico na nuvem em cerca de 5 a 15 minutos, após a confirmação do evento de pagamento." },
+  { q: "Como eu recebo as fotos finais?", a: "Você não precisa se preocupar com logins. A foto 4K pura e bruta chegará como um anexo (Aquivop .JPG) em máxima qualidade direto na caixa de entrada do seu E-mail, logo após a compra." },
+  { q: "Será que vai parecer comigo?", a: "Nossa tecnologia mapeia as micro-expressões únicas do seu rosto humano, absorvendo detalhes como formato, íris e traços estruturais. O resultado é assustadoramente idêntico a você, como se estivesse fisicamente no estúdio fotográfico de luxo." }
 ];
 
 export default function App() {
