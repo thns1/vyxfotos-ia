@@ -229,17 +229,13 @@ export default function App() {
             
             {/* HERO SECTION OPTIMIZED (100vh NO SCROLL GUARANTEED) */}
             <section className="min-h-[100dvh] py-32 flex flex-col justify-center items-center relative px-4 md:px-6 w-full overflow-hidden">
-              <div ref={heroTextRef} className="max-w-4xl mx-auto text-center space-y-2 z-10 w-full mt-10 md:mt-16">
-                <div className="inline-block px-3 py-1 border border-white/10 rounded-full bg-white/5 backdrop-blur-md mb-2">
-                  <span className="text-[10px] md:text-xs font-mono text-champagne uppercase tracking-[0.2em] font-bold">I.A. RENDERIZADORA 🟢</span>
-                </div>
-                
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-ivory tracking-tighter leading-[1.05]">
+              <div ref={heroTextRef} className="max-w-4xl mx-auto text-center space-y-2 z-10 w-full mt-4 md:mt-8">
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-ivory tracking-tighter leading-[1.05]">
                   ENSAIOS DE ALTO PADRÃO<br/> gerados a partir de uma <br/>
                   <span className="font-drama italic text-champagne font-black drop-shadow-2xl">SIMPLES SELFIE.</span>
                 </h1>
                 
-                <p className="text-sm md:text-lg text-ivory/60 max-w-2xl mx-auto font-light leading-snug pt-2">
+                <p className="text-xs md:text-base text-ivory/60 max-w-2xl mx-auto font-light leading-snug pt-2">
                   Esqueça estúdios e fotógrafos. Renderize fotos corporativas, festas infantis ou artísticas com absoluta e perfeita resolução 4k em 3 minutos.
                 </p>
               </div>
