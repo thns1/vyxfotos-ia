@@ -19,7 +19,7 @@ class ImagePipelineService {
             
             // 1. Definição do Prompt (Engenharia de Cena Luxuosa)
             const promptMestre = customText && customText.trim() !== '' 
-                ? `photorealistic, ${customText}, 8k resolution, cinematic lighting, masterpiece`
+                ? `A highly detailed professional photorealistic portrait of a person. The scenario and concept is exactly this: "${customText}". Translate the concept to a visually stunning scene. High-end photography, cinematic lighting, hyper-realistic, 8k masterpiece, extremely detailed, natural skin texture.`
                 : (themePrompts[theme] || themePrompts['luxo']);
             
             console.log(`[Backend-AI] Esculpindo Cenário: "${promptMestre}"`);
