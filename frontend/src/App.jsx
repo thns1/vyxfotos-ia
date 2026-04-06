@@ -8,10 +8,10 @@ gsap.registerPlugin(ScrollTrigger);
 
 // Constantes
 const THEMES = [
-  { id: 'aniversario', name: 'Aniversário VIP', icon: '🎉' },
-  { id: 'jogador', name: 'Atleta de Elite', icon: '⚽' },
-  { id: 'luxo', name: 'Luxo Clássico', icon: '💎' },
   { id: 'executivo', name: 'Poder Executivo', icon: '💼' },
+  { id: 'luxo', name: 'Luxo Clássico', icon: '💎' },
+  { id: 'sonhos', name: 'Fantasia & Sonhos', icon: '✨' },
+  { id: 'aniversario', name: 'Aniversário VIP', icon: '🎉' },
 ];
 
 const PACKAGES = [
@@ -61,10 +61,10 @@ export default function App() {
     if (generatedImage) return generatedImage; // Se a IA já gerou a sua foto real, mostra a SUA FOTO REAL com a marca d'água!
     
     switch(selectedTheme) {
-      case 'aniversario': return 'https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?auto=format&fit=crop&q=80'; // Princesa
-      case 'jogador': return 'https://images.unsplash.com/photo-1511886929837-354d827aae26?auto=format&fit=crop&q=80'; // Esporte/Estádio
-      case 'luxo': return 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80'; // Beauty Clássico
       case 'executivo': return 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80'; // Terno corporativo
+      case 'luxo': return 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80'; // Beauty Clássico
+      case 'sonhos': return 'https://images.unsplash.com/photo-1518002171953-a080ee817e1f?auto=format&fit=crop&q=80'; // Fantasia
+      case 'aniversario': return 'https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?auto=format&fit=crop&q=80'; // Princesa
       default: return 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80'; // Um borrão criativo mágico/metálico para temas customizados
     }
   };
