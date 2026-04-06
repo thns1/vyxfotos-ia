@@ -62,11 +62,11 @@ export default function App() {
     if (generatedImage) return generatedImage; // Se a IA já gerou a sua foto real, mostra a SUA FOTO REAL com a marca d'água!
     
     switch(selectedTheme) {
-      case 'executivo': return 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80'; // Terno corporativo
-      case 'luxo': return 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80'; // Beauty Clássico
-      case 'sonhos': return 'https://images.unsplash.com/photo-1518002171953-a080ee817e1f?auto=format&fit=crop&q=80'; // Fantasia
-      case 'aniversario': return 'https://images.unsplash.com/photo-1530648672449-81f7f02d45a9?auto=format&fit=crop&q=80'; // Princesa (Criança/Menina real)
-      default: return 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80'; // Um borrão criativo mágico/metálico para temas customizados
+      case 'executivo': return '/executivo.png';
+      case 'luxo': return '/luxo.png';
+      case 'sonhos': return '/sonhos.png';
+      case 'aniversario': return '/princesa.png';
+      default: return 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80';
     }
   };
 
@@ -327,28 +327,28 @@ export default function App() {
                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {/* Imagem 1 - Mulher Corporativa / Executivo */}
                     <div className="relative group overflow-hidden rounded-[2rem] aspect-[3/4] border border-white/10 shadow-2xl bg-slate-900">
-                      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105"></div>
+                      <div className="absolute inset-0 bg-[url('/executivo.png')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105"></div>
                       <div className="absolute inset-0 bg-gradient-to-t from-[#050508]/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6 text-left">
                          <span className="font-bold text-ivory text-sm">Poder Executivo</span>
                       </div>
                     </div>
                     {/* Imagem 2 - Luxo Clássico */}
                     <div className="relative group overflow-hidden rounded-[2rem] aspect-[3/4] border border-white/10 shadow-2xl bg-slate-900 md:mt-8">
-                      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105"></div>
+                      <div className="absolute inset-0 bg-[url('/luxo.png')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105"></div>
                       <div className="absolute inset-0 bg-gradient-to-t from-[#050508]/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6 text-left">
                          <span className="font-bold text-ivory text-sm">Luxo Clássico</span>
                       </div>
                     </div>
                     {/* Imagem 3 - Fantasia & Sonhos */}
                     <div className="relative group overflow-hidden rounded-[2rem] aspect-[3/4] border border-white/10 shadow-2xl bg-slate-900">
-                      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1518002171953-a080ee817e1f?auto=format&fit=crop&q=80')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105"></div>
+                      <div className="absolute inset-0 bg-[url('/sonhos.png')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105"></div>
                       <div className="absolute inset-0 bg-gradient-to-t from-[#050508]/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6 text-left">
                          <span className="font-bold text-ivory text-sm">Fantasia & Sonhos</span>
                       </div>
                     </div>
                     {/* Imagem 4 - Aniversário VIP */}
                     <div className="relative group overflow-hidden rounded-[2rem] aspect-[3/4] border border-white/10 shadow-2xl bg-slate-900 md:mt-8">
-                      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1530648672449-81f7f02d45a9?auto=format&fit=crop&q=80')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105"></div>
+                      <div className="absolute inset-0 bg-[url('/princesa.png')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105"></div>
                       <div className="absolute inset-0 bg-gradient-to-t from-[#050508]/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-6 text-left">
                          <span className="font-bold text-ivory text-sm">Aniversário VIP</span>
                       </div>
