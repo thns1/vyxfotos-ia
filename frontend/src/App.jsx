@@ -228,7 +228,7 @@ export default function App() {
           <div className="w-full">
             
             {/* HERO SECTION OPTIMIZED (100vh NO SCROLL GUARANTEED) */}
-            <section className="h-[100dvh] min-h-[600px] flex flex-col justify-center items-center relative px-4 md:px-6 w-full overflow-hidden">
+            <section className="min-h-[100dvh] py-32 flex flex-col justify-center items-center relative px-4 md:px-6 w-full overflow-hidden">
               <div ref={heroTextRef} className="max-w-4xl mx-auto text-center space-y-2 z-10 w-full mt-10 md:mt-16">
                 <div className="inline-block px-3 py-1 border border-white/10 rounded-full bg-white/5 backdrop-blur-md mb-2">
                   <span className="text-[10px] md:text-xs font-mono text-champagne uppercase tracking-[0.2em] font-bold">I.A. RENDERIZADORA 🟢</span>
