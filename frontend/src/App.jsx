@@ -129,8 +129,13 @@ export default function App() {
         formData.append('theme', selectedTheme);
         formData.append('customTheme', customTheme);
 
+        // Detecção de Ambiente (Localhouse vs Produção na Nuvem)
+        const BASE_API_URL = window.location.hostname === 'localhost' 
+          ? 'http://localhost:3001' 
+          : 'https://vyxfotos-backend.onrender.com';
+
         // Comunicação Real com a nova API Backend
-        const response = await fetch('http://localhost:3001/api/generate', {
+        const response = await fetch(`${BASE_API_URL}/api/generate`, {
           method: 'POST',
           body: formData
         });
