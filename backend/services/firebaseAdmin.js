@@ -11,13 +11,15 @@ try {
   if (fs.existsSync(serviceAccountPath)) {
     const serviceAccount = require(serviceAccountPath);
     admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount)
+      credential: admin.credential.cert(serviceAccount),
+      databaseURL: "https://vyxfotos-default-rtdb.firebaseio.com/"
     });
-    db = admin.firestore();
-    console.log('✅ [🔥 Firebase] Firebase Admin SDK (Banco de Dados) Conectado!');
+    db = admin.database();
+    console.log('✅ [🔥 Firebase] Realtime Database Conectado!');
   } else {
     console.warn('⚠️ [🔥 Firebase] Arquivo "firebase-admin-key.json" não encontrado. O Banco de Dados de pedidos está rodando em modo OFFLINE até que a configuração seja inserida.');
   }
+
 } catch (error) {
   console.error('❌ [🔥 Firebase] Erro interno ao tentar conectar o servidor ao banco:', error.message);
 }

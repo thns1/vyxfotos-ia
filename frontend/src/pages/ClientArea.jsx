@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth, provider, signInWithPopup, signOut, db } from '../firebase';
-import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { auth, provider, signInWithPopup, signOut, database } from '../firebase';
+import { ref, query, orderByChild, equalTo, onValue, get } from 'firebase/database';
 
 export default function ClientArea() {
   const [user, setUser] = useState(null);
@@ -14,7 +14,7 @@ export default function ClientArea() {
     const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
-        // Buscar fotos do cliente no Firestore
+        // Buscar fotos do cliente no Realtime Database
         fetchClientOrders(currentUser.email);
       } else {
         setLoading(false);
@@ -26,24 +26,34 @@ export default function ClientArea() {
   const fetchClientOrders = async (email) => {
     setLoading(true);
     try {
-      const q = query(
-        collection(db, "marketing_orders"), 
-        where("email", "==", email),
-        orderBy("timestamp", "desc")
-      );
-      const querySnapshot = await getDocs(q);
-      const userOrders = [];
-      querySnapshot.forEach((doc) => {
-        userOrders.push({ id: doc.id, ...doc.data() });
-      });
-      setOrders(userOrders);
+      // No Realtime Database, buscamos o nó 'marketing_orders'
+      const ordersRef = ref(database, 'marketing_orders');
+      
+      // Criamos uma query filtrando pelo e-mail
+      // Importante: No RTDB, você precisa ter o índice .indexOn: ["email"] nas regras para funcionar bem em produção
+      const emailQuery = query(ordersRef, orderByChild('email'), equalTo(email));
+      
+      const snapshot = await get(emailQuery);
+      
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        // Converter o objeto de objetos do RTDB em uma array, ordenando por timestamp descendente
+        const userOrders = Object.keys(data).map(key => ({
+          id: key,
+          ...data[key]
+        })).sort((a, b) => b.timestamp - a.timestamp);
+        
+        setOrders(userOrders);
+      } else {
+        setOrders([]);
+      }
     } catch (error) {
-      console.error("Erro ao buscar fotos:", error);
-      // Se não houver banco configurado ainda, evitamos travar a tela
+      console.error("Erro ao buscar fotos no Realtime Database:", error);
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleLogin = async () => {
     if (!user) {

@@ -263,8 +263,8 @@ export default function Landing() {
           <div className="w-full">
             
             {/* HERO SECTION OPTIMIZED (100vh NO SCROLL GUARANTEED) */}
-            <section className="min-h-[100dvh] py-32 flex flex-col justify-center items-center relative px-4 md:px-6 w-full overflow-hidden">
-              <div ref={heroTextRef} className="max-w-4xl mx-auto text-center space-y-2 z-10 w-full mt-4 md:mt-8">
+            <section className="min-h-[100dvh] pt-12 md:pt-24 pb-16 flex flex-col justify-start items-center relative px-4 md:px-6 w-full overflow-hidden">
+              <div ref={heroTextRef} className="max-w-4xl mx-auto text-center space-y-2 z-10 w-full mt-2 md:mt-4">
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-ivory tracking-tighter leading-[1.05]">
                   ENSAIOS DE ALTO PADRÃO<br/> gerados a partir de uma <br/>
                   <span className="font-drama italic text-champagne font-black drop-shadow-2xl">SIMPLES SELFIE.</span>

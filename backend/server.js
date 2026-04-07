@@ -56,14 +56,15 @@ app.post('/api/webhooks/kiwify', async (req, res) => {
            try {
              const { db } = require('./services/firebaseAdmin');
              if (db && customerEmail !== "sem_email") {
-                await db.collection('marketing_orders').add({
+                await db.ref('marketing_orders').push({
                    email: customerEmail,
                    orderId: orderId,
                    fotoFinal: fotoGerada4k,
                    timestamp: Date.now()
                 });
-                console.log(`[🔥 Firebase] Pedido Arquivado no Cofre VIP do Cliente (${customerEmail})!`);
+                console.log(`[🔥 Firebase] Pedido Arquivado no Realtime Database do Cliente (${customerEmail})!`);
              }
+
            } catch(e) {
              console.error(`[🔥 Firebase Error]`, e.message);
            }
