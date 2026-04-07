@@ -13,3 +13,6 @@ backend/uploads/
 
 # Obsidian (Não mandar a base mental)
 *.md
+
+# Chaves Privadas do Firebase (SEGURANCA MAXIMA)
+backend/firebase-admin-key.json
