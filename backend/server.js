@@ -48,13 +48,22 @@ app.post('/api/webhooks/kiwify', async (req, res) => {
            console.log(`[🚀 SINAL VERDE!] O cliente pagou.`);
            console.log(`[🚀 O Rastreio (src) da Câmera] -> ${orderId} | Conta: ${customerEmail}`);
            
-           // Em caso prático: Aqui verificaríamos o ${orderId} no Banco de Dados para ver qual foi a URL da imagem.
-           // Mas para testes imediatos, vamos usar uma URL de foto fake de teste que já deixamos pronta:
-           const fotoGerada4k = "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=800&q=80"; 
-
-           // SALVAMENTO NO BANCO DE DADOS DA 'ÁREA DO CLIENTE' (Firebase)
+           // BUSCA A FOTO REAL NO BANCO DE DADOS (Pendente)
+           let fotoGerada4k = "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=800&q=80"; // Fallback de seguranca
+           
            try {
              const { db } = require('./services/firebaseAdmin');
+             if (db && orderId !== "PEDIDO_MANUAL") {
+                const snap = await db.ref('pending_generations/' + orderId).get();
+                if (snap.exists()) {
+                   fotoGerada4k = snap.val().output_url;
+                   console.log(`[🚀 SUCESSO!] Foto Real encontrada para o Pedido: ${orderId}`);
+                } else {
+                   console.warn(`[⚠️ Alerta] Pedido ${orderId} pago, mas imagem original não encontrada no banco pendente.`);
+                }
+             }
+
+             // SALVAMENTO NO BANCO DE DADOS DA 'ÁREA DO CLIENTE' (Firebase)
              if (db && customerEmail !== "sem_email") {
                 await db.ref('marketing_orders').push({
                    email: customerEmail,
@@ -64,7 +73,6 @@ app.post('/api/webhooks/kiwify', async (req, res) => {
                 });
                 console.log(`[🔥 Firebase] Pedido Arquivado no Realtime Database do Cliente (${customerEmail})!`);
              }
-
            } catch(e) {
              console.error(`[🔥 Firebase Error]`, e.message);
            }
@@ -101,6 +109,20 @@ app.post('/api/generate', upload.single('selfieFile'), async (req, res) => {
 
         // Dispara o PipeLine Principal que foi programado junto de FaceID
         const result = await ImagePipelineService.generateWithFaceID(file, theme, customTheme);
+
+        // SALVA NA FILA DE PENDENTES (Para o Webhook encontrar depois da compra)
+        try {
+            const { db } = require('./services/firebaseAdmin');
+            if (db) {
+                await db.ref('pending_generations/' + result.orderId).set({
+                    output_url: result.output_url,
+                    createdAt: Date.now()
+                });
+                console.log(`[🔥 Firebase] Geração ${result.orderId} registrada no aguardo do pagamento.`);
+            }
+        } catch (dbError) {
+            console.error("[🔥 Firebase Cache Error]", dbError.message);
+        }
 
         res.json({
             success: true,
