@@ -8,6 +8,7 @@ export default function Checkout() {
   const [orderId, setOrderId] = useState(null);
   const [generatedImage, setGeneratedImage] = useState(null);
   const [user, setUser] = useState(null);
+  const [selectedPkgId, setSelectedPkgId] = useState('p7'); // Performance selecionado por padrão
 
   useEffect(() => {
     // Escuta estado do usuário
@@ -108,25 +109,34 @@ export default function Checkout() {
             <div className="w-full flex flex-col space-y-4 md:space-y-6">
               <h3 className="text-xl md:text-2xl font-bold tracking-tight mb-2 text-center md:text-left text-ivory">Escolha seu pacote</h3>
                {PACKAGES.map((pkg) => (
-                <div key={pkg.id} className={`p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] flex flex-col justify-between transition-all w-full border ${
-                  pkg.popular ? 'bg-[#121217] border-champagne shadow-[0_0_30px_rgba(201,168,76,0.15)] scale-100 lg:scale-105 z-10' : 'bg-[#0a0a0e] border-white/5 hover:border-white/20'
-                }`}>
+                <div 
+                  key={pkg.id} 
+                  onClick={() => setSelectedPkgId(pkg.id)}
+                  className={`p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] flex flex-col justify-between transition-all w-full border cursor-pointer ${
+                    selectedPkgId === pkg.id 
+                      ? 'bg-[#121217] border-champagne shadow-[0_0_30px_rgba(201,168,76,0.15)] scale-100 lg:scale-105 z-10' 
+                      : 'bg-[#0a0a0e] border-white/5 hover:border-white/20'
+                  }`}
+                >
                   <div className="flex justify-between items-start mb-4 md:mb-6">
                     <div>
-                      <h4 className="text-xl md:text-2xl font-bold tracking-tight">{pkg.name}</h4>
-                      <p className="text-ivory/40 text-xs md:text-sm mt-1">{pkg.limit} Ativos Digitais 4K</p>
+                      <h4 className={`text-xl md:text-2xl font-bold tracking-tight ${selectedPkgId === pkg.id ? 'text-champagne' : 'text-ivory'}`}>{pkg.name}</h4>
+                      <p className="text-ivory/40 text-xs md:text-sm mt-1 mb-2">🔥 {pkg.limit} Fotos 4K</p>
                     </div>
-                    <div className={`text-2xl md:text-4xl font-black ${pkg.popular ? 'text-champagne' : 'text-ivory'}`}>
-                      <span className="text-lg mr-1 opacity-50">R$</span>{pkg.price}
+                    <div className={`text-2xl md:text-4xl font-black ${selectedPkgId === pkg.id ? 'text-champagne' : 'text-ivory'}`}>
+                      <span className="text-lg mr-1 opacity-50 font-light">R$</span>{pkg.price}
                     </div>
                   </div>
                   
                   <button 
-                    onClick={() => {
+                    onClick={(e) => {
+                       e.stopPropagation();
                        window.location.href = `${pkg.link}?src=${orderId}`;
                     }}
                     className={`w-full py-4 rounded-xl font-bold tracking-wide transition-all uppercase text-xs md:text-sm ${
-                      pkg.popular ? 'bg-champagne text-obsidian hover:bg-ivory' : 'bg-white/5 text-ivory hover:bg-white/10 border border-white/5'
+                      selectedPkgId === pkg.id 
+                        ? 'bg-champagne text-obsidian hover:bg-ivory shadow-lg' 
+                        : 'bg-white/5 text-ivory hover:bg-white/10 border border-white/5'
                     }`}
                   >
                     Quero esse pacote
