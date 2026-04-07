@@ -109,7 +109,13 @@ app.post('/api/generate', upload.single('selfieFile'), async (req, res) => {
 
     } catch (error) {
         console.error("[API] Erro ao processar requisição:", error.message);
-        res.status(500).json({ success: false, error: "Erro interno do Motor de Imagens." });
+        console.error("[API] Stack completo:", error.stack);
+        // Retorna o erro real do Google para diagnóstico
+        res.status(500).json({ 
+            success: false, 
+            error: "Erro interno do Motor de Imagens.",
+            detail: error.message 
+        });
     }
 });
 

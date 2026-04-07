@@ -40,7 +40,7 @@ class ImagePipelineService {
 
             // 3. CHAMADA REAL GOOGLE AI STUDIO (SDK @google/genai - OFICIAL)
             const response = await this.ai.models.generateContent({
-                model: "gemini-3-pro-image-preview",
+                model: "gemini-3.1-flash-image-preview",
                 contents: [
                     {
                         parts: [
