@@ -46,11 +46,14 @@ export default function ClientArea() {
   };
 
   const handleLogin = async () => {
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error("Erro no login", error);
-      alert("Erro ao efetuar login pelo Google.");
+    if (!user) {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (error) {
+        console.error("Erro no login", error);
+        alert(`Erro no Login Google: ${error.code}\n${error.message}\n\nVerifique se o domínio vyxfotos-ia.vercel.app está autorizado no Firebase Authentication.`);
+        return;
+      }
     }
   };
 
