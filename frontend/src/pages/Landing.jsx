@@ -515,6 +515,36 @@ export default function Landing() {
           </div>
         )}
 
+        {/* PASSO 3: TELA DE CARREGAMENTO (LOADING) */}
+        {step === 3 && isGenerating && (
+          <div className="w-full min-h-screen flex items-center justify-center pt-20 px-6 animate-fade-in relative z-10">
+            <div className="flex flex-col items-center justify-center min-h-[50vh] bg-[#0a0a0e]/60 p-10 md:p-16 rounded-[3rem] backdrop-blur-2xl border border-white/10 shadow-2xl">
+               <div className="relative mb-8">
+                  <div className="w-24 h-24 border-4 border-white/5 border-t-champagne rounded-full animate-spin"></div>
+                  <div className="absolute inset-0 flex items-center justify-center font-mono font-bold text-champagne text-xl">
+                     {countdown}s
+                  </div>
+               </div>
+               <h2 className="text-xl md:text-2xl font-bold text-ivory text-center mb-2">Estamos gerando sua foto...</h2>
+               <p className="text-ivory/60 font-light text-center max-w-xs md:max-w-md">Aguarde um momento enquanto nossa IA renderiza seus traços com perfeição.</p>
+            </div>
+          </div>
+        )}
+        {/* PASSO 3: TELA DE CARREGAMENTO (LOADING) */}
+        {step === 3 && isGenerating && (
+          <div className="w-full min-h-screen flex items-center justify-center pt-20 px-6 animate-fade-in relative z-10">
+            <div className="flex flex-col items-center justify-center min-h-[50vh] bg-[#0a0a0e]/60 p-10 md:p-16 rounded-[3rem] backdrop-blur-2xl border border-white/10 shadow-2xl transition-all">
+               <div className="relative mb-8">
+                  <div className="w-24 h-24 border-4 border-white/5 border-t-champagne rounded-full animate-spin"></div>
+                  <div className="absolute inset-0 flex items-center justify-center font-mono font-bold text-champagne text-xl">
+                     {countdown}s
+                  </div>
+               </div>
+               <h2 className="text-xl md:text-2xl font-bold text-ivory text-center mb-2">Estamos gerando sua foto...</h2>
+               <p className="text-ivory/60 font-light text-center max-w-xs md:max-w-md">Aguarde um momento enquanto nossa IA renderiza seus traços com perfeição.</p>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

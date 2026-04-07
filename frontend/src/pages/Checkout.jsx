@@ -44,9 +44,9 @@ export default function Checkout() {
     <div className="min-h-screen bg-[#050508] text-ivory font-sans selection:bg-champagne selection:text-obsidian relative overflow-x-hidden">
       {/* GLOBAL CINEMATIC BACKGROUND */}
       <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050508] via-transparent to-[#050508] opacity-90 z-10"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(201,168,76,0.05),transparent_70%)] z-10"></div>
-        <img src="/hero-bg.jpg" alt="Cinematic Studio Background" className="w-full h-full object-cover opacity-30 grayscale contrast-125 scale-110 blur-[2px]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050508] via-transparent to-[#050508] opacity-80 z-10"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(201,168,76,0.1),transparent_70%)] z-10"></div>
+        <img src="/hero-bg.jpg" alt="Cinematic Studio Background" className="w-full h-full object-cover opacity-40 grayscale contrast-125 scale-110 blur-[2px]" />
       </div>
 
       {/* NAVBAR SIMPLIFICADA */}
