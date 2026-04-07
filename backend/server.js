@@ -52,6 +52,22 @@ app.post('/api/webhooks/kiwify', async (req, res) => {
            // Mas para testes imediatos, vamos usar uma URL de foto fake de teste que já deixamos pronta:
            const fotoGerada4k = "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=800&q=80"; 
 
+           // SALVAMENTO NO BANCO DE DADOS DA 'ÁREA DO CLIENTE' (Firebase)
+           try {
+             const { db } = require('./services/firebaseAdmin');
+             if (db && customerEmail !== "sem_email") {
+                await db.collection('marketing_orders').add({
+                   email: customerEmail,
+                   orderId: orderId,
+                   fotoFinal: fotoGerada4k,
+                   timestamp: Date.now()
+                });
+                console.log(`[🔥 Firebase] Pedido Arquivado no Cofre VIP do Cliente (${customerEmail})!`);
+             }
+           } catch(e) {
+             console.error(`[🔥 Firebase Error]`, e.message);
+           }
+
            console.log(`[✅ FASE 4 START] Mandando carta para o caminhão dos Correios Eletrônicos...`);
            
            // Aciona a sub-rotina para montar a caixa de HTML e enviar. O 'await' não é bloqueante.
