@@ -147,6 +147,11 @@ export default function Landing() {
           await signInWithPopup(auth, provider);
         } catch (error) {
           console.error("Erro no login", error);
+          if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
+             alert("O login foi bloqueado. Por favor, clique nos três pontinhos (...) e escolha 'Abrir no Navegador' (Chrome/Safari) para continuar com segurança.");
+          } else {
+             alert("Erro de conexão. Tente abrir o site fora do Instagram/Facebook.");
+          }
         }
       }
       return;
@@ -161,6 +166,7 @@ export default function Landing() {
         await signInWithPopup(auth, provider);
       } catch (error) {
         console.error("Erro no login", error);
+        alert("O login foi impedido pelo navegador do App. Procure a opção 'Abrir no Navegador' ou tente pelo Safari/Chrome.");
         return;
       }
     }
@@ -327,8 +333,8 @@ export default function Landing() {
                   ))}
                 </div>
 
-                <div className="text-center mt-6 mb-2">
-                   <p className="text-ivory/40 text-[10px] md:text-xs font-mono tracking-widest uppercase italic">ou se preferir, digite seu tema abaixo especificando certinho:</p>
+                <div className="text-center mt-8 mb-4">
+                   <p className="text-ivory/60 text-sm md:text-base font-medium tracking-tight">Ou se preferir, digite seu tema abaixo, especificando-o:</p>
                 </div>
 
                 <div className="mt-2 flex flex-col items-center">
@@ -473,8 +479,12 @@ export default function Landing() {
                         <span className="font-semibold text-lg">{faq.q}</span>
                         <ChevronDown className={`transform transition-transform duration-300 ${openFaq === i ? 'rotate-180 text-champagne' : 'text-ivory/40'}`} />
                       </button>
-                      <div className={`px-6 overflow-hidden transition-all duration-500 ease-in-out ${openFaq === i ? 'max-h-40 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}>
-                        <p className="text-ivory/60 leading-relaxed font-light">{faq.a}</p>
+                      <div className={`px-6 overflow-hidden transition-all duration-500 ease-in-out ${openFaq === i ? 'max-h-60 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}>
+                        <p className="text-ivory/60 leading-relaxed font-light">
+                          {i === 2 
+                            ? "As fotos 4K puras e brutas chegarão como anexo direto no seu e-mail logo após a compra. Caso não queira acessar seu e-mail, elas também ficam salvas automaticamente na sua 'Área do Cliente' aqui no site para download a qualquer momento."
+                            : faq.a}
+                        </p>
                       </div>
                     </div>
                   ))}
