@@ -1,28 +1,16 @@
 const axios = require('axios');
 const fs = require('fs');
 const themePrompts = require('../constants/themePrompts');
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { GoogleGenAI } = require("@google/genai");
 
 /**
  * SERVIÇO DE CLONAGEM DE ROSTO E RENDERIZAÇÃO (GOOGLE GEMINI 3 PRO - NANO BANANA)
- * FINAL PRODUCTION ENGINE
+ * FINAL PRODUCTION ENGINE v2 - SDK OFICIAL CORRETO
  */
 class ImagePipelineService {
     
     constructor() {
-        this.genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY);
-    }
-
-    /**
-     * Auxiliar para ler arquivo e transformar em part do Google
-     */
-    fileToGenerativePart(path, mimeType) {
-        return {
-            inlineData: {
-                data: Buffer.from(fs.readFileSync(path)).toString("base64"),
-                mimeType
-            },
-        };
+        this.ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_AI_KEY });
     }
 
     /**
@@ -31,50 +19,63 @@ class ImagePipelineService {
     async generateWithFaceID(imageFile, theme, customText) {
         try {
             console.log(`[Backend-AI] Motor GOOGLE NANO BANANA Acionado (Fidelidade Extrema)!`);
-            
-            const model = this.genAI.getGenerativeModel({ model: "gemini-3-pro-image-preview" });
 
             // 1. Definição do Prompt (Foco em Subject Consistency)
             const temaCena = customText && customText.trim() !== '' 
                 ? customText 
                 : (themePrompts[theme] || themePrompts['luxo']);
             
-            const promptFinal = `
-                ACT AS A PROFESSIONAL PHOTOGRAPHER. 
-                USE THE ATTACHED IMAGE AS MANDATORY IDENTITY ANCHOR. 
-                MAINTAIN FACE GEOMETRY, EYES, NOSE, LIPS, AND SKIN TEXTURE 100% IDENTICAL.
-                
-                RENDER THE FINAL PORTRAIT IN THIS SCENARIO: "${temaCena}".
-                
-                STYLE: Cinematic lighting, luxury photography, 8k resolution, photorealistic, blurred high-end studio background.
-                QUALITY: Sharp focus on face, non-distorted features, premium color grading.
-            `.trim();
+            const promptFinal = `You are a professional portrait photographer AI. 
+                The attached image contains a person's face. 
+                USE THAT FACE as the MANDATORY IDENTITY ANCHOR - preserve the exact facial geometry, eyes, nose, lips, skin tone and texture.
+                Generate a new professional portrait of this SAME PERSON in the following scenario: "${temaCena}".
+                Style: Cinematic lighting, luxury photography, 8k resolution, photorealistic, premium studio background.
+                The face must be identical to the reference photo. Only change the environment and clothing.`;
 
             console.log(`[Backend-AI] Enviando Selfie e Prompt para ancoragem no Google...`);
 
-            // 2. Transforma a foto do usuário num formato compatível com Google GenAI
-            const imagePart = this.fileToGenerativePart(imageFile.path, imageFile.mimetype || 'image/jpeg');
+            // 2. Lê a imagem e converte para base64
+            const imageData = fs.readFileSync(imageFile.path).toString("base64");
+            const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 3. CHAMADA REAL GOOGLE AI STUDIO (GEMINI 3 PRO IMAGE)
-            // Nota: gemini-3-pro-image-preview usa o método generateContent para multimodal image creation
-            const result = await model.generateContent([promptFinal, imagePart]);
-            
-            // O Google devolve a imagem gerada no formato candidates -> content -> parts
-            const response = await result.response;
-            const generatedImagePart = response.candidates[0].content.parts.find(p => p.inlineData);
+            // 3. CHAMADA REAL GOOGLE AI STUDIO (SDK @google/genai - OFICIAL)
+            const response = await this.ai.models.generateContent({
+                model: "gemini-3-pro-image-preview",
+                contents: [
+                    {
+                        parts: [
+                            { text: promptFinal },
+                            {
+                                inlineData: {
+                                    mimeType: mimeType,
+                                    data: imageData,
+                                }
+                            }
+                        ]
+                    }
+                ],
+                config: {
+                    responseModalities: ['TEXT', 'IMAGE'],
+                }
+            });
+
+            // 4. Extrai a imagem gerada da resposta
+            const parts = response.candidates[0].content.parts;
+            const generatedImagePart = parts.find(p => p.inlineData);
 
             if (!generatedImagePart) {
-                throw new Error("O Google não retornou uma imagem gerada. Verifique o limite da sua API.");
+                const textPart = parts.find(p => p.text);
+                console.error(`[Backend-AI] Google não retornou imagem. Resposta de texto:`, textPart?.text);
+                throw new Error("O Google não retornou uma imagem. Verifique os logs para mais detalhes.");
             }
 
-            // O Google costuma devolver a imagem gerada como Base64 inline
             const output_url = `data:${generatedImagePart.inlineData.mimeType};base64,${generatedImagePart.inlineData.data}`;
 
             console.log(`[Backend-AI] RENDERIZAÇÃO GOOGLE CONCLUÍDA! Fidelidade preservada.`);
 
             return {
                 status: "success",
-                message: "Identidade Preservada (Google Nano Banana)",
+                message: "Identidade Preservada (Google Nano Banana Pro)",
                 output_url: output_url,
                 prompt_usado: promptFinal,
                 orderId: `PEDIDO_${Date.now()}` 
