@@ -46,6 +46,23 @@ export default function Landing() {
   const [isThankYouScreen, setIsThankYouScreen] = useState(false);
   const [generatedImage, setGeneratedImage] = useState(null); // Imagem REAL cuspidada pela IA
   const [user, setUser] = useState(null);
+  const [countdown, setCountdown] = useState(15);
+  const [hasImageArrival, setHasImageArrival] = useState(false);
+
+  // Lógica de Suspense: Só libera quando contador chegar a 0 E a imagem chegar
+  useEffect(() => {
+    let timer;
+    if (isGenerating && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    } else if (isGenerating && countdown === 0 && hasImageArrival) {
+       // FINALMENTE LIBERA O RESULTADO
+       setIsGenerating(false);
+       setHasImageArrival(false);
+    }
+    return () => clearInterval(timer);
+  }, [isGenerating, countdown, hasImageArrival]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
@@ -158,6 +175,7 @@ export default function Landing() {
       const file = e.target.files[0];
       
       setIsGenerating(true);
+      setCountdown(15); // Reset do contador ao iniciar nova geração
       setGeneratedImage(null); // Limpa gerações antigas
       setStep(3); // Mostra as telas rodando
       window.scrollTo(0, 0);
@@ -187,7 +205,7 @@ export default function Landing() {
            setOrderId(result.data.orderId);
            setGeneratedImage(result.data.output_url); // INJETA FOTO REAL!
            // Libera para o cliente visualizar a imagem borrada e comprar a original
-           setIsGenerating(false);
+           setHasImageArrival(true); 
         } else {
            console.error("Backend Error:", result.error);
            setIsGenerating(false);
@@ -506,9 +524,15 @@ export default function Landing() {
           <div className="w-full min-h-screen pt-32 pb-20 px-6 animate-fade-in relative z-10 flex flex-col items-center">
             
             {isGenerating ? (
-              <div className="flex flex-col items-center justify-center min-h-[50vh] bg-black/50 p-16 rounded-full backdrop-blur-xl border border-white/5">
-                 <div className="w-20 h-20 border-4 border-white/10 border-t-champagne rounded-full animate-spin mb-8"></div>
-                 <h2 className="text-2xl font-mono uppercase tracking-widest text-champagne drop-shadow-lg">Renderizando Redes Neurais...</h2>
+              <div className="flex flex-col items-center justify-center min-h-[50vh] bg-black/50 p-10 md:p-16 rounded-[3rem] backdrop-blur-2xl border border-white/10 shadow-2xl">
+                 <div className="relative mb-8">
+                    <div className="w-24 h-24 border-4 border-white/5 border-t-champagne rounded-full animate-spin"></div>
+                    <div className="absolute inset-0 flex items-center justify-center font-mono font-bold text-champagne text-xl">
+                       {countdown}s
+                    </div>
+                 </div>
+                 <h2 className="text-xl md:text-2xl font-bold text-ivory text-center mb-2">Estamos gerando sua foto...</h2>
+                 <p className="text-ivory/60 font-light text-center max-w-xs md:max-w-md">Aguarde um momento enquanto nossa IA renderiza seus traços com perfeição.</p>
               </div>
             ) : (
               <div className="max-w-6xl mx-auto w-full flex flex-col items-center space-y-24 bg-[#050508]/60 p-10 md:p-16 rounded-[4rem] border border-white/5 backdrop-blur-xl">
