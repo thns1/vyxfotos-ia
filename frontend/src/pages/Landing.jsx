@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { ChevronDown, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { auth, provider, signInWithPopup } from '../firebase';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -44,6 +45,14 @@ export default function Landing() {
   const [orderId, setOrderId] = useState(null); // Guarantimos a comissão com parametro SRC
   const [isThankYouScreen, setIsThankYouScreen] = useState(false);
   const [generatedImage, setGeneratedImage] = useState(null); // Imagem REAL cuspidada pela IA
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     // Escuta se a Kiwify redirecionou a gente de volta após a venda
@@ -112,9 +121,32 @@ export default function Landing() {
     );
   }, { dependencies: [step], scope: containerRef });
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
+    if (!user) {
+      if(confirm("Para garantir a segurança da sua identidade e a entrega das fotos em 4K, você precisa se identificar rapidamente. Deseja entrar com o Google agora?")) {
+        try {
+          await signInWithPopup(auth, provider);
+        } catch (error) {
+          console.error("Erro no login", error);
+        }
+      }
+      return;
+    }
     setStep(2);
     window.scrollTo(0, 0);
+  };
+
+  const handleThemeSelect = async (themeId) => {
+    if (!user) {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (error) {
+        console.error("Erro no login", error);
+        return;
+      }
+    }
+    setSelectedTheme(themeId);
+    setCustomTheme("");
   };
 
   const handleUpload = async (e) => {
@@ -264,7 +296,7 @@ export default function Landing() {
                   {THEMES.map((t) => (
                     <div 
                       key={t.id}
-                      onClick={() => { setSelectedTheme(t.id); setCustomTheme(""); }}
+                      onClick={() => handleThemeSelect(t.id)}
                       className={`cursor-pointer group flex items-center justify-center gap-2 p-3 md:p-4 rounded-xl border transition-all duration-300 hover:scale-[1.03] ${
                         selectedTheme === t.id ? 'bg-champagne border-champagne text-obsidian shadow-[0_0_20px_rgba(201,168,76,0.3)]' : 'bg-white/5 border-white/5 text-ivory hover:border-champagne/50'
                       }`}
