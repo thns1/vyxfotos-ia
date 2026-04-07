@@ -90,7 +90,7 @@ app.post('/api/generate', upload.single('selfieFile'), async (req, res) => {
 // ============================================
 app.post('/api/marketing/upload', upload.single('image'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: "Nenhum arquivo enviado." });
-    const publicUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
+    const publicUrl = `https://${req.get('host')}/uploads/${req.file.filename}`;
     res.json({ url: publicUrl });
 });
 
