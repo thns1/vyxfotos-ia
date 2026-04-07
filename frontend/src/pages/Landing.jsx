@@ -25,9 +25,9 @@ const TESTIMONIALS = [
 ];
 
 const FAQS = [
-  { q: "Como o serviço da Vyxfotos funciona?", a: "O processo é simples e autônomo. Você seleciona o cenário exato que deseja para a estética da sua marca, envia uma selfie sua com o rosto iluminado, e nós renderizamos o retrato. Assim que você confirmar a compra da licença que mais se adequa a você, nosso ecossistema gera instantaneamente os arquivos originais limpos em ultra-resolução (4K) e manda anexado direto no seu e-mail." },
+  { q: "Como o serviço da Vyxfotos funciona?", a: "O processo é simples e autônomo. Você seleciona o cenário exato que deseja para a estética da sua marca, envia uma selfie sua com o rosto iluminado, e nós renderizamos o retrato. Assim que você confirmar a compra da licença que mais se adequa a você, as fotos originais em 4K são liberadas imediatamente na sua Área do Cliente e também enviadas para o seu e-mail." },
   { q: "Qual o prazo para as fotos ficarem prontas?", a: "Imediatamente. Nosso servidor de Inteligência Artificial renderiza e escala seu ensaio fotográfico na nuvem em cerca de 5 a 15 minutos, após a confirmação do evento de pagamento." },
-  { q: "Como eu recebo as fotos finais?", a: "Você não precisa se preocupar com logins. A foto 4K pura e bruta chegará como um anexo (Aquivop .JPG) em máxima qualidade direto na caixa de entrada do seu E-mail, logo após a compra." },
+  { q: "Como eu recebo as fotos finais?", a: "As fotos 4K puras e brutas chegarão como anexo direto no seu e-mail logo após a compra. Como segurança extra, elas também ficam salvas automaticamente na sua 'Área do Cliente' aqui no site para download a qualquer momento, sem depender da sua caixa de entrada." },
   { q: "Será que vai parecer comigo?", a: "Nossa tecnologia mapeia as micro-expressões únicas do seu rosto humano, absorvendo detalhes como formato, íris e traços estruturais. O resultado é assustadoramente idêntico a você, como se estivesse fisicamente no estúdio fotográfico de luxo." }
 ];
 
@@ -333,8 +333,10 @@ export default function Landing() {
                   ))}
                 </div>
 
-                <div className="text-center mt-8 mb-4">
-                   <p className="text-ivory/60 text-sm md:text-base font-medium tracking-tight">Ou se preferir, digite seu tema abaixo, especificando-o:</p>
+                <div className="text-center mt-10 mb-4">
+                   <p className="text-ivory/30 text-[10px] md:text-xs font-mono font-bold tracking-[0.2em] uppercase">
+                      Ou se preferir, digite seu tema abaixo, especificando-o:
+                   </p>
                 </div>
 
                 <div className="mt-2 flex flex-col items-center">
@@ -481,9 +483,7 @@ export default function Landing() {
                       </button>
                       <div className={`px-6 overflow-hidden transition-all duration-500 ease-in-out ${openFaq === i ? 'max-h-60 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}>
                         <p className="text-ivory/60 leading-relaxed font-light">
-                          {i === 2 
-                            ? "As fotos 4K puras e brutas chegarão como anexo direto no seu e-mail logo após a compra. Caso não queira acessar seu e-mail, elas também ficam salvas automaticamente na sua 'Área do Cliente' aqui no site para download a qualquer momento."
-                            : faq.a}
+                          {faq.a}
                         </p>
                       </div>
                     </div>
