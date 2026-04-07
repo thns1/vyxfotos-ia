@@ -327,7 +327,11 @@ export default function Landing() {
                   ))}
                 </div>
 
-                <div className="mt-4 flex flex-col items-center">
+                <div className="text-center mt-6 mb-2">
+                   <p className="text-ivory/40 text-[10px] md:text-xs font-mono tracking-widest uppercase italic">ou se preferir, digite seu tema abaixo especificando certinho:</p>
+                </div>
+
+                <div className="mt-2 flex flex-col items-center">
                   <div className={`relative w-full max-w-lg p-[1px] rounded-[15px] transition-all ${
                       selectedTheme === 'custom' ? 'bg-gradient-to-r from-champagne to-yellow-600' : 'bg-white/10'
                     }`}>
