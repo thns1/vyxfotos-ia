@@ -76,7 +76,7 @@ export default function ClientArea() {
     <div className="min-h-screen bg-[#050508] text-ivory font-sans selection:bg-champagne selection:text-obsidian relative overflow-x-hidden">
         {/* Navbar Simplificado VIP */}
         <nav className="relative md:fixed top-0 w-full z-50 py-4 md:py-5 px-6 md:px-12 flex justify-between items-center border-b border-white/5 bg-[#0a0a0e]/80 backdrop-blur-xl">
-            <div className="text-xl md:text-2xl font-black tracking-tight text-ivory cursor-pointer" onClick={() => navigate('/')}>
+            <div className="text-xl md:text-2xl font-black tracking-tight text-ivory cursor-pointer" onClick={() => window.location.href = '/'}>
             Vyxfotos<span className="text-champagne ml-1">.</span>IA
             </div>
             {user ? (
@@ -90,7 +90,7 @@ export default function ClientArea() {
                 </button>
               </div>
             ) : (
-              <button onClick={() => navigate('/')} className="text-[10px] md:text-sm font-mono tracking-widest uppercase text-ivory/60 hover:text-champagne transition-colors">
+              <button onClick={() => window.location.href = '/'} className="text-[10px] md:text-sm font-mono tracking-widest uppercase text-ivory/60 hover:text-champagne transition-colors">
                  Voltar Início
               </button>
             )}
@@ -130,7 +130,7 @@ export default function ClientArea() {
                        <span className="text-6xl mb-4 block opacity-50">📂</span>
                        <h3 className="text-2xl font-bold text-ivory mb-2">Nenhum Pedido Encontrado.</h3>
                        <p className="text-ivory/50 font-light max-w-md mx-auto">Você ainda não possui projetos renderizados nesta conta ou as imagens estão sendo processadas no nosso servidor.</p>
-                       <button onClick={() => navigate('/')} className="mt-8 text-champagne border border-champagne/50 hover:bg-champagne hover:text-obsidian py-3 px-8 rounded-full font-bold transition-all transition">Criar Meu Ensaio</button>
+                       <button onClick={() => window.location.href = '/'} className="mt-8 text-champagne border border-champagne/50 hover:bg-champagne hover:text-obsidian py-3 px-8 rounded-full font-bold transition-all transition">Criar Meu Ensaio</button>
                     </div>
                  ) : (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -156,3 +156,4 @@ export default function ClientArea() {
     </div>
   );
 }
+

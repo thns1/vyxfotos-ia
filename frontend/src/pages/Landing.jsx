@@ -91,13 +91,16 @@ export default function Landing() {
       toggleClass: {className: 'bg-obsidian/80 backdrop-blur-xl border-b border-white/10', targets: '#navbar'}
     });
 
-    gsap.fromTo(
-      heroTextRef.current.children,
-      { y: 50, opacity: 0 },
-      { y: 0, opacity: 1, duration: 1, stagger: 0.2, ease: "power3.out", delay: 0.2 }
-    );
+    if (heroTextRef.current && heroTextRef.current.children) {
+      gsap.fromTo(
+        heroTextRef.current.children,
+        { y: 50, opacity: 0 },
+        { y: 0, opacity: 1, duration: 1, stagger: 0.2, ease: "power3.out", delay: 0.2 }
+      );
+    }
 
     cardsRef.current.forEach((card, index) => {
+      if (!card) return;
       ScrollTrigger.create({
         trigger: card,
         start: "top 15%",
@@ -114,6 +117,7 @@ export default function Landing() {
         scrub: true,
       });
     });
+
 
     gsap.fromTo(".phil-reveal", 
       { opacity: 0, y: 40 },
@@ -263,7 +267,7 @@ export default function Landing() {
           <div className="w-full">
             
             {/* HERO SECTION OPTIMIZED (100vh NO SCROLL GUARANTEED) */}
-            <section className="min-h-[100dvh] pt-6 md:pt-12 pb-16 flex flex-col justify-start items-center relative px-4 md:px-6 w-full overflow-hidden">
+            <section className="min-h-[100dvh] pt-8 md:pt-16 pb-16 flex flex-col justify-start items-center relative px-4 md:px-6 w-full overflow-hidden">
               <div ref={heroTextRef} className="max-w-4xl mx-auto text-center space-y-2 z-10 w-full mt-0">
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-ivory tracking-tighter leading-[1.05]">
                   ENSAIOS DE ALTO PADRÃO<br/> gerados a partir de uma <br/>
