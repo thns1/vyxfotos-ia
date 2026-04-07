@@ -1,57 +1,88 @@
 const axios = require('axios');
 const fs = require('fs');
 const themePrompts = require('../constants/themePrompts');
-const { fal } = require('@fal-ai/client');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 /**
- * SERVIÇO DE CLONAGEM DE ROSTO E RENDERIZAÇÃO
+ * SERVIÇO DE CLONAGEM DE ROSTO E RENDERIZAÇÃO (GOOGLE GEMINI 3 PRO - NANO BANANA)
+ * FINAL PRODUCTION ENGINE
  */
 class ImagePipelineService {
     
-    constructor() {}
+    constructor() {
+        this.genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY);
+    }
 
     /**
-     * Processa a Selfie + Tema na Rede Neural Real da Replicate
+     * Auxiliar para ler arquivo e transformar em part do Google
+     */
+    fileToGenerativePart(path, mimeType) {
+        return {
+            inlineData: {
+                data: Buffer.from(fs.readFileSync(path)).toString("base64"),
+                mimeType
+            },
+        };
+    }
+
+    /**
+     * Processa a Selfie + Tema na Rede Neural Real do Google AI Studio
      */
     async generateWithFaceID(imageFile, theme, customText) {
         try {
-            console.log(`[Backend-AI] Motor FAL.AI Acionado (Velocidade Extrema)!`);
+            console.log(`[Backend-AI] Motor GOOGLE NANO BANANA Acionado (Fidelidade Extrema)!`);
             
-            // 1. Definição do Prompt (Engenharia de Cena Luxuosa)
-            const promptMestre = customText && customText.trim() !== '' 
-                ? `A highly detailed professional photorealistic portrait of a person. The scenario and concept is exactly this: "${customText}". Translate the concept to a visually stunning scene. High-end photography, cinematic lighting, hyper-realistic, 8k masterpiece, extremely detailed, natural skin texture.`
+            const model = this.genAI.getGenerativeModel({ model: "gemini-3-pro-image-preview" });
+
+            // 1. Definição do Prompt (Foco em Subject Consistency)
+            const temaCena = customText && customText.trim() !== '' 
+                ? customText 
                 : (themePrompts[theme] || themePrompts['luxo']);
             
-            console.log(`[Backend-AI] Esculpindo Cenário: "${promptMestre}"`);
+            const promptFinal = `
+                ACT AS A PROFESSIONAL PHOTOGRAPHER. 
+                USE THE ATTACHED IMAGE AS MANDATORY IDENTITY ANCHOR. 
+                MAINTAIN FACE GEOMETRY, EYES, NOSE, LIPS, AND SKIN TEXTURE 100% IDENTICAL.
+                
+                RENDER THE FINAL PORTRAIT IN THIS SCENARIO: "${temaCena}".
+                
+                STYLE: Cinematic lighting, luxury photography, 8k resolution, photorealistic, blurred high-end studio background.
+                QUALITY: Sharp focus on face, non-distorted features, premium color grading.
+            `.trim();
 
-            // 2. Transforma a foto do usuário num formato compatível com I.A. (Data URI)
-            const base64Data = fs.readFileSync(imageFile.path).toString("base64");
-            const mimeType = imageFile.mimetype || 'image/jpeg';
-            const imageURI = `data:${mimeType};base64,${base64Data}`;
+            console.log(`[Backend-AI] Enviando Selfie e Prompt para ancoragem no Google...`);
 
-            console.log(`[Backend-AI] Enviando Malha Facial para o Cluster na Nuvem... Isso pode levar de 10 a 25 segundos.`);
+            // 2. Transforma a foto do usuário num formato compatível com Google GenAI
+            const imagePart = this.fileToGenerativePart(imageFile.path, imageFile.mimetype || 'image/jpeg');
 
-            // 3. (SIMULAÇÃO) Como os bancos estão derrubando o pagamento, ativamos o "Modo Blefe"
-            // Vamos esperar 4 segundos para a animação da roleta tocar...
-            await new Promise((resolve) => setTimeout(resolve, 4000));
+            // 3. CHAMADA REAL GOOGLE AI STUDIO (GEMINI 3 PRO IMAGE)
+            // Nota: gemini-3-pro-image-preview usa o método generateContent para multimodal image creation
+            const result = await model.generateContent([promptFinal, imagePart]);
+            
+            // O Google devolve a imagem gerada no formato candidates -> content -> parts
+            const response = await result.response;
+            const generatedImagePart = response.candidates[0].content.parts.find(p => p.inlineData);
 
-            // E vamos jogar a foto do rosto que você upou ali com a Malha de Proteção por cima!
-            const output_url = imageURI;
+            if (!generatedImagePart) {
+                throw new Error("O Google não retornou uma imagem gerada. Verifique o limite da sua API.");
+            }
 
-            console.log(`[Backend-AI] RENDERIZAÇÃO SIMULADA CONCLUÍDA! Devolvendo selfie...`);
+            // O Google costuma devolver a imagem gerada como Base64 inline
+            const output_url = `data:${generatedImagePart.inlineData.mimeType};base64,${generatedImagePart.inlineData.data}`;
+
+            console.log(`[Backend-AI] RENDERIZAÇÃO GOOGLE CONCLUÍDA! Fidelidade preservada.`);
 
             return {
                 status: "success",
-                message: "Identidade Preservada (Simulada)",
+                message: "Identidade Preservada (Google Nano Banana)",
                 output_url: output_url,
-                prompt_usado: promptMestre,
-                orderId: `PEDIDO_${Date.now()}` // Gera ID dinâmico para a Kiwify
+                prompt_usado: promptFinal,
+                orderId: `PEDIDO_${Date.now()}` 
             };
 
         } catch (error) {
-            // Removendo o filtro de erro para lermos EXATAMENTE a reclamação oficial da Nuvem (ex: 422 Payload, 401 Unauth)
-            console.error(`[Backend-AI] ERRO REAL FAL.AI:`, error.response ? error.response.data : error.message || error);
-            throw new Error(`Falha da Fal.AI Nuvem: ${error.message || 'Erro Desconhecido'}`);
+            console.error(`[Backend-AI] ERRO REAL GOOGLE AI:`, error.message);
+            throw new Error(`Falha no Google AI Studio: ${error.message}`);
         }
     }
 }
