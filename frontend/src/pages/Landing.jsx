@@ -16,11 +16,7 @@ const THEMES = [
   { id: 'aniversario', name: 'Aniversário VIP', icon: '🎉' },
 ];
 
-const PACKAGES = [
-  { id: 'p5', name: 'Essencial', limit: 5, price: '19,90', link: 'https://pay.kiwify.com.br/TFhEPp5' },
-  { id: 'p7', name: 'Performance', limit: 7, price: '29,90', popular: true, link: 'https://pay.kiwify.com.br/QKuA1rr' },
-  { id: 'p12', name: 'Enterprise', limit: 12, price: '49,90', link: 'https://pay.kiwify.com.br/PYxMyzy' },
-];
+import { PACKAGES } from '../constants/packages';
 
 const TESTIMONIALS = [
   { name: "Mariana S.", role: "CEO", text: "Fiz um ensaio executivo e estou usando as fotos no LinkedIn. Todos acharam que paguei um fotógrafo caríssimo para o estúdio iluminado!", rating: "⭐⭐⭐⭐⭐" },
@@ -48,7 +44,6 @@ export default function Landing() {
   const [user, setUser] = useState(null);
   const [countdown, setCountdown] = useState(15);
   const [hasImageArrival, setHasImageArrival] = useState(false);
-
   // Lógica de Suspense: Só libera quando contador chegar a 0 E a imagem chegar
   useEffect(() => {
     let timer;
@@ -57,12 +52,15 @@ export default function Landing() {
         setCountdown((prev) => prev - 1);
       }, 1000);
     } else if (isGenerating && countdown === 0 && hasImageArrival) {
-       // FINALMENTE LIBERA O RESULTADO
+       // FINALMENTE LIBERA O RESULTADO - AGORA REDIRECIONA PARA CHECKOUT
+       localStorage.setItem('vyx_generated_image', generatedImage);
+       localStorage.setItem('vyx_order_id', orderId);
        setIsGenerating(false);
        setHasImageArrival(false);
+       navigate('/checkout');
     }
     return () => clearInterval(timer);
-  }, [isGenerating, countdown, hasImageArrival]);
+  }, [isGenerating, countdown, hasImageArrival, generatedImage, orderId, navigate]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
@@ -514,103 +512,6 @@ export default function Landing() {
                 VOLTAR AO INÍCIO
               </button>
             </div>
-          </div>
-        )}
-
-        {/* ============================================================== */}
-        {/* PASSO 3: GERAÇÃO FAKE E CHECKOUT (Tabela de Preços)            */}
-        {/* ============================================================== */}
-        {step === 3 && !isThankYouScreen && (
-          <div className="w-full min-h-screen pt-32 pb-20 px-6 animate-fade-in relative z-10 flex flex-col items-center">
-            
-            {isGenerating ? (
-              <div className="flex flex-col items-center justify-center min-h-[50vh] bg-black/50 p-10 md:p-16 rounded-[3rem] backdrop-blur-2xl border border-white/10 shadow-2xl">
-                 <div className="relative mb-8">
-                    <div className="w-24 h-24 border-4 border-white/5 border-t-champagne rounded-full animate-spin"></div>
-                    <div className="absolute inset-0 flex items-center justify-center font-mono font-bold text-champagne text-xl">
-                       {countdown}s
-                    </div>
-                 </div>
-                 <h2 className="text-xl md:text-2xl font-bold text-ivory text-center mb-2">Estamos gerando sua foto...</h2>
-                 <p className="text-ivory/60 font-light text-center max-w-xs md:max-w-md">Aguarde um momento enquanto nossa IA renderiza seus traços com perfeição.</p>
-              </div>
-            ) : (
-              <div className="max-w-6xl mx-auto w-full flex flex-col items-center space-y-24 bg-[#050508]/60 p-10 md:p-16 rounded-[4rem] border border-white/5 backdrop-blur-xl">
-                
-                {/* Cabeçalho do Sucesso */}
-                <div className="text-center space-y-6 max-w-3xl">
-                  <span className="inline-block px-4 py-1 bg-green-500/10 text-green-400 font-mono text-sm tracking-widest uppercase rounded-full border border-green-500/20">
-                    SÍNTESE CONCLUÍDA ✨
-                  </span>
-                  <h2 className="text-5xl md:text-7xl font-black text-ivory tracking-tighter">O resultado é visceral.</h2>
-                  <p className="text-ivory/60 text-xl font-light">Seu projeto de alta definição foi concluído. Liberamos uma prévia restrita abaixo, selecione sua licença para desbloquear os arquivos originais.</p>
-                </div>
-
-                {/* Grid Duplo: Imagem Quase Nítida + Tabela Kiwify */}
-                <div className="w-full grid lg:grid-cols-2 gap-16 lg:gap-10 items-center">
-                  
-                  {/* Esquerda: A Imagem Protegida (Nítida com Marca D'água Anti-Cópia) */}
-                  <div className="relative w-full max-w-md mx-auto aspect-[4/5] bg-black rounded-[3rem] overflow-hidden border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] group select-none pointer-events-none">
-                    <div 
-                      className="absolute inset-0 bg-cover bg-center filter brightness-100 group-hover:scale-105 transition-all duration-700"
-                      style={{ backgroundImage: `url(${getPreviewImage()})` }}
-                    ></div>
-                    
-                    {/* Malha de Marca d'água Anti-Cópia (Repeating Full Coverage) */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/10 z-10 overflow-hidden rounded-[3rem]">
-                      <div className="w-[200%] h-[200%] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 -rotate-45 opacity-60 flex flex-col justify-center items-center gap-12 pointer-events-none">
-                         {[...Array(12)].map((_, rowIndex) => (
-                           <div key={`row-${rowIndex}`} className="flex gap-8 whitespace-nowrap">
-                             {[...Array(10)].map((_, colIndex) => (
-                               <span key={`col-${colIndex}`} className="text-4xl font-black text-white/40 tracking-[0.3em] font-drama uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] mix-blend-overlay">VYXFOTOS</span>
-                             ))}
-                           </div>
-                         ))}
-                      </div>
-                      <span className="absolute bottom-10 px-4 py-2 bg-obsidian/80 backdrop-blur-md border border-white/10 rounded-full text-xs font-mono tracking-widest text-white/80 z-20 shadow-xl">Ativo Protegido | Compre a Licença</span>
-                    </div>
-                  </div>
-
-                  {/* Direita: Tabela/Cards da Kiwify */}
-                  <div className="w-full flex flex-col space-y-6">
-                    <h3 className="text-2xl font-bold tracking-tight mb-4 text-center md:text-left text-ivory">Pacotes Comerciais (Kiwify)</h3>
-                     {PACKAGES.map((pkg) => (
-                      <div key={pkg.id} className={`p-8 rounded-[2rem] flex flex-col justify-between transition-all w-full border ${
-                        pkg.popular ? 'bg-[#121217] border-champagne shadow-[0_0_30px_rgba(201,168,76,0.15)] scale-100 lg:scale-105 z-10' : 'bg-[#0a0a0e] border-white/5 hover:border-white/20'
-                      }`}>
-                        <div className="flex justify-between items-start mb-6">
-                          <div>
-                            <h4 className="text-2xl font-bold tracking-tight">{pkg.name}</h4>
-                            <p className="text-ivory/40 text-sm mt-1">{pkg.limit} Ativos Digitais 4K</p>
-                          </div>
-                          <div className={`text-4xl font-black ${pkg.popular ? 'text-champagne' : 'text-ivory'}`}>
-                            <span className="text-lg mr-1 opacity-50">R$</span>{pkg.price}
-                          </div>
-                        </div>
-                        
-                        <button 
-                          onClick={() => {
-                             // Redireciona para o Kiwify do pacote escolhido enviando o rastreio (orderId)
-                             if(pkg.link.includes('SUBSTITUIR_DEPOIS')) {
-                               alert('Modo Desenvolvedor: Links da Kiwify ainda não configurados no código.');
-                             } else {
-                               window.location.href = `${pkg.link}?src=${orderId}`;
-                             }
-                          }}
-                          className={`w-full py-4 rounded-xl font-bold tracking-wide transition-all uppercase text-sm ${
-                           pkg.popular 
-                            ? 'bg-champagne text-obsidian shadow-lg hover:bg-yellow-500 hover:scale-105' 
-                            : 'bg-white/10 text-ivory hover:bg-white/20 hover:scale-[1.02]'
-                        }`}>
-                          Quero Esse Pacote
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                </div>
-              </div>
-            )}
           </div>
         )}
 
