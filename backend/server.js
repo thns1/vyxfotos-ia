@@ -7,6 +7,8 @@ const ImagePipelineService = require('./services/imagePipeline');
 const MailerService = require('./services/mailer');
 const SalesAgentService = require('./services/salesAgent');
 const MetaMessageService = require('./services/metaMessageService');
+const { startPolling } = require('./services/igPoller');
+
 const app = express();
 const port = process.env.PORT || 3001;
 
@@ -257,4 +259,6 @@ app.post('/api/webhooks/instagram', async (req, res) => {
 app.listen(port, () => {
     console.log(`🚀 [Vyxfotos-Backend] Servidor Neural rodando na porta ${port}`);
     console.log(`👉 Aguardando selfies e comandos de tema.`);
+    startPolling(); // Inicia o polling de DMs do Instagram
 });
+
