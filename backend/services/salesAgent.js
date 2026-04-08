@@ -9,7 +9,7 @@ class SalesAgentService {
         const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_KEY;
         this.genAI = new GoogleGenerativeAI(apiKey.trim());
         // Usamos o modelo Pro para máxima estabilidade e inteligência nas vendas
-        this.model = this.genAI.getGenerativeModel({ model: "gemini-pro" });
+        this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
     }
 
     async generateResponse(userMessage, niche = "Geral") {

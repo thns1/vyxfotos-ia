@@ -203,34 +203,56 @@ app.get('/api/webhooks/instagram', (req, res) => {
 
 // 2. Recebimento de Mensagens
 app.post('/api/webhooks/instagram', async (req, res) => {
+    console.log('📬 [Meta Webhook] RAW BODY RECEIVED:', JSON.stringify(req.body, null, 2));
     const body = req.body;
 
-    if (body.object === 'instagram') {
+    if (body.object === 'instagram' || body.object === 'page') {
+        res.status(200).send('EVENT_RECEIVED'); // Responde imediatamente para a Meta
+
         body.entry.forEach(async (entry) => {
-            const messagingEvent = entry.messaging[0];
-            if (messagingEvent.message && !messagingEvent.message.is_echo) {
-                const senderId = messagingEvent.sender.id;
-                const messageText = messagingEvent.message.text;
-                
+            let senderId = null;
+            let messageText = null;
+
+            // Formato 1: entry.messaging[] (DMs reais da Instagram Messaging API)
+            if (entry.messaging && entry.messaging.length > 0) {
+                const event = entry.messaging[0];
+                if (event.message && !event.message.is_echo && event.message.text) {
+                    senderId = event.sender.id;
+                    messageText = event.message.text;
+                }
+            }
+
+            // Formato 2: entry.changes[] (usado na API de Webhook do Instagram Business)
+            if (!senderId && entry.changes && entry.changes.length > 0) {
+                const change = entry.changes[0];
+                if (change.field === 'messages' && change.value) {
+                    const val = change.value;
+                    if (val.message && val.message.text && !val.message.is_echo) {
+                        senderId = val.sender.id;
+                        messageText = val.message.text;
+                    }
+                }
+            }
+
+            if (senderId && messageText) {
                 console.log(`💬 [IG Native] Mensagem de ${senderId}: "${messageText}"`);
                 
-                // 🧠 O Cérebro entra em ação
                 try {
                     const aiResponse = await SalesAgentService.generateResponse(messageText);
-                    
-                    // 📡 A Voz entra em ação
                     await MetaMessageService.sendTextMessage(senderId, aiResponse);
                     console.log(`✅ [IG Native] Resposta enviada com sucesso.`);
                 } catch (aiError) {
                     console.error('❌ [IG Native Error] Falha ao processar resposta:', aiError.message);
                 }
+            } else {
+                console.log('ℹ️ [IG Native] Evento recebido mas sem mensagem de texto para processar (eco, reação, etc).');
             }
         });
-        res.status(200).send('EVENT_RECEIVED');
     } else {
         res.sendStatus(404);
     }
 });
+
 
 app.listen(port, () => {
     console.log(`🚀 [Vyxfotos-Backend] Servidor Neural rodando na porta ${port}`);
