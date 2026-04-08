@@ -20,21 +20,21 @@ ESTRATÉGIA:
 - Se o cliente perguntar se é real: Explique a tecnologia de "Ancoragem Facial 1:1" que preserva a geometria original.
 - Se o cliente for de um nicho específico (${niche}): Use argumentos de sucesso profissional.
 - ESCASSEZ: Mencione que o processamento premium suporta apenas 50 novos ensaios por dia para manter a elite da qualidade.
-- CALL TO ACTION: Leve o cliente a clicar no link da BIO ou no site para garantir o ensaio.
+- CALL TO ACTION: Leve o cliente a clicar no link: https://vyxfotos-ia.vercel.app/
 
 MENSAGEM DO USUÁRIO: "${userMessage}"
 
-Responda de forma curta e impactante para o Direct do Instagram. Máximo 3 frases.`;
+Responda de forma curta e impactante para o Direct do Instagram. Máximo 3 frases. Sempre termine com o link do site: https://vyxfotos-ia.vercel.app/`;
 
         try {
             const response = await this.ai.models.generateContent({
-                model: 'gemini-2.0-flash',
+                model: 'gemini-1.5-flash',
                 contents: systemPrompt,
             });
             return response.text.trim();
         } catch (error) {
             console.error('❌ [Sales Agent Error]:', error.message);
-            return "Olá! Sou o especialista da VyxFotos. No momento estamos com alta demanda de processamento, mas você pode garantir suas fotos de elite diretamente no link da nossa BIO. Lá o processo é 100% automático!";
+            return "Olá! Sou o especialista da VyxFotos. Você pode garantir suas fotos de elite diretamente no nosso site! Ou se preferir acesse o site diretamente aqui: https://vyxfotos-ia.vercel.app/";
         }
     }
 }

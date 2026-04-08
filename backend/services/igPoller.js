@@ -1,15 +1,31 @@
 const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 const SalesAgentService = require('./salesAgent');
 const MetaMessageService = require('./metaMessageService');
 
 const PAGE_ID = '977055518833688';
-const IG_PAGE_ACCOUNT_ID = '17841441355621258'; // ID da conta vyxfotos.ia
-const POLL_INTERVAL_MS = 30000; // 30 segundos
+const IG_PAGE_ACCOUNT_ID = '17841441355621258';
+const POLL_INTERVAL_MS = 25000; // 25 segundos
+const IDS_FILE = path.join(__dirname, '..', 'processed_ids.json');
 
-// Guarda os IDs de mensagens já processadas para não responder duas vezes
-const processedMessageIds = new Set();
+// Carrega IDs processados do arquivo para persistência
+let processedMessageIds = new Set();
+if (fs.existsSync(IDS_FILE)) {
+    try {
+        const data = JSON.parse(fs.readFileSync(IDS_FILE, 'utf8'));
+        processedMessageIds = new Set(data);
+    } catch (e) {
+        console.error('Erro ao ler processed_ids.json');
+    }
+}
+
 let isPolling = false;
 let pageAccessToken = null;
+
+function saveIds() {
+    fs.writeFileSync(IDS_FILE, JSON.stringify([...processedMessageIds]));
+}
 
 async function getPageToken() {
     if (pageAccessToken) return pageAccessToken;
@@ -18,7 +34,7 @@ async function getPageToken() {
         params: { access_token: userToken }
     });
     const page = res.data.data.find(p => p.id === PAGE_ID);
-    if (!page) throw new Error('Página não encontrada no token.');
+    if (!page) throw new Error('Página não encontrada.');
     pageAccessToken = page.access_token;
     return pageAccessToken;
 }
@@ -29,8 +45,6 @@ async function fetchNewMessages() {
 
     try {
         const pt = await getPageToken();
-
-        // Busca conversas recentes do Instagram via Page
         const convRes = await axios.get(`https://graph.facebook.com/v20.0/${PAGE_ID}/conversations`, {
             params: {
                 platform: 'instagram',
@@ -45,65 +59,68 @@ async function fetchNewMessages() {
             const messages = conv.messages?.data || [];
 
             for (const msg of messages) {
-                // Pula se já processamos essa mensagem
+                // TRAVA 1: Pula se já processamos esse ID (persistente)
                 if (processedMessageIds.has(msg.id)) continue;
-                processedMessageIds.add(msg.id);
+                
+                // TRAVA 2: Pula se for mensagem nossa
+                if (msg.from?.id === IG_PAGE_ACCOUNT_ID) {
+                    processedMessageIds.add(msg.id);
+                    continue;
+                }
 
-                // Pula mensagens enviadas pela própria conta vyxfotos.ia (ecos)
-                if (msg.from?.id === IG_PAGE_ACCOUNT_ID) continue;
-
-                // Pula mensagens sem texto
-                if (!msg.message || msg.message.trim() === '') continue;
+                // TRAVA 3: Pula mensagens vazias
+                if (!msg.message || msg.message.trim() === '') {
+                    processedMessageIds.add(msg.id);
+                    continue;
+                }
 
                 const senderId = msg.from?.id;
                 const messageText = msg.message;
 
-                console.log(`💬 [IG Poll] Nova mensagem de @${msg.from?.username} (${senderId}): "${messageText}"`);
+                console.log(`💬 [IG Poll] Processando: "${messageText}" de ${senderId}`);
 
                 try {
                     const aiResponse = await SalesAgentService.generateResponse(messageText);
                     await MetaMessageService.sendTextMessage(senderId, aiResponse);
-                    console.log(`✅ [IG Poll] Resposta enviada para @${msg.from?.username}.`);
+                    
+                    // Sucesso! Marca como processado e salva
+                    processedMessageIds.add(msg.id);
+                    saveIds();
+                    console.log(`✅ [IG Poll] Resposta enviada.`);
                 } catch (err) {
                     console.error(`❌ [IG Poll] Erro ao responder: ${err.message}`);
                 }
             }
         }
     } catch (error) {
-        console.error('❌ [IG Poll] Erro ao buscar mensagens:', error.response?.data || error.message);
+        console.error('❌ [IG Poll] Erro:', error.response?.data || error.message);
     } finally {
         isPolling = false;
     }
 }
 
 function startPolling() {
-    console.log(`🔄 [IG Poll] Iniciando polling a cada ${POLL_INTERVAL_MS / 1000}s...`);
-    // Marca todas as mensagens atuais como já processadas (não responde histórico)
-    preloadProcessedMessages().then(() => {
+    console.log(`🔄 [IG Poll] Iniciando sistema anti-duplicação...`);
+    // Na primeira execução, marca tudo que já existe como "visto" para não responder histórico
+    preload().then(() => {
         setInterval(fetchNewMessages, POLL_INTERVAL_MS);
-        console.log('✅ [IG Poll] Histórico carregado. Aguardando mensagens NOVAS...');
     });
 }
 
-async function preloadProcessedMessages() {
+async function preload() {
     try {
         const pt = await getPageToken();
         const convRes = await axios.get(`https://graph.facebook.com/v20.0/${PAGE_ID}/conversations`, {
-            params: {
-                platform: 'instagram',
-                fields: 'messages{id}',
-                access_token: pt
-            }
+            params: { platform: 'instagram', fields: 'messages{id}', access_token: pt }
         });
         const conversations = convRes.data.data || [];
         for (const conv of conversations) {
             const messages = conv.messages?.data || [];
             messages.forEach(msg => processedMessageIds.add(msg.id));
         }
-        console.log(`✅ [IG Poll] ${processedMessageIds.size} mensagens antigas marcadas como processadas.`);
-    } catch (e) {
-        console.error('❌ [IG Poll] Erro ao pré-carregar histórico:', e.message);
-    }
+        saveIds();
+        console.log(`✅ [IG Poll] Histórico limpo (${processedMessageIds.size} msgs). Aguardando NOVAS.`);
+    } catch (e) {}
 }
 
 module.exports = { startPolling };
