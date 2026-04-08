@@ -1,45 +1,82 @@
+/**
+ * AGENTE INSTAGRAM - V8.1 PRODUCTION (CAROUSEL EDITION)
+ * Gerencia Pilares: Autoridade (SEG - Carrossel), Fidelidade (QUA - Mosaico), Lifestyle (SEX - Carrossel)
+ */
 require('dotenv').config();
-const { createConversionPost } = require('./imageProcessor');
 const { generateSmartContent } = require('./contentGenerator');
-const { publishToInstagram } = require('./instagramService');
-const axios = require('axios');
+const { generateRealisticImage, generateAfterImageFromBefore } = require('./geminiImageService');
+const { createConversionPost } = require('./imageProcessor');
+const { postToInstagram, postCarouselToInstagram } = require('./instagramService');
 const path = require('path');
 const fs = require('fs');
-const FormData = require('form-data');
 
-async function runV7Final() {
-    console.log('🚀 [V7] Executando postagem de unidade absoluta...');
+async function runAutomation() {
+    console.log('🚀 [VYX-AGENTE] Iniciando Ciclo Semanal Estratégico...');
     
+    const today = new Date().getDay();
+    const isWednesday = (today === 3);
+    const isCarouselDay = (today === 1 || today === 5);
+
     try {
+        // 1. CONTEÚDO
         const content = await generateSmartContent();
-        
-        // V10 - MESMA PESSOA, FOTOS DIFERENTES (Em pé na esquerda, sentado na direita)
-        const assetOriginal = path.join(__dirname, '..', 'frontend', 'public', 'executivo_1.png');
-        const assetSitting = path.join(__dirname, '..', 'frontend', 'public', 'executivo_3.png');
-        
-        const output = path.join(__dirname, `post-final-${Date.now()}.jpg`);
+        const caption = content.caption;
+        console.log(`📝 [${content.theme}] Gerado com sucesso.`);
 
-        // O motor gráfico vai fazer o Flop na direita e o Zoom no centro automaticamente
-        await createConversionPost(assetOriginal, assetOriginal, assetSitting, content.top_text, content.bottom_text, output);
-        // 4. Upload para o Discord (?wait=true) para pegar o link público estável
-        const form = new FormData();
-        form.append('file', fs.createReadStream(output));
-        const discordRes = await axios.post(`${process.env.DISCORD_WEBHOOK_URL}?wait=true`, form, { headers: form.getHeaders() });
-        
-        // Link estável do Discord (CDN)
-        const publicUrl = discordRes.data.attachments[0].url;
-        console.log('🔗 [V10] Link Ponte Discord:', publicUrl);
+        // 2. FOTO BASE (ANTES)
+        const pathBefore = path.join(__dirname, 'temp_before.jpg');
+        await generateRealisticImage(content.prompt_before, pathBefore);
+        await new Promise(r => setTimeout(r, 5000));
 
-        console.log('⏳ [V10] Aguardando 5s para o cache do Instagram...');
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        if (isWednesday) {
+            // FLUXO QUARTA-FEIRA: MOSAICO TRIPLO
+            const pathAfter1 = path.join(__dirname, 'temp_after_1.jpg');
+            const pathAfter2 = path.join(__dirname, 'temp_after_2.jpg');
+            const finalPost = path.join(__dirname, 'post_mosaico.jpg');
 
-        // 5. Postagem Oficial no Feed
-        await publishToInstagram(publicUrl, content.caption);
-        console.log('✅ Post V10 DEFINITIVO Concluído!');
-        
+            console.log('📸 Gerando variações para Mosaico...');
+            await generateAfterImageFromBefore(pathBefore, content.prompt_after, "Pose A", pathAfter1);
+            await new Promise(r => setTimeout(r, 5000));
+            await generateAfterImageFromBefore(pathBefore, content.prompt_after, "Pose B Zoom", pathAfter2);
+
+            await createConversionPost(pathAfter1, pathAfter2, pathBefore, content.top_text, content.bottom_text, finalPost);
+            
+            console.log('📤 Postando Mosaico Triplo...');
+            await postToInstagram(finalPost, caption);
+            
+            // Limpeza
+            [pathBefore, pathAfter1, pathAfter2, finalPost].forEach(f => fs.existsSync(f) && fs.unlinkSync(f));
+        } 
+        else if (isCarouselDay) {
+            // FLUXO SEGUNDA/SEXTA: CARROSSEL (3 Slides Profesionais)
+            const slides = [];
+            const variations = [
+                "Full body professional pose, cinematic lighting",
+                "Medium shot, confident expression, looking at camera",
+                "Extreme close up portrait, high detail"
+            ];
+
+            console.log(`📸 Gerando ${variations.length} slides para Carrossel...`);
+            for (let i = 0; i < variations.length; i++) {
+                const slidePath = path.join(__dirname, `temp_slide_${i}.jpg`);
+                await generateAfterImageFromBefore(pathBefore, content.prompt_after, variations[i], slidePath);
+                slides.push(slidePath);
+                await new Promise(r => setTimeout(r, 8000)); // Delay seguro
+            }
+
+            console.log('📤 Postando Carrossel de Impacto...');
+            await postCarouselToInstagram(slides, caption);
+
+            // Limpeza
+            [pathBefore, ...slides].forEach(f => fs.existsSync(f) && fs.unlinkSync(f));
+        }
+
+        console.log('✅ CICLO CONCLUÍDO COM SUCESSO!');
+
     } catch (error) {
-        console.error('❌ Erro V7:', error.message);
+        console.error('❌ ERRO NO FLUXO:', error.message);
+        process.exit(1);
     }
 }
 
-runV7Final();
+runAutomation();

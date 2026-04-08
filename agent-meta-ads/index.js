@@ -1,66 +1,75 @@
+/**
+ * AGENTE TRÁFEGO PAGO V2.0 - VYXFOTOS IA
+ * Especialista em Impulsionamento e ROI
+ */
 require('dotenv').config();
-const cron = require('node-cron');
 const axios = require('axios');
+const fs = require('fs');
 
-const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || 'sua_url_do_discord_aqui';
-const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN || 'seu_token_meta_ads_aqui';
-const AD_ACCOUNT_ID = process.env.AD_ACCOUNT_ID || 'act_xxxxxxxx';
+const { AD_ACCOUNT_ID, META_ACCESS_TOKEN, INSTAGRAM_ACCOUNT_ID } = process.env;
 
-// Função para Coletar Dados do Meta Ads (ROAS, CPA, Gastos)
-async function fetchCampaignInsights() {
-  console.log('📊 Coletando métricas do Meta Ads...');
-  try {
-    /* 
-    const url = `https://graph.facebook.com/v19.0/${AD_ACCOUNT_ID}/insights?fields=campaign_name,spend,cpa,purchase_roas,actions&level=campaign&date_preset=last_7d&access_token=${META_ACCESS_TOKEN}`;
-    const response = await axios.get(url);
-    return response.data.data;
-    */
-    
-    // MOCK para testes
-    return [
-      { campaign_name: '[Vyxfotos] Conversão - Pacotes Premium', spend: 150.00, cpa: 15.00, roas: 3.2 },
-      { campaign_name: '[Vyxfotos] Remarketing - Checkout', spend: 50.00, cpa: 8.50, roas: 5.8 }
-    ];
-  } catch (error) {
-    console.error('Erro ao coletar dados do Meta Ads', error);
-    throw error;
-  }
+/**
+ * 📊 1. COLETA DE PERFORMANCE ORGÂNICA
+ * Identifica quais posts da vitrine estão performando melhor
+ */
+async function getTopPerformingPosts() {
+    console.log('🔍 [Analista] Investigando posts orgânicos no feed...');
+    try {
+        // Simulação de busca na API Graph (Media Insights)
+        // No mundo real: https://graph.facebook.com/v20.0/${INSTAGRAM_ACCOUNT_ID}/media?fields=like_count,comments_count,media_url
+        
+        const mockMedia = [
+            { id: '18023456789', likes: 120, comments: 15, theme: 'Advocacia', url: '...' },
+            { id: '18023456790', likes: 45, comments: 2, theme: 'Viagem', url: '...' },
+            { id: '18023456791', likes: 210, comments: 34, theme: 'Corretagem', url: '...' }
+        ];
+
+        // Ordena por engajamento total
+        return mockMedia.sort((a, b) => (b.likes + b.comments) - (a.likes + a.comments));
+    } catch (error) {
+        console.error('❌ Erro ao coletar insights:', error.message);
+        return [];
+    }
 }
 
-// Analise com IA 
-async function analyzeMetricsWithAI(insightsData) {
-  console.log('🤖 IA Analisando os resultados das campanhas...');
-  // Aqui enviamos para a OpenAI/Gemini avaliar se o ROAS ta bom e o que deve ser desligado.
-  return `📈 **Relatório de Tráfego: Vyxfotos.IA**\n\n` +
-         `✅ A campanha **[Vyxfotos] Remarketing** está voando! ROAS de 5.8 e CPA baixíssimo (R$ 8,50). *Recomendação: Dobre o orçamento dessa campanha hoje.*\n\n` +
-         `⚠️ A campanha **Pacotes Premium** está com ROAS de 3.2. Está no lucro, mas convém testar criativos novos amanhã.`;
+/**
+ * 💰 2. LÓGICA DE AUTO-BOOST
+ * Cria o anúncio se a performance for acima da média
+ */
+async function performStrategy(topPosts) {
+    const winner = topPosts[0];
+    console.log(`🏆 [Analista] Vencedor detectado: Post de ${winner.theme} com ${winner.likes} likes.`);
+
+    if (winner.likes > 100) {
+        console.log(`🚀 [Estrategista] PERFORMANCE DE ELITE DETECTADA.`);
+        console.log(`💡 Ação: Criando campanha de Impulsionamento de R$ 20,00/dia para o público nichado.`);
+        
+        // Simulação de criação de Ad via API Meta
+        /*
+        const adSet = await axios.post(`https://graph.facebook.com/v20.0/${AD_ACCOUNT_ID}/adsets`, {
+            name: `[Auto-Boost] Vyx - ${winner.theme} - ${new Date().toLocaleDateString()}`,
+            daily_budget: 2000, // R$ 20.00
+            billing_event: 'IMPRESSIONS',
+            optimization_goal: 'POST_ENGAGEMENT',
+            campaign_id: 'Sua_Campaign_ID',
+            targeting: { geo_locations: { countries: ['BR'] }, age_min: 25, age_max: 55 },
+            access_token: META_ACCESS_TOKEN
+        });
+        */
+        
+        return { success: true, message: `Campanha iniciada para o tema: ${winner.theme}` };
+    } else {
+        console.log('⏳ [Analista] Engajamento estável. Aguardando mais dados para investir.');
+        return { success: false, message: 'Nenhuma campanha nova hoje.' };
+    }
 }
 
-// Envios Discord
-async function sendDiscordReport(report) {
-   // await axios.post(DISCORD_WEBHOOK_URL, { content: report });
-   console.log('\n💬 Relatório Enviado pro Discord: \n' + report);
+async function runAdsAgent() {
+    console.log('\n--- 🧠 VYX TRAFFIC AGENT: ATIVADO ---');
+    const topPosts = await getTopPerformingPosts();
+    const result = await performStrategy(topPosts);
+    console.log(`\n📊 Relatório: ${result.message}`);
+    console.log('-------------------------------------\n');
 }
 
-// Rotina Master
-async function runAdsAnalyzer() {
-  console.log('\n=======================================');
-  console.log('💰 [AGENTE DE TRÁFEGO] Iniciando análise...');
-  console.log('=======================================');
-  try {
-     const data = await fetchCampaignInsights();
-     const iaReport = await analyzeMetricsWithAI(data);
-     await sendDiscordReport(iaReport);
-  } catch (error) {
-     console.log('Falha na analise de ads: ', error.message);
-  }
-}
-
-// Roda todos os dias as 08:00 AM para avaliar o dia anterior
-console.log('⏳ Agente Meta Ads pronto. Análise diária programada para as 08:00 AM...');
-cron.schedule('0 8 * * *', () => {
-   runAdsAnalyzer();
-}, { timezone: "America/Sao_Paulo" });
-
-// Teste inicial
-runAdsAnalyzer();
+runAdsAgent();

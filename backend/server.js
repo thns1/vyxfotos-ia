@@ -5,6 +5,8 @@ const multer = require('multer');
 const fs = require('fs');
 const ImagePipelineService = require('./services/imagePipeline');
 const MailerService = require('./services/mailer');
+const SalesAgentService = require('./services/salesAgent');
+const MetaMessageService = require('./services/metaMessageService');
 const app = express();
 const port = process.env.PORT || 3001;
 
@@ -142,12 +144,92 @@ app.post('/api/generate', upload.single('selfieFile'), async (req, res) => {
 });
 
 // ============================================
+// WEBHOOK DE VENDAS: ManyChat IA Expert
+// ============================================
+app.post('/api/webhooks/manychat-sales', async (req, res) => {
+    try {
+        const { message, niche } = req.body;
+        
+        if (!message) {
+            return res.status(400).json({ error: "Mensagem vazia." });
+        }
+
+        console.log(`💬 [ManyChat] Lead perguntou: "${message.substring(0, 30)}..."`);
+        
+        const aiResponse = await SalesAgentService.generateResponse(message, niche);
+        
+        // Muitos bots de ManyChat esperam um campo 'content' ou 'response'
+        res.json({ 
+            success: true,
+            response: aiResponse 
+        });
+
+    } catch (err) {
+        console.error("[ManyChat Webhook Error]", err.message);
+        res.status(500).json({ success: false, error: "Erro na IA de Vendas." });
+    }
+});
+
+// ============================================
 // PONTE DE MARKETING: Recebe fotos do Robô
 // ============================================
 app.post('/api/marketing/upload', upload.single('image'), (req, res) => {
     if (!req.file) return res.status(400).json({ error: "Nenhum arquivo enviado." });
     const publicUrl = `https://${req.get('host')}/uploads/${req.file.filename}`;
     res.json({ url: publicUrl });
+});
+
+// ============================================
+// WEBHOOK NATIVO: Instagram Messaging API
+// ============================================
+
+// 1. Verificação (Handshake da Meta)
+app.get('/api/webhooks/instagram', (req, res) => {
+    const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN || 'vyx_secret_token_2026';
+    
+    const mode = req.query['hub.mode'];
+    const token = req.query['hub.verify_token'];
+    const challenge = req.query['hub.challenge'];
+
+    if (mode && token) {
+        if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+            console.log('✅ [Meta Webhook] Verificado com sucesso!');
+            res.status(200).send(challenge);
+        } else {
+            res.sendStatus(403);
+        }
+    }
+});
+
+// 2. Recebimento de Mensagens
+app.post('/api/webhooks/instagram', async (req, res) => {
+    const body = req.body;
+
+    if (body.object === 'instagram') {
+        body.entry.forEach(async (entry) => {
+            const messagingEvent = entry.messaging[0];
+            if (messagingEvent.message && !messagingEvent.message.is_echo) {
+                const senderId = messagingEvent.sender.id;
+                const messageText = messagingEvent.message.text;
+                
+                console.log(`💬 [IG Native] Mensagem de ${senderId}: "${messageText}"`);
+                
+                // 🧠 O Cérebro entra em ação
+                try {
+                    const aiResponse = await SalesAgentService.generateResponse(messageText);
+                    
+                    // 📡 A Voz entra em ação
+                    await MetaMessageService.sendTextMessage(senderId, aiResponse);
+                    console.log(`✅ [IG Native] Resposta enviada com sucesso.`);
+                } catch (aiError) {
+                    console.error('❌ [IG Native Error] Falha ao processar resposta:', aiError.message);
+                }
+            }
+        });
+        res.status(200).send('EVENT_RECEIVED');
+    } else {
+        res.sendStatus(404);
+    }
 });
 
 app.listen(port, () => {
