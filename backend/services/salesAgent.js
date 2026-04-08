@@ -1,30 +1,42 @@
 const { GoogleGenAI } = require('@google/genai');
 
 /**
- * SERVIÇO DE VENDAS IA (Expert Specialist)
- * O cérebro por trás dos DMs do Instagram
+ * SERVIÇO DE VENDAS IA (Elite Specialist)
+ * O cérebro por trás dos DMs do Instagram da Vyxfotos
  */
 class SalesAgentService {
     constructor() {
         const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_KEY;
-        this.ai = new GoogleGenAI({ apiKey: apiKey.trim() });
+        if (!apiKey) {
+            console.error('⚠️ [Sales Agent] API KEY não encontrada.');
+            this.ai = null;
+        } else {
+            this.ai = new GoogleGenAI({ apiKey: apiKey.trim() });
+        }
     }
 
     async generateResponse(userMessage, niche = "Geral") {
-        console.log(`🔍 [Sales Agent] Atendendo lead. Nicho: ${niche}`);
+        console.log(`🔍 [Sales Agent] Gerando resposta para: "${userMessage}"`);
 
-        const systemPrompt = `Você é o Especialista de Vendas da Vyxfotos-IA. Seu tom é profissional, autoritário e educativo.
-Você não dá descontos, você vende valor e autoridade.
+        if (!this.ai) {
+            return this.getFallbackResponse();
+        }
 
-ESTRATÉGIA:
-- Se o cliente perguntar se é real: Explique a tecnologia de "Ancoragem Facial 1:1" que preserva a geometria original.
-- Se o cliente for de um nicho específico (${niche}): Use argumentos de sucesso profissional.
-- ESCASSEZ: Mencione que o processamento premium suporta apenas 50 novos ensaios por dia para manter a elite da qualidade.
-- CALL TO ACTION: Leve o cliente a clicar no link: https://vyxfotos-ia.vercel.app/
+        const systemPrompt = `Você é o Especialista de Vendas da Vyxfotos-IA. Seu tom é profissional, autoritário e focado em resultados executivos.
+Você NÃO dá descontos. Você vende o valor de um ensaio fotográfico feito por IA que economiza tempo e dinheiro do cliente.
+
+ESTRATÉGIA DE RESPOSTA:
+1. Responda à dúvida do cliente de forma direta.
+2. Argumente sobre a qualidade (Ancoragem Facial 1:1) - fotos que parecem 100% reais.
+3. ESCASSEZ: Temos vagas limitadas para o lote premium de hoje.
+4. CALL TO ACTION: Direcione o cliente para o link de compra: https://vyxfotos-ia.vercel.app/
 
 MENSAGEM DO USUÁRIO: "${userMessage}"
 
-Responda de forma curta e impactante para o Direct do Instagram. Máximo 3 frases. Sempre termine com o link do site: https://vyxfotos-ia.vercel.app/`;
+REGRAS:
+- Responda em no máximo 3 frases curtas.
+- Seja cordial mas focado em fechar a venda.
+- INCLUA SEMPRE o link do site no final: https://vyxfotos-ia.vercel.app/`;
 
         try {
             const response = await this.ai.models.generateContent({
@@ -34,8 +46,12 @@ Responda de forma curta e impactante para o Direct do Instagram. Máximo 3 frase
             return response.text.trim();
         } catch (error) {
             console.error('❌ [Sales Agent Error]:', error.message);
-            return "Olá! Sou o especialista da VyxFotos. Você pode garantir suas fotos de elite diretamente no nosso site! Ou se preferir acesse o site diretamente aqui: https://vyxfotos-ia.vercel.app/";
+            return this.getFallbackResponse();
         }
+    }
+
+    getFallbackResponse() {
+        return "Olá! Sou o especialista da VyxFotos. Você pode garantir seu ensaio executivo de elite agora mesmo de forma 100% automática em nosso site! Acesse aqui: https://vyxfotos-ia.vercel.app/";
     }
 }
 
