@@ -1,8 +1,7 @@
 const { GoogleGenAI } = require('@google/genai');
 
 /**
- * SERVIÇO DE VENDAS IA (Expert Specialist)
- * O cérebro por trás dos DMs do Instagram da Vyxfotos
+ * SERVIÇO DE VENDAS IA (Expert Conversacional)
  */
 class SalesAgentService {
     constructor() {
@@ -13,34 +12,37 @@ class SalesAgentService {
     }
 
     async generateResponse(userMessage, niche = "Geral") {
-        console.log(`🔍 [Sales Agent] Processando conversa: "${userMessage}"`);
+        console.log(`🔍 [Sales Agent] Iniciando geração inteligente para: "${userMessage}"`);
 
         if (!this.ai) {
             return this.getFallbackResponse();
         }
 
-        const systemInstruction = `Você é o Especialista de Vendas da Vyxfotos-IA. Seu tom é profissional, autoritário e educativo.
-Você vende ensaios fotográficos de elite gerados por IA.
+        const systemInstruction = `Você é o Especialista de Vendas da Vyxfotos-IA. Seu objetivo é converter seguidores em clientes de forma humana e inteligente.
 
-DIRETRIZES DE CONVERSA:
-1. NÃO responda sempre a mesma coisa. Seja natural e inteligente.
-2. Se o cliente apenas disser "Olá", "Oi" ou algo genérico, dê as boas-vindas e mencione que estamos com alta demanda, mas que ele pode garantir o ensaio no site.
-3. Se o cliente fizer uma pergunta específica (ex: "quanto custa?", "como funciona?"), responda de forma consultiva usando a tecnologia "Ancoragem Facial 1:1" para explicar o realismo.
-4. Use este texto abaixo como base de informações e tom, mas ADAPTE-O à conversa:
-"Olá! Sou o especialista da VyxFotos. No momento estamos com alta demanda de processamento, mas você pode garantir suas fotos de elite diretamente no link da nossa BIO. Lá o processo é 100% automático! Ou se preferir acesse o site diretamente por aqui: https://vyxfotos-ia.vercel.app/"
+DIRETRIZES DE PERSONALIDADE:
+1. Reaja diretamente ao que o usuário disse. Se ele elogiou, agradeça. Se perguntou algo técnico (como realismo), explique que usamos redes neurais que mapeiam micro-expressões faciais (Ancoragem Facial 1:1).
+2. NUNCA envie apenas uma mensagem padrão pronta. Cada resposta deve ser única.
+3. Você pode mencionar que a demanda está alta, mas faça isso de forma natural na conversa.
 
-REGRAS RÍGIDAS:
-- Mantenha a resposta curta (máximo 3 frases).
-- SEMPRE termine com o link do site: https://vyxfotos-ia.vercel.app/
+OBJETIVO FINAL:
+Sempre direcione o cliente para o link de compra/geração no site: https://vyxfotos-ia.vercel.app/
 
-CLIENTE DISSE: "${userMessage}"`;
+FORMATO:
+- Responda em no máximo 1 parágrafo curto (2 a 4 frases).
+- Use um tom de luxo e exclusividade.
+
+MENSAGEM DO CLIENTE: "${userMessage}"
+
+Sua resposta deve ser humanizada e persuasiva.`;
 
         try {
-            const response = await this.ai.models.generateContent({
-                model: 'gemini-1.5-flash',
-                contents: systemInstruction,
-            });
-            return response.text.trim();
+            const model = this.ai.getGenerativeModel({ model: 'gemini-1.5-flash' });
+            const result = await model.generateContent(systemInstruction);
+            const text = result.response.text().trim();
+            
+            console.log(`✅ [Sales Agent AI] Resposta gerada: "${text}"`);
+            return text;
         } catch (error) {
             console.error('❌ [Sales Agent AI Error]:', error.message);
             return this.getFallbackResponse();
@@ -48,7 +50,7 @@ CLIENTE DISSE: "${userMessage}"`;
     }
 
     getFallbackResponse() {
-        return `Olá! Sou o especialista da VyxFotos. No momento estamos com alta demanda de processamento, mas você pode garantir suas fotos de elite diretamente no link da nossa BIO. Lá o processo é 100% automático! Ou se preferir acesse o site diretamente por aqui: https://vyxfotos-ia.vercel.app/`;
+        return `Olá! Sou o especialista da VyxFotos. Notei seu interesse! Estamos com uma fila de processamento alta hoje, mas você pode garantir seu ensaio de elite agora mesmo de forma 100% automática aqui: https://vyxfotos-ia.vercel.app/`;
     }
 }
 
