@@ -1,13 +1,15 @@
 /**
  * SERVIÇO DE VENDAS AUTOMÁTICO (Fixo e Estável)
- * Envia a mensagem padrão aprovada pelo usuário.
+ * Envia a mensagem padrão escolhida pelo usuário.
  */
 class SalesAgentService {
     async generateResponse(userMessage) {
-        // Mensagem padrão 100% estável solicitada pelo Thiago
-        return `Olá! Sou o especialista da Vyxfotos. No momento estamos com alta demanda de processamento, mas você pode garantir suas fotos de elite diretamente no link da nossa BIO. Lá o processo é 100% automático!
+        // Mensagem final escolhida pelo Thiago
+        return `Olá! Sou o especialista da VyxFotos. Notei seu interesse!
 
-Ou se preferir acesse o site diretamente por aqui: https://vyxfotos-ia.vercel.app/`;
+Estamos com uma fila de processamento alta hoje, mas você pode garantir seu ensaio de elite agora mesmo de forma 100% automática pelo site no link da BIO.
+
+Ou se preferir pode acessar diretamente por aqui: https://vyxfotos-ia.vercel.app/`;
     }
 }
 
