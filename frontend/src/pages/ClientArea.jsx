@@ -76,8 +76,8 @@ export default function ClientArea() {
     <div className="min-h-screen bg-[#050508] text-ivory font-sans selection:bg-champagne selection:text-obsidian relative overflow-x-hidden">
         {/* Navbar Simplificado VIP */}
         <nav className="relative md:fixed top-0 w-full z-50 py-4 md:py-5 px-6 md:px-12 flex justify-between items-center border-b border-white/5 bg-[#0a0a0e]/80 backdrop-blur-xl">
-            <div className="text-xl md:text-2xl font-black tracking-tight text-ivory cursor-pointer" onClick={() => window.location.href = '/'}>
-            Vyxfotos<span className="text-champagne ml-1">.</span>IA
+            <div className="cursor-pointer" onClick={() => window.location.href = '/'}>
+              <img src="/logo.png" alt="Vyxfotos.IA" className="h-7 md:h-9 w-auto" />
             </div>
             {user ? (
               <div className="flex gap-4 items-center">

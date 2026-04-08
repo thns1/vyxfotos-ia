@@ -238,8 +238,8 @@ export default function Landing() {
 
       {/* NAVBAR */}
       <nav id="navbar" className="relative md:fixed top-0 w-full z-50 py-4 md:py-5 transition-all duration-500 ease-in-out px-6 md:px-12 flex justify-between items-center bg-[#050508] md:bg-transparent">
-        <div className="text-xl md:text-2xl font-black tracking-tight text-ivory cursor-pointer flex items-center" onClick={() => setStep(1)}>
-          Vyxfotos<span className="text-champagne ml-1">.</span>IA
+        <div className="cursor-pointer flex items-center" onClick={() => setStep(1)}>
+          <img src="/logo.png" alt="Vyxfotos.IA" className="h-8 md:h-10 w-auto" />
         </div>
         <button onClick={() => navigate('/cliente')} className="text-[10px] md:text-sm font-mono tracking-widest uppercase text-ivory/60 hover:text-champagne transition-colors relative z-10">
           Area do Cliente
