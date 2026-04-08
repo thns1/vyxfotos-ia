@@ -236,10 +236,10 @@ export default function Landing() {
          <div className="absolute inset-0 bg-[url('data:image/svg+xml;utf8,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E')] opacity-[0.06] mix-blend-overlay pointer-events-none"></div>
       </div>
 
-      {/* NAVBAR */}
+      {/* NAVBAR: VOLTADO PARA TEXTO CONFORME PEDIDO */}
       <nav id="navbar" className="relative md:fixed top-0 w-full z-50 py-4 md:py-5 transition-all duration-500 ease-in-out px-6 md:px-12 flex justify-between items-center bg-[#050508] md:bg-transparent">
-        <div className="cursor-pointer flex items-center" onClick={() => setStep(1)}>
-          <img src="/logo.png" alt="Vyxfotos.IA" className="h-8 md:h-10 w-auto" />
+        <div className="text-xl md:text-2xl font-black tracking-tight text-ivory cursor-pointer flex items-center" onClick={() => setStep(1)}>
+          Vyxfotos<span className="text-champagne ml-1">.</span>IA
         </div>
         <button onClick={() => navigate('/cliente')} className="text-[10px] md:text-sm font-mono tracking-widest uppercase text-ivory/60 hover:text-champagne transition-colors relative z-10">
           Area do Cliente
