@@ -1,4 +1,4 @@
-const { GoogleGenAI } = require('@google/genai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 /**
  * SERVIÇO DE VENDAS IA (Expert Conversacional)
@@ -7,12 +7,14 @@ class SalesAgentService {
     constructor() {
         const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_KEY;
         if (apiKey) {
-            this.ai = new GoogleGenAI({ apiKey: apiKey.trim() });
+            this.ai = new GoogleGenerativeAI(apiKey.trim());
+        } else {
+            console.error("⚠️ [Sales Agent] Nenhuma API KEY encontrada no .env");
         }
     }
 
     async generateResponse(userMessage, niche = "Geral") {
-        console.log(`🔍 [Sales Agent] Iniciando geração inteligente para: "${userMessage}"`);
+        console.log(`🔍 [Sales Agent] Iniciando geração inteligente (SDK Oficial) para: "${userMessage}"`);
 
         if (!this.ai) {
             return this.getFallbackResponse();
@@ -37,20 +39,21 @@ MENSAGEM DO CLIENTE: "${userMessage}"
 Sua resposta deve ser humanizada e persuasiva.`;
 
         try {
-            const model = this.ai.getGenerativeModel({ model: 'gemini-1.5-flash' });
+            const model = this.ai.getGenerativeModel({ model: "gemini-1.5-flash" });
             const result = await model.generateContent(systemInstruction);
-            const text = result.response.text().trim();
+            const response = await result.response;
+            const text = response.text().trim();
             
-            console.log(`✅ [Sales Agent AI] Resposta gerada: "${text}"`);
+            console.log(`✅ [Sales Agent AI SUCCESS] Resposta: "${text}"`);
             return text;
         } catch (error) {
-            console.error('❌ [Sales Agent AI Error]:', error.message);
+            console.error('❌ [Sales Agent AI ERROR]:', error.message);
             return this.getFallbackResponse();
         }
     }
 
     getFallbackResponse() {
-        return `Olá! Sou o especialista da VyxFotos. Notei seu interesse! Estamos com uma fila de processamento alta hoje, mas você pode garantir seu ensaio de elite agora mesmo de forma 100% automática aqui: https://vyxfotos-ia.vercel.app/`;
+        return `Olá! Sou o especialista da VyxFotos. Notei seu interesse! Estamos com uma fila de processamento alta hoje, mas você pode garantir l seu ensaio de elite agora mesmo de forma 100% automática aqui: https://vyxfotos-ia.vercel.app/`;
     }
 }
 
