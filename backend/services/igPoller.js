@@ -12,7 +12,7 @@ const IDS_FILE = path.join(__dirname, '..', 'processed_ids.json');
 let processedMessageIds = new Set();
 // Bloqueio por usuário (SenderID -> Timestamp) para evitar spam duplo por erro de polling
 const userCooldowns = new Map();
-const COOLDOWN_TIME_MS = 120000; // 2 minutos de "descanso" por usuário
+const COOLDOWN_TIME_MS = 15000; // 15 segundos entre respostas para o mesmo usuário
 
 let pageAccessToken = null;
 let isPolling = false;
