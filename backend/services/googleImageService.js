@@ -63,10 +63,7 @@ class GoogleImageService {
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 4. Calibragem V11.0: Subject Customization + Negative Prompt + Subject Description
-            // Usamos o núcleo de fidelidade no subjectDescription para 'ensinar' a IA antes da geração
-            const highFidelityDescription = "Brazilian person with warm skin tone and dark features. EXACT same face, eyes, nose, and hair as reference. No distortion, no smoothing.";
-
+            // 4. Modo Gemini Puro: Requisição Limpa para Máxima Naturalidade
             const requestBody = {
                 instances: [
                     {
@@ -80,8 +77,7 @@ class GoogleImageService {
                                     mimeType: mimeType
                                 },
                                 subjectImageConfig: {
-                                    subjectType: "SUBJECT_TYPE_PERSON",
-                                    subjectDescription: highFidelityDescription
+                                    subjectType: "SUBJECT_TYPE_PERSON"
                                 }
                             }
                         ]
@@ -89,10 +85,13 @@ class GoogleImageService {
                 ],
                 parameters: {
                     sampleCount: 1,
-                    aspectRatio: "3:4",
-                    negativePrompt: "distorted face, unnatural eyes, different person, airbrushed, cartoon, smooth skin, plastic look, fake eyes, blurred face, low quality face, distorted features, changed eye color"
+                    aspectRatio: "3:4"
                 }
             };
+            
+            // Adicionamos apenas uma instrução de person_generation para evitar censura indevida
+            requestBody.parameters.personGeneration = "ALLOW_ADULT";
+            requestBody.parameters.safetySetting = "BLOCK_ONLY_HIGH";
 
             // 5. Obtém token de acesso
             const client = await this.auth.getClient();

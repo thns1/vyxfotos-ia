@@ -1,47 +1,43 @@
 /**
- * VYXFOTOS.IA - PROMPTS DE ELITE (V11.0 - CALIBRAGEM THIAGO)
+ * VYXFOTOS.IA - PROMPTS NATIVOS (V12.0 - MODO GEMINI PURO)
  * 
- * Regra: FIDELIDADE TOTAL BASEADA NO GUIA DO USUÁRIO.
- * Traduzido para Inglês técnico para máxima performance do motor Imagen 3.
+ * Estratégia: Usar o estilo de "Prompt Nativo" do Gemini.
+ * Comandos curtos em Inglês para máxima fidelidade e zero artificialidade.
  */
 
-const FIDELIDADE_BLINDADA = "Brazilian person with warm skin tone and dark features. CRITICAL: this person MUST be EXACTLY the same as the reference photo [1] — same face, same hair, same eyes, same nose, same mouth, same eyebrows, same skin texture and visible pores, same facial symmetry. Same person, same face, same features as reference photo [1]. No distortion, no idealization, 100% photorealistic identity preservation.";
-
 const themePrompts = {
-
-  // 01 - CLASSICO (PROMPT SAGRADO)
-  'executivo': `${FIDELIDADE_BLINDADA} Outfit: premium black or anthracite executive suit, white dress shirt, discrete cufflinks. High-level board of directors look. Natural authoritative posture. Lighting: Mixed lighting: dramatic and elegant natural window light combined with professional professional fill light. Real skin texture, visible pores, natural reflections. Background: modern corporate office completely blurred in bokeh (bookshelves, glass windows, warm ambient lighting). Extremely shallow depth of field. Camera: 85mm lens at f/1.8, eyes in critical focus with natural catchlights. Mid-bust shot. 4K, RAW quality, zero artificiality, zero artifacts.`,
+  // 01 - CLASSICO
+  'executivo': "A professional and natural corporate portrait of [1], wearing a tailored executive suit, soft natural studio lighting, high resolution, 85mm lens photography, professional office background.",
 
   // 02 - MODERNO
-  'moderno': `${FIDELIDADE_BLINDADA} Outfit: contemporary charcoal gray suit, light blue or white dress shirt, no tie — modern and sophisticated. Lighting: High-key studio lighting: broad soft main light, warm skin tone preserved. Background: soft off-white (#F5F5F0), seamless. Camera: 85mm lens at f/2.0, shoulder-up framing. 4K RAW, zero skin smoothing.`,
+  'moderno': "A modern and accessible business portrait of [1], wearing an executive suit without a tie, soft daylight studio lighting, clean background, 85mm lens.",
 
   // 03 - PREMIUM
-  'premium': `${FIDELIDADE_BLINDADA} Outfit: premium executive suit, white dress shirt, discrete luxury watch and cufflinks. Lighting: Dramatic and elegant natural lateral window light. Background: Blurred modern corporate office with circular bokeh. Camera: 85mm lens at f/1.8, mid-bust shot. 4K RAW quality.`,
+  'premium': "A high-end executive portrait of [1], wearing a luxury suit and cufflinks, blurred corporate library background, cinematic business lighting, sharp focus on eyes.",
 
   // 04 - INTERNACIONAL
-  'internacional': `${FIDELIDADE_BLINDADA} Outfit: dark brown or forest green suit, neutral dress shirt. Lighting: Dramatic lateral Rembrandt lighting. Background: Blurred textured concrete or exposed brick wall. Camera: 85mm lens at f/2.2, three-quarter framing. 4K RAW total realism.`,
+  'internacional': "A cosmopolitan business portrait of [1], wearing a dark brown suit, blurred architectural background, natural side lighting, realistic skin texture.",
 
   // 05 - FEMININO
-  'feminino': `${FIDELIDADE_BLINDADA} Outfit: tailored women's blazer in off-white or navy, silk shirt, discrete jewelry. Lighting: Soft three-point studio lighting. Background: neutral gray or soft beige seamless. Camera: 85mm lens at eye level. 4K, RAW finish.`,
+  'feminino': "A professional corporate portrait of [1], wearing a tailored blazer, soft studio lighting, neutral background, 85mm portrait lens.",
 
   // 06 - SMART CASUAL
-  'smart_casual': `${FIDELIDADE_BLINDADA} Outfit: structured blazer over premium basic t-shirt, no tie. C-level tech style. Lighting: Broad and diffuse natural studio lighting. Background: pure white or very light gray seamless. Camera: 85mm lens at f/2.5. 4K RAW realism.`,
+  'smart_casual': "A tech-style business portrait of [1], wearing a structured blazer over a premium shirt, clean startup office background, natural lighting.",
 
   // 07 - LUXO
-  'luxo': `${FIDELIDADE_BLINDADA} Outfit: deep black suit, white shirt, discrete golden accessories. Lighting: Key light with soft amber gel, warm dramatic golden light. Background: deep black or dark gray seamless. Camera: 85mm lens at f/2.0, slightly tilted bust shot. 4K maximum resolution.`,
+  'luxo': "A prestigious executive portrait of [1], wearing a deep black suit, gold watch, dark elegant background, warm dramatic lighting.",
 
   // 08 - FINANCEIRO
-  'financeiro': `${FIDELIDADE_BLINDADA} Outfit: navy blue pinstripe or dark gray suit, white button-down shirt, classic tie. Lighting: Traditional three-point studio lighting. Background: neutral blue-gray or medium gray. Camera: 85mm lens at f/2.8, centered eye-level framing. 4K RAW quality.`,
+  'financeiro': "A formal banking executive portrait of [1], wearing a navy blue pinstripe suit and classic tie, medium gray background, professional lighting.",
 
   // 09 - LINKEDIN
-  'linkedin': `${FIDELIDADE_BLINDADA} Outfit: well-fitted suit or blazer, light shirt. Optimized for professional headshot. Lighting: Soft studio lighting with abundant fill. Background: soft gray-blue or blue-gray gradient. Camera: 85mm lens at f/2.2. 4K premium headshot quality.`,
+  'linkedin': "A clean professional LinkedIn profile headshot of [1], wearing a business suit, soft blue-gray background, direct eye contact, friendly professional expression.",
 
   // 10 - URBANO
-  'urbano': `${FIDELIDADE_BLINDADA} Outfit: elegant navy or gray suit, t-shirt or open shirt underneath. Lighting: Simulated golden hour natural outdoor light. Background: completely blurred modern metropolis bokeh. Camera: 85mm lens at f/1.8, mid-bust shot. 4K RAW total realism.`,
+  'urbano': "A modern executive portrait of [1], wearing a navy suit, blurred city metropolis background with circular bokeh, golden hour lighting.",
 
-  'sonhos': `${FIDELIDADE_BLINDADA}. No skin smoothing, no distortion.`,
-  'custom': `${FIDELIDADE_BLINDADA}. No skin smoothing, no distortion.`
-
+  'sonhos': "A cinematic artistic portrait of [1].",
+  'custom': "A professional portrait of [1]."
 };
 
 module.exports = themePrompts;
