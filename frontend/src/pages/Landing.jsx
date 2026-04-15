@@ -171,7 +171,10 @@ export default function Landing() {
       }
     }
     setSelectedTheme(themeId);
-    setCustomTheme("");
+    // Só limpa o texto se o tema atual NÃO for sonhos ou custom, para não perder o que escreveu
+    if (themeId !== 'sonhos' && themeId !== 'custom') {
+      setCustomTheme("");
+    }
   };
 
   const handleUpload = async (e) => {
@@ -225,7 +228,9 @@ export default function Landing() {
     }
   };
 
-  const isContinueEnabled = selectedTheme === 'custom' ? customTheme.trim().length > 2 : selectedTheme !== null;
+  const isContinueEnabled = (selectedTheme === 'custom' || selectedTheme === 'sonhos') 
+    ? customTheme.trim().length > 3 
+    : selectedTheme !== null;
 
   return (
     <div ref={containerRef} className="min-h-screen text-ivory font-sans selection:bg-champagne selection:text-obsidian relative overflow-x-hidden bg-[#050508]">
@@ -350,23 +355,39 @@ export default function Landing() {
                 </div>
 
                 <div className="mt-2 flex flex-col items-center">
-                  <div className={`relative w-full max-w-lg p-[1px] rounded-[15px] transition-all ${
-                      selectedTheme === 'custom' ? 'bg-gradient-to-r from-champagne to-yellow-600' : 'bg-white/10'
+                  <div className={`relative w-full max-w-lg p-[1px] rounded-[15px] transition-all duration-500 ${
+                      (selectedTheme === 'custom' || selectedTheme === 'sonhos') 
+                        ? 'bg-gradient-to-r from-champagne via-yellow-500 to-champagne animate-shimmer shadow-[0_0_20px_rgba(201,168,76,0.3)]' 
+                        : 'bg-white/10 opacity-40 hover:opacity-100'
                     }`}>
                     <div className="bg-[#0a0a0e] rounded-[14px] flex items-center p-1 md:p-2">
-                      <span className="text-lg ml-2 mr-2">✨</span>
+                      <span className="text-lg ml-2 mr-2">
+                        {selectedTheme === 'sonhos' ? '✨' : '🎨'}
+                      </span>
                       <input 
                         type="text" 
-                        placeholder="Ex: Ensaio de Bebê Recém Nascido..."
+                        placeholder={
+                          selectedTheme === 'sonhos' 
+                            ? "Qual o seu sonho? Ex: Voando no espaço..." 
+                            : "Ou se preferir, digite seu tema específico aqui..."
+                        }
                         value={customTheme}
                         onChange={(e) => { 
                           setCustomTheme(e.target.value); 
-                          setSelectedTheme('custom'); 
+                          // Se ele começar a digitar, e não tiver tema, seleciona o custom
+                          if (!selectedTheme || (selectedTheme !== 'sonhos' && selectedTheme !== 'custom')) {
+                            setSelectedTheme('custom');
+                          }
                         }}
-                        className="w-full py-2 px-2 text-ivory text-sm bg-transparent outline-none rounded-xl"
+                        className="w-full py-2 px-2 text-ivory text-sm bg-transparent outline-none rounded-xl placeholder:text-ivory/30"
                       />
                     </div>
                   </div>
+                  {(selectedTheme === 'sonhos' || selectedTheme === 'custom') && customTheme.trim().length <= 3 && (
+                    <p className="text-[10px] text-champagne mt-2 font-bold animate-pulse">
+                      Descreva com pelo menos 4 letras para prosseguir 👇
+                    </p>
+                  )}
                 </div>
 
                 <div className="mt-6 flex justify-center">
