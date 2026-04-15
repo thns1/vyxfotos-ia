@@ -63,9 +63,9 @@ class GoogleImageService {
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 4. Protocolo de Fidelidade Global V17.0: Extração Universal + Estúdio Elite
-            // Ordem Global: Isolar o ser humano de [1] e descartar 100% do ambiente, objetos e luz original.
-            const universalExtractionProtocol = "Absolute identity mirror of the human subject in reference [1]. Focus EXCLUSIVELY on the person's face and hair identity. IGNORE, DISCARD, and DELETE 100% of the surrounding environment, background objects, and original lighting from reference [1]. The subject must be treated as a clean extraction for a new professional studio scene.";
+            // 4. Identidade Absoluta V18.1: Reset de Motor
+            // Foco 100% na foto [1]. Sem descrições extras para não confundir a IA.
+            const identityMirror = "Absolute identity mirror of the person in [1].";
 
             const requestBody = {
                 instances: [
@@ -81,7 +81,7 @@ class GoogleImageService {
                                 },
                                 subjectImageConfig: {
                                     subjectType: "SUBJECT_TYPE_PERSON",
-                                    subjectDescription: universalExtractionProtocol
+                                    subjectDescription: identityMirror
                                 }
                             }
                         ]

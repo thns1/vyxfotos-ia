@@ -1,43 +1,43 @@
 /**
- * VYXFOTOS.IA - PROTOCOLO DE FIDELIDADE GLOBAL (V17.0 - ESTÚDIO ELITE)
+ * VYXFOTOS.IA - PROMPTS DE IDENTIDADE ABSOLUTA (V18.0 - SIMPLIFICAÇÃO RADICAL)
  * 
- * Regra: Aplicar iluminação de estúdio profissional e isolamento total em qualquer cenário.
- * Foco: Qualidade de Estúdio Fotográfico Comercial.
+ * Regra de Ouro: NÃO DESCREVER A PESSOA. Deixar que a foto [1] seja a única fonte de identidade.
+ * Focar apenas no terno e no cenário profissional.
  */
 
 const themePrompts = {
   // 01 - CLASSICO
-  'executivo': "A high-end professional studio portrait of [1] wearing a navy blue executive suit. 3-point studio strobe lighting, softbox illumination, clean professional corporate background with deep bokeh. Professional DSLR 85mm lens, sharp focus on eyes, perfect subject separation from background. Discard original environment.",
+  'executivo': "A professional photo of [1] wearing a navy blue executive suit, standing in a corporate office. High-quality DSLR photography, 85mm lens, sharp focus, professional lighting, editorial style.",
 
   // 02 - MODERNO
-  'moderno': "A professional corporate studio photo of [1] wearing a gray blazer. Modern minimalist office studio background, soft daylight studio lighting, realistic skin texture, professional composition. Identity of [1] preserved in a new professional light.",
+  'moderno': "A professional photo of [1] wearing a gray blazer and white shirt, no tie, modern office background. Realistic RAW photography, natural lighting.",
 
   // 03 - PREMIUM
-  'premium': "A prestigious RAW studio portrait of [1] wearing a custom black suit. Professional executive library studio setting, cinematic rim lighting, 85mm portrait lens, ultra-high resolution. Copy identity from [1] into this new elite light.",
+  'premium': "A high-end professional portrait of [1] wearing a black executive suit, luxury corporate background. Cinematic lighting, professional photography.",
 
   // 04 - INTERNACIONAL
-  'internacional': "A cosmopolitan business studio portrait of [1] wearing a luxury suit. Blurred architectural studio backdrop, professional side lighting, authentic identity preservation. High-end commercial photography style.",
+  'internacional': "A professional photo of [1] wearing a dark suit, modern architectural blurred city background. High-quality editorial portrait photography.",
 
   // 05 - FEMININO
-  'feminino': "A professional executive studio portrait of [1] wearing a luxury tailored blazer. Soft beauty studio lighting, elegant neutral background, sharp focus, consistent identity with [1].",
+  'feminino': "A professional photo of [1] wearing a tailored business blazer, elegant corporate background. Soft professional lighting.",
 
   // 06 - SMART CASUAL
-  'smart_casual': "A modern tech-executive studio photo of [1] wearing a structured blazer. Clean startup studio environment, natural studio lighting, professional 85mm lens, clear separation of [1] from background.",
+  'smart_casual': "A professional photo of [1] wearing a structured blazer and shirt, clean modern office. Candid professional photography style.",
 
   // 07 - LUXO
-  'luxo': "A prestigious high-contrast studio portrait of [1] wearing a black suit. Dark elegant studio background, warm dramatic professional lighting, realistic skin and hair texture. Absolute identity anchor.",
+  'luxo': "A prestigious professional portrait of [1] wearing a black suit, elegant dark background, warm professional lighting.",
 
   // 08 - FINANCEIRO
-  'financeiro': "A formal banking executive studio portrait of [1] wearing a navy suit. Traditional gray studio background, flat professional studio lighting, high resolution, faithful to [1].",
+  'financeiro': "A formal professional portrait of [1] wearing a navy pinstripe suit, neutral office background. Traditional business photography.",
 
   // 09 - LINKEDIN
-  'linkedin': "A clean professional LinkedIn studio headshot of [1] wearing a business suit. Neutral studio background, soft daylight illumination, direct professional gaze, unretouched identity.",
+  'linkedin': "A clean professional LinkedIn headshot of [1] wearing a business suit, neutral studio background. Soft natural light, high-end photography.",
 
   // 10 - URBANO
-  'urbano': "A modern professional studio portrait of [1] wearing a navy suit. Blurred city metropolis studio backdrop, golden hour studio lighting, cinematic 85mm look, realistic subject extraction.",
+  'urbano': "A professional photo of [1] wearing a navy suit, blurred metropolis background. Golden hour lighting, high-quality editorial style.",
 
-  'sonhos': "A realistic professional studio portrait of [1].",
-  'custom': "A realistic professional studio portrait of [1]."
+  'sonhos': "A realistic photo of [1].",
+  'custom': "A realistic photo of [1]."
 };
 
 module.exports = themePrompts;
