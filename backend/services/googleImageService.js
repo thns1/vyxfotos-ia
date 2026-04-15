@@ -63,9 +63,9 @@ class GoogleImageService {
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 4. Studio Relighting V21.0: Re-iluminação Profissional do Sujeito
-            // Ordem: Manter identidade biométrica, mas APLICAR LUZ DE ESTÚDIO no rosto.
-            const atomicWipeInstruction = "Strictly preserve the exact facial identity of [1]. However, you MUST RELIGHT the subject's face and body with high-end professional 3-point studio strobe lighting. Eliminate the dull original lighting of [1] and create beautiful studio contrast, shadows, and crisp details on the person. The subject is immersed in a luxury corporate studio environment.";
+            // 4. Natural Skin V22.0: Foco em Realismo Humano (Anti-AI Filter)
+            // Ordem: Manter identidade biométrica e APLICAR LUZ, mas PROIBIR filtros de beleza.
+            const atomicWipeInstruction = "Strictly preserve the authentic facial identity of [1]. DO NOT smooth the skin. DO NOT use beauty filters or airbrushing. Keep natural skin textures, visible pores, and unique characteristics of [1]. RELIGHT the subject with professional studio lighting but maintain the raw, unretouched character of the person.";
 
             const requestBody = {
                 instances: [
