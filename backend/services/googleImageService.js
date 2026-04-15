@@ -63,7 +63,9 @@ class GoogleImageService {
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 4. Modo Gemini Puro: Requisição Limpa para Máxima Naturalidade
+            // 4. Calibragem V12.1: Isolando o rosto do cenário original
+            const highFidelityDescription = "The face and distinctive facial features of the person in [1]. Focus only on the identity, ignoring the original background and clothing.";
+
             const requestBody = {
                 instances: [
                     {
@@ -77,7 +79,8 @@ class GoogleImageService {
                                     mimeType: mimeType
                                 },
                                 subjectImageConfig: {
-                                    subjectType: "SUBJECT_TYPE_PERSON"
+                                    subjectType: "SUBJECT_TYPE_PERSON",
+                                    subjectDescription: highFidelityDescription
                                 }
                             }
                         ]
@@ -89,7 +92,7 @@ class GoogleImageService {
                 }
             };
             
-            // Adicionamos apenas uma instrução de person_generation para evitar censura indevida
+            // Forçamos a geração de pessoas adultas e alta tolerância
             requestBody.parameters.personGeneration = "ALLOW_ADULT";
             requestBody.parameters.safetySetting = "BLOCK_ONLY_HIGH";
 
