@@ -291,6 +291,15 @@ export default function Landing() {
             {/* HERO SECTION OPTIMIZED (100vh NO SCROLL GUARANTEED) */}
             <section className="min-h-[100dvh] pt-8 md:pt-16 pb-16 flex flex-col justify-start items-center relative px-4 md:px-6 w-full overflow-hidden">
               <div ref={heroTextRef} className="max-w-4xl mx-auto text-center space-y-2 z-10 w-full mt-0">
+
+                {/* BADGE DE TESTE GRÁTIS */}
+                <div className="flex justify-center mb-4">
+                  <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-champagne/60 bg-champagne/10 backdrop-blur-sm text-champagne text-xs md:text-sm font-bold tracking-widest uppercase animate-pulse shadow-[0_0_20px_rgba(201,168,76,0.2)]">
+                    <span className="w-2 h-2 rounded-full bg-champagne inline-block"></span>
+                    ✨ Faça o teste de graça — sem cartão
+                  </span>
+                </div>
+
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-ivory tracking-tighter leading-[1.05]">
                   ENSAIOS DE ALTO PADRÃO<br/> gerados a partir de uma <br/>
                   <span className="font-drama italic text-champagne font-black drop-shadow-2xl">SIMPLES SELFIE.</span>

@@ -1,38 +1,18 @@
-const axios = require('axios');
-const fs = require('fs');
-const path = require('path');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 /**
- * GERADOR DE CONTEÚDO ESTRATÉGICO V8.0
- * Suporta pilares de conteúdo: Autoridade (SEG), Fidelidade (QUA), Lifestyle (SEX)
+ * GERADOR DE CONTEÚDO ESTRATÉGICO V8.5 (SDK EDITION)
  */
 async function generateSmartContent() {
     try {
-        const apiKey = process.env.GEMINI_API_KEY;
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        const today = new Date().getDay(); // 1=Segunda, 3=Quarta, 5=Sexta
+        const today = new Date().getDay(); 
         
-        let contextPrompt = "";
-        if (today === 1) { // SEGUNDA: Autoridade/Nicho
-            const niches = ["Advocacia/Direito", "Corretagem de Imóveis", "Medicina/Saúde", "Tecnologia/SaaS", "Arquitetura/Design"];
-            const selectedNiche = niches[Math.floor(Math.random() * niches.length)];
-            contextPrompt = `HOJE É SEGUNDA-FEIRA: Dia da Autoridade Profissional.
-            O nicho escolhido é: ${selectedNiche}.
-            O "Depois" deve ser um retrato impecável dessa profissão, passando confiança e poder.
-            Legenda: Foco em "Sua imagem é seu cartão de visitas".`;
-        } else if (today === 5) { // SEXTA: Lifestyle
-            const destinations = ["Amalfi Coast, Italy", "Santorini, Greece", "Dubai luxury rooftop", "New York City Times Square", "Swiss Alps luxury resort"];
-            const selectedDest = destinations[Math.floor(Math.random() * destinations.length)];
-            contextPrompt = `HOJE É SEXTA-FEIRA: Dia do Lifestyle e Sonhos.
-            O cenário é: ${selectedDest}.
-            O "Depois" deve ser cinematográfico, focado em luxo e liberdade.
-            Legenda: Foco em "Viva a vida que você merece".`;
-        } else { // QUARTA (ou outros dias): Fidelidade
-            contextPrompt = `DIA DA FIDELIDADE TOTAL: Foco em provar que a IA mantém o rosto perfeito.
-            Cenários de estúdio de alto luxo.
-            Legenda: Curta e objetiva sobre a tecnologia.`;
-        }
+        let contextPrompt = "DIA DA FIDELIDADE TOTAL: Foco em provar que a IA mantém o rosto perfeito. Cenários de estúdio de alto luxo.";
+        if (today === 1) contextPrompt = "DIA DA AUTORIDADE: Nicho Profissional (Advocacia, Medicina, Executivos).";
+        if (today === 5) contextPrompt = "DIA DO LIFESTYLE: Luxo, Viagens, Mansões e Liberdade.";
 
         const prompt = `
             Você é o Diretor de Marketing da Vyxfotos-IA.
@@ -42,36 +22,36 @@ async function generateSmartContent() {
             {
               "person_name": "Nome",
               "prompt_before": "Casual selfie, raw photo, natural light",
-              "prompt_after": "Professional detailed portrait, 8k, photorealistic, raw skin texture, relevant to the theme",
+              "prompt_after": "Professional detailed portrait, 8k, photorealistic, raw skin texture, suit or premium outfit",
               "top_text": "FOTO COMUM -> PROFISSIONAL\\nSEM ESTÚDIO.",
-              "bottom_text": "COMENTE 'EU QUERO'\\n100% FIDELIDADE",
-              "caption": "Legenda curta, objetiva, gerando desejo imediato.",
-              "theme": "Descrição do tema"
+              "bottom_text": "Sua imagem é seu lucro.\\nLink na BIO.",
+              "caption": "🔥 PARE DE PERDER OPORTUNIDADES! Sua imagem no Instagram é sua vitrine. Nossa IA de Elite transforma uma simples selfie em um retrato de autoridade em segundos. 🚀\\n\\n✅ 100% de Fidelidade Facial\\n✅ Qualidade de Estúdio Fotográfico\\n✅ Resultado Instantâneo\\n\\nClique no link da BIO e garanta seu ensaio agora! #vyxfotos #ia #sucesso #branding",
+              "theme": "Mosaico de Fidelidade"
             }
             Retorne APENAS o JSON.
         `;
 
-        const response = await axios.post(url, {
-            contents: [{ parts: [{ text: prompt }] }]
-        });
-
-        let text = response.data.candidates[0].content.parts[0].text;
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        let text = response.text().trim();
+        
+        // Limpeza de Markdown
         text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         const jsonMatch = text.match(/\{[\s\S]*\}/);
         if (jsonMatch) text = jsonMatch[0];
         
-        const content = JSON.parse(text);
-        console.log(`📝 [Content V8] Pilar: ${today === 1 ? 'Autoridade' : (today === 5 ? 'Lifestyle' : 'Fidelidade')} | Tema: ${content.theme}`);
-        return content;
+        return JSON.parse(text);
+
     } catch (error) {
-        console.error('❌ [Content] Erro no Agente. Usando Fallback de Emergência.');
+        console.error('❌ [Content Agent] Fallback necessário.');
         return {
             person_name: "Gabriel",
-            prompt_before: "Young Brazilian man, casual t-shirt, messy hair, home background, raw photo",
+            prompt_before: "Young Brazilian man, casual t-shirt, raw photo",
+            prompt_after: "Professional 8k executive portrait",
             top_text: "1 FOTO SUA -> PROFISSIONAL\nSEM ESTÚDIO.",
-            bottom_text: "COMENTE 'EU QUERO'\n100% FIDELIDADE",
-            caption: "Sua imagem é o seu cartão de visitas. Transforme-se hoje! 🚀 Link na BIO.",
-            theme: "Geral"
+            bottom_text: "LINK NA BIO\n100% FIDELIDADE",
+            caption: "Sua imagem é o seu cartão de visitas. Transforme-se hoje! 🚀 Use o link na BIO.",
+            theme: "Fidelidade (Fallback)"
         };
     }
 }
