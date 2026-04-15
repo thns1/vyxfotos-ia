@@ -1,41 +1,25 @@
 /**
- * VYXFOTOS.IA - PROMPTS V33.0 (ZORDON MODE - ABSOLUTE OVERWRITE)
- * Foco: Matar o espelhamento persistente usando lente de cinema e ordens afirmativas.
+ * VYXFOTOS.IA - PROMPTS V34.0 (ULTRA-FIDELITY STUDIO RESTORATION)
+ * 
+ * BASE: O Prompt de Elite fornecido pelo usuário.
+ * FOCO: Retrato executivo de altíssimo padrão, 85mm, RAW, sem filtros.
  */
 
+const studioPromptBase = "Ultra-realistic professional executive portrait photograph of a Brazilian person with warm skin tone and dark features. CRITICAL: this person must be EXACTLY the same individual as in the reference photo [1] — identical facial structure, same hair texture, color and length, same eye shape and color, same nose bridge width and tip shape, same lip contour and thickness, same eyebrow arch, density and spacing, same ear shape and placement, same jawline, same cheekbones, same skin tone and visible pores, same facial symmetry. Every single facial feature must be a perfect match to the reference [1]. Same person, same face, same features as reference photo [1]. Subject wearing a tailored men executive suit in deep navy/charcoal, crisp white dress shirt, premium silk tie. Confident, composed expression with natural micro-expressions preserved. Posture: straight, authoritative, shoulders slightly back. Studio lighting setup: three-point professional lighting (key light at 45° angle, soft fill light eliminating harsh shadows, subtle rim light separating subject from background). Lighting renders skin texture with photographic realism — visible pores, natural skin imperfections, realistic subsurface scattering. Background: clean seamless studio gradient in neutral light gray (#E8E8E8), shallow depth of field with subject in razor-sharp focus, bokeh on background. Camera: 85mm portrait lens, f/2.2 aperture, ISO 100, studio strobe. Shot at eye level. Full sharpness on face, eyes in critical focus with natural catchlights. Output: 4K resolution, RAW-quality finish, zero artificial smoothing or skin retouching, no AI artifacts, no blurring of facial features, no duplicate elements in background. Professional headshot quality equivalent to top-tier corporate photography studio.";
+
 const themePrompts = {
-  // 01 - EXECUTIVO
-  'executivo': "AUTHENTIC RAW 70mm PHOTOGRAPHY, Panavision wide shot. Full body photo showing [1] head to toe, seated in a NEW luxury leather executive armchair. THE ORIGINAL SELFIE BACKGROUND IS COMPLETELY OVERWRITTEN BY A MINIMALIST LUXURY CORPORATE OFFICE. Natural light from a window. [1] DRESSED IN a premium flawless Italian suit. High-end professional texture, unretouched.",
-
-  // 02 - MODERNO
-  'moderno': "AUTHENTIC RAW 70mm PHOTOGRAPHY, cinematic wide angle. Full body photo of [1] seated in a contemporary designer chair. REPLACE AND OVERWRITE all original pixels of [1]. DRESSED IN a sharp modern blazer. Luxury tech office environment. Sharp focus, raw skin texture, 8k.",
-
-  // 03 - PREMIUM
-  'premium': "AUTHENTIC RAW 70mm PHOTOGRAPHY, wide lens head to feet. [1] seated in a prestigious luxury sofa. OVERWRITE original context of [1] with a high-end luxury penthouse at sunset. [1] DRESSED IN a black executive suit. Absolute subject separation, cinematic lighting.",
-
-  // 04 - INTERNACIONAL
-  'internacional': "AUTHENTIC RAW 70mm PHOTOGRAPHY, panoramic wide shot. [1] seated in a designer chair. OVERWRITE original home environment with a premium architectural office background. [1] DRESSED IN a professional dark suit. Natural lighting, high-fidelity identity.",
-
-  // 05 - FEMININO
-  'feminino': "AUTHENTIC RAW 70mm PHOTOGRAPHY, wide length shot. [1] seated elegantly in a designer office chair. OVERWRITE original background with a high-end minimalist luxury studio. [1] DRESSED IN a premium blazer, natural skin character, sharp eyes.",
-
-  // 06 - SMART CASUAL
-  'smart_casual': "AUTHENTIC RAW 70mm PHOTOGRAPHY, cinematic wide shot. [1] seated comfortably in a modern office lounge. OVERWRITE original home background and clothes. [1] DRESSED IN a structured blazer and shirt. Real skin character, visible pores.",
-
-  // 07 - LUXO
-  'luxo': "AUTHENTIC RAW 70mm PHOTOGRAPHY, ultra-wide cinematic lens. [1] seated in a velvet luxury armchair. OVERWRITE original context of [1] with a prestigious library background. [1] DRESSED IN a black tailored suit. Moody dramatic lighting, commercial quality.",
-
-  // 08 - FINANCEIRO
-  'financeiro': "AUTHENTIC RAW 70mm PHOTOGRAPHY, wide head to knees shot. [1] seated in a NEW executive chair. OVERWRITE all original pixels of [1]'s background. [1] DRESSED IN a pinstripe suit. Professional financial district scenario.",
-
-  // 09 - LINKEDIN
-  'linkedin': "AUTHENTIC RAW 70mm PHOTOGRAPHY, wide lens portrait. [1] seated in a professional office armchair. OVERWRITE [1]'s original gaming chair and background completely. [1] DRESSED IN a business suit. High-fidelity identity, sharp details.",
-
-  // 10 - URBANO
-  'urbano': "AUTHENTIC RAW 70mm PHOTOGRAPHY, wide angle shot. [1] seated in a stylish urban lounge armchair. OVERWRITE original home environment and clothes. [1] DRESSED IN a navy suit and white shirt. Cinematic natural lighting.",
-
-  'sonhos': "AUTHENTIC RAW 70mm PHOTOGRAPHY, Panavision wide shot. [1] seated in an elegant scenario, head to toe. NEW clothes, NEW scenario, OVERWRITING original pixels.",
-  'custom': "AUTHENTIC RAW 70mm PHOTOGRAPHY, wide angle head to toe. [1] seated in a luxury armchair. OVERWRITING original background and clothes, high-fidelity face."
+  'executivo': studioPromptBase,
+  'moderno': studioPromptBase.replace("neutral light gray (#E8E8E8)", "modern luxury office blurred background"),
+  'premium': studioPromptBase.replace("neutral light gray (#E8E8E8)", "high-end luxury penthouse blurred background"),
+  'internacional': studioPromptBase.replace("neutral light gray (#E8E8E8)", "premium urban architectural background"),
+  'feminino': studioPromptBase.replace("men executive suit", "women tailored blazer").replace("Brazilian person", "Brazilian woman"),
+  'smart_casual': studioPromptBase.replace("men executive suit", "modern casual blazer").replace("neutral light gray (#E8E8E8)", "modern tech office"),
+  'luxo': studioPromptBase.replace("neutral light gray (#E8E8E8)", "prestigious library background"),
+  'financeiro': studioPromptBase,
+  'linkedin': studioPromptBase,
+  'urbano': studioPromptBase.replace("neutral light gray (#E8E8E8)", "cinematic urban background"),
+  'sonhos': studioPromptBase,
+  'custom': studioPromptBase
 };
 
 module.exports = themePrompts;
