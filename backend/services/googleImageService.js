@@ -63,9 +63,9 @@ class GoogleImageService {
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 4. Calibragem V13.0: DNA Facial Absoluto
-            // Aqui descrevemos o Thiago real para a IA não usar um 'modelo padrão'
-            const highFidelityDescription = "Person with an elongated face shape, deep-set dark eyes, thick dark eyebrows, and a specific goatee and mustache pattern. Preserve the exact facial proportions, nose shape, and natural skin texture from [1] without any idealization or model-like changes.";
+            // 4. Calibragem V13.1: Simplificação para Estabilidade
+            // Removemos o negativePrompt que causa erro em alguns modelos de customização
+            const highFidelityDescription = "Person with elongated face, dark eyes, and specific goatee pattern.";
 
             const requestBody = {
                 instances: [
@@ -89,12 +89,11 @@ class GoogleImageService {
                 ],
                 parameters: {
                     sampleCount: 1,
-                    aspectRatio: "3:4",
-                    negativePrompt: "different person, generic face, model look, idealized features, changed face shape, distorted nose, broad jaw, commercial beauty look, face lift, fake skin"
+                    aspectRatio: "3:4"
                 }
             };
             
-            // Forçamos a geração de pessoas adultas e alta tolerância
+            // Parâmetros de segurança e geração
             requestBody.parameters.personGeneration = "ALLOW_ADULT";
             requestBody.parameters.safetySetting = "BLOCK_ONLY_HIGH";
 
