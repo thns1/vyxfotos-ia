@@ -9,6 +9,7 @@
   "dependencies": {
     "@fal-ai/client": "^1.9.5",
     "@fal-ai/serverless-client": "^0.15.0",
+    "@google-cloud/aiplatform": "^6.6.0",
     "@google/genai": "^1.48.0",
     "@google/generative-ai": "^0.24.1",
     "@gradio/client": "^2.1.0",

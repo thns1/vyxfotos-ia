@@ -2,7 +2,7 @@
 .env
 .env.local
 
-# Dependencias muito pesadas (A Vercel baixa sozinha la, nao manda)
+# Dependencias muito pesadas
 node_modules/
 npm-debug.log
 
@@ -11,8 +11,12 @@ backend/uploads/
 *.log
 .DS_Store
 
-# Obsidian (Não mandar a base mental)
+# Obsidian
 *.md
 
-# Chaves Privadas do Firebase (SEGURANCA MAXIMA)
+# Chaves Privadas do Firebase
 backend/firebase-admin-key.json
+
+# Chaves de Segurança do Google Cloud (NUNCA MANDAR)
+vyxfotos-*.json
+*.json.key
