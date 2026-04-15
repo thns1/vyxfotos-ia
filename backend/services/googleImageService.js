@@ -1,120 +1,114 @@
 const fs = require('fs');
-const path = require('path');
-const { PredictionServiceClient } = require('@google-cloud/aiplatform');
+const { GoogleAuth } = require('google-auth-library');
 const themePrompts = require('../constants/themePrompts');
 
 /**
- * SERVIÇO DE GERAÇÃO DE IMAGENS - GOOGLE IMAGEN 3 ELITE
- * 
- * Este serviço utiliza a API Vertex AI do Google Cloud para gerar imagens.
- * O modelo 'imagen-3.0-capability-001' permite manter a fidelidade do rosto
- * através do Subject Customization (SUBJECT_TYPE_PERSON).
+ * SERVIÇO DE GERAÇÃO DE IMAGENS - GOOGLE IMAGEN 3 ELITE (V8.4 - REST)
+ *
+ * Usa a REST API direta do Vertex AI (não gRPC).
+ * Isso elimina problemas de serialização de proto e é 100% estável.
  */
 class GoogleImageService {
     constructor() {
-        this.projectId = process.env.GOOGLE_PROJECT_ID || 'vyxfotos-493415';
-        this.location = process.env.GOOGLE_LOCATION || 'us-central1';
-        this.modelId = 'imagen-3.0-capability-001';
-        
-        // Configura o endpoint de predição
-        this.endpoint = `projects/${this.projectId}/locations/${this.location}/publishers/google/models/${this.modelId}`;
+        this.projectId = 'vyxfotos-493415';
+        this.location = 'us-central1';
+        this.apiUrl = `https://${this.location}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${this.location}/publishers/google/models/imagen-3.0-capability-001:predict`;
 
-        // O cliente do Google Cloud usa GOOGLE_APPLICATION_CREDENTIALS automaticamente (se for caminho)
-        // Se passarmos o JSON diretamente em uma variável, tratamos aqui:
-        const credentialsConfig = {};
+        // Configuração do cliente de autenticação
+        const authConfig = { scopes: ['https://www.googleapis.com/auth/cloud-platform'] };
         if (process.env.GOOGLE_CREDS_JSON) {
-            try {
-                credentialsConfig.credentials = JSON.parse(process.env.GOOGLE_CREDS_JSON);
-                console.log("[Google-AI] Usando credenciais via variável de ambiente.");
-            } catch (err) {
-                console.error("[Google-AI] Erro ao parsear GOOGLE_CREDS_JSON:", err.message);
-            }
+            authConfig.credentials = JSON.parse(process.env.GOOGLE_CREDS_JSON);
         }
+        this.auth = new GoogleAuth(authConfig);
 
-        this.client = new PredictionServiceClient({
-            apiEndpoint: `${this.location}-aiplatform.googleapis.com`,
-            ...credentialsConfig
-        });
-
-        console.log(`[Google-AI] Motor Imagen 3 Elite configurado (Projeto: ${this.projectId})`);
+        console.log('[Google-AI V8.4] Motor REST Imagen 3 Elite configurado.');
     }
 
     async generateWithFaceID(imageFile, theme, customText) {
         try {
-            console.log(`[Google-AI] Iniciando geração ELITE. Tema: ${theme}`);
+            console.log(`[Google-AI] Iniciando geração. Tema: ${theme}`);
 
-            // 1. Prepara o prompt (usando a sintaxe de referência [1] do Google)
-            let promptBase = themePrompts[theme] || themePrompts['executivo'];
-            
-            // Adaptamos o prompt para o formato do Google Subject Customization
-            // Substituímos referências genéricas por "[1]"
-            let promptElite = promptBase
-                .replace(/the person|a person|a man|a student|a executive|a child/gi, 'the person [1]')
-                .replace(/Subject/g, 'Person [1]');
-            
+            // 1. Prompt com marcação [1] para subject customization
+            let promptElite;
             if (customText && customText.trim().length > 3) {
-                promptElite = `A high-quality professional portrait of the person [1] in ${customText.trim()}, 85mm portrait photography, f/2.2, sharp focus, cinematic lighting, 8k resolution.`;
+                promptElite = `A high-quality professional portrait of [1] in ${customText.trim()}, 85mm portrait photography, sharp focus, cinematic lighting, 8k resolution.`;
+            } else {
+                const base = themePrompts[theme] || themePrompts['executivo'];
+                // Insere marcação [1] no começo do prompt
+                promptElite = `Portrait of [1], ${base}`;
             }
 
-            console.log(`[Google-AI] Prompt Elite: "${promptElite.substring(0, 100)}..."`);
+            console.log(`[Google-AI] Prompt: "${promptElite.substring(0, 100)}..."`);
 
             // 2. Converte selfie para Base64
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
+            const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 3. Monta a requisição para o Vertex AI (Subject Customization V8.3)
-            const instance = {
-                prompt: promptElite,
-                subjectReferences: [
+            // 3. Monta o body REST no formato correto do Imagen 3 Subject Customization
+            const requestBody = {
+                instances: [
                     {
-                        referenceId: "1",
-                        subjectType: "SUBJECT_TYPE_PERSON",
-                        image: {
-                            bytesBase64Encoded: imageData,
-                            mimeType: imageFile.mimetype || 'image/jpeg'
-                        }
+                        prompt: promptElite,
+                        referenceImages: [
+                            {
+                                referenceType: "REFERENCE_TYPE_SUBJECT",
+                                referenceId: 1,
+                                referenceImage: {
+                                    bytesBase64Encoded: imageData,
+                                    mimeType: mimeType
+                                },
+                                subjectImageConfig: {
+                                    subjectType: "SUBJECT_TYPE_PERSON"
+                                }
+                            }
+                        ]
                     }
-                ]
+                ],
+                parameters: {
+                    sampleCount: 1,
+                    aspectRatio: "3:4"
+                }
             };
 
-            const parameters = {
-                sampleCount: 1,
-                aspectRatio: "3:4"
-            };
+            // 4. Obtém token de acesso
+            const client = await this.auth.getClient();
+            const tokenResponse = await client.getAccessToken();
+            const token = tokenResponse.token;
 
-            const request = {
-                endpoint: this.endpoint,
-                instances: [instance],
-                parameters: parameters,
-            };
+            // 5. Chama a REST API do Vertex AI
+            console.log('[Google-AI] Chamando Vertex AI REST...');
+            const response = await fetch(this.apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
 
-            // 4. Chama a API do Google
-            console.log(`[Google-AI] Chamando Vertex AI Prediction...`);
-            const [response] = await this.client.predict(request);
+            const responseJson = await response.json();
+            console.log('[Google-AI] Resposta:', JSON.stringify(responseJson).substring(0, 200));
 
-            // 5. Extrai a imagem resultante (Geralmente base64 ou link GCS)
-            const prediction = response.predictions[0];
-            
-            // O Imagen 3 retorna bytes em base64 na predição
-            if (prediction && prediction.bytesBase64Encoded) {
-                // Como o frontend espera uma URL, vamos salvar localmente ou usar um Data URL
-                // Por questões de performance e rede, retornaremos em formato Data URL
-                return {
-                    status: "success",
-                    output_url: `data:image/png;base64,${prediction.bytesBase64Encoded}`,
-                    orderId: `PEDIDO_G_${Date.now()}`
-                };
-            } else if (prediction && prediction.gcsUri) {
-                 return {
-                    status: "success",
-                    output_url: prediction.gcsUri,
-                    orderId: `PEDIDO_G_${Date.now()}`
-                };
+            if (!response.ok) {
+                throw new Error(`Google API Error ${response.status}: ${JSON.stringify(responseJson.error || responseJson)}`);
             }
 
-            throw new Error("O Google não retornou dados de imagem válidos.");
+            // 6. Extrai a imagem da resposta
+            const prediction = responseJson?.predictions?.[0];
+            const imageBase64 = prediction?.bytesBase64Encoded;
+
+            if (!imageBase64) {
+                throw new Error(`Google não retornou imagem. Resposta: ${JSON.stringify(responseJson).substring(0, 300)}`);
+            }
+
+            return {
+                status: "success",
+                output_url: `data:image/png;base64,${imageBase64}`,
+                orderId: `PEDIDO_G_${Date.now()}`
+            };
 
         } catch (error) {
-            console.error(`[Google-AI] FALHA CRÍTICA:`, error.message);
+            console.error('[Google-AI] FALHA CRÍTICA:', error.message);
             throw error;
         }
     }
