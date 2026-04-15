@@ -1,43 +1,42 @@
 /**
- * VYXFOTOS.IA - PROMPTS DE BLINDAGEM (V16.0 - ZERO RETOUCH)
+ * VYXFOTOS.IA - PROMPTS DE TELETRANSPORTE (V16.1 - CENÁRIO FORÇADO)
  * 
- * Regra de Ouro: Proibir qualquer alteração de identidade ou retoque de beleza.
- * Foco em RAW Photo, unretouched, authentic identity.
+ * Regra: Forçar a IA a ignorar o fundo original e teletransportar o rosto para um novo ambiente.
  */
 
 const themePrompts = {
   // 01 - CLASSICO
-  'executivo': "A RAW unfiltered DSLR photo of [1] wearing a navy blue executive suit. Preservation of exact face, hair, and features from [1]. No retouching, no skin smoothing, no identity modification. 100% authentic identity. Background: corporate office.",
+  'executivo': "The person [1] in a COMPLETELY NEW SETTING: a High-end corporate office background. The person is wearing a navy blue executive suit. 85mm RAW photo, ignore original background of [1], zero retouching on face.",
 
   // 02 - MODERNO
-  'moderno': "Authentic RAW photo of [1] wearing a gray blazer, no tie. Zero retouching, exact hair and face from [1]. Modern office background, natural light.",
+  'moderno': "The person [1] in a NEW ENVIRONMENT: a modern office background. Wearing a gray blazer, no tie. RAW photo, ignore [1]'s original background, exact face preservation.",
 
   // 03 - PREMIUM
-  'premium': "A high-fidelity RAW portrait of [1] wearing a black suit. Mirror identity of [1] without any beauty filters or grooming. Luxury office background, cinematic real-world lighting.",
+  'premium': "A high-fidelity RAW photo of [1] in a NEW SCENE: a luxury executive library background. Wearing a black suit. Discard [1]'s original background, identity mirror of [1].",
 
   // 04 - INTERNACIONAL
-  'internacional': "Real-life photo of [1] wearing a professional suit. Copy every detail of [1]'s face and hair without changes. Blurred city architecture background.",
+  'internacional': "The person [1] teletransported to a NEW SETTING: a modern architectural blurred city background. Wearing a professional suit. Ignore [1]'s selfie background.",
 
   // 05 - FEMININO
-  'feminino': "A RAW unretouched photo of [1] wearing a tailored blazer. Clear focus on [1]'s original features. No beauty filter, authentic skin texture.",
+  'feminino': "The person [1] in a NEW PROFESSIONAL SETTING: elegant office background. Wearing a tailored blazer. RAW photo, ignore original background and clothing of [1].",
 
   // 06 - SMART CASUAL
-  'smart_casual': "A candid-style RAW photo of [1] wearing a blazer and shirt. Preserve exact identity and original hair of [1]. Clean office environment.",
+  'smart_casual': "The person [1] in a NEW CORPORATE SETTING: clean startup office. Wearing a blazer and white shirt. Ignore [1]'s original gaming chair or bedroom background.",
 
   // 07 - LUXO
-  'luxo': "A prestigious RAW portrait of [1] in a black suit. Absolute fidelity to [1]'s original features. Dark elegant background, realistic lighting.",
+  'luxo': "A prestigious RAW portrait of [1] in a NEW ELEGANT SCENE: dark professional background. Wearing a black suit. Absolute identity mirror, discard selfie background.",
 
   // 08 - FINANCEIRO
-  'financeiro': "A formal RAW photo of [1] in a navy suit. Identity mirror of [1]. Neutral office background, authentic photography style.",
+  'financeiro': "The person [1] in a NEW FORMAL SETTING: traditional gray office background. Wearing a navy suit. Identity mirror, ignore original context of [1].",
 
   // 09 - LINKEDIN
-  'linkedin': "A natural RAW LinkedIn headshot of [1] in a suit. Professional background, soft daylight, preserving [1]'s exact likeness with zero retouching.",
+  'linkedin': "A professional RAW headshot of [1] in a NEW NEUTRAL SETTING: soft office background. Wearing a business suit. Natural lighting, ignore original selfie background.",
 
   // 10 - URBANO
-  'urbano': "A realistic RAW photo of [1] wearing a navy suit. City background, golden hour, zero identity smoothing, original hair texture of [1].",
+  'urbano': "The person [1] in a NEW URBAN SETTING: blurred metropolis metropolis background. Wearing a navy suit. Golden hour, ignore [1]'s original bedroom context.",
 
-  'sonhos': "A RAW realistic photo of [1].",
-  'custom': "A RAW realistic photo of [1]."
+  'sonhos': "A RAW realistic photo of [1] in a new scene.",
+  'custom': "A RAW realistic photo of [1] in a new scene."
 };
 
 module.exports = themePrompts;

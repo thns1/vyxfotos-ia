@@ -63,9 +63,9 @@ class GoogleImageService {
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 4. Blindagem Facial V16.0: Identidade Absoluta (Identity Mirroring)
-            // Ordem de comando para o Google: Cópia idêntica, zero retoque, zero mudança.
-            const highFidelityDescription = "Absolute identity mirror of the person in reference photo [1]. Preserve every facial detail, exact hair style, and real-world texture from [1] with zero retouching, zero grooming, and zero identity smoothing.";
+            // 4. Blindagem V16.1: Teletransporte de Cenário Final
+            // Ordem: Manter 100% a identidade focial/capilar de [1] mas IGNORAR fundo e roupas originais.
+            const highFidelityDescription = "Absolute identity mirror of the person in [1]. Focus ONLY on the face and hair identity. IGNORE and DISCARD the original background and clothing of [1] completely.";
 
             const requestBody = {
                 instances: [
