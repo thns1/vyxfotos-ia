@@ -4,9 +4,9 @@ const { GoogleAuth } = require('google-auth-library');
 const fetch = require('node-fetch');
 
 /**
- * SERVIÇO GOOGLE VERTEX AI - V27.0 (ULTIMATE HYBRID - IDENTITY + BODY)
- * Re-ativado Face Mesh para garantir 99% de fidelidade facial.
- * Foco em poses suaves e naturais (Seated/Leaning) para corpo inteiro.
+ * SERVIÇO GOOGLE VERTEX AI - V28.0 (ELITE SEATED RESCUE)
+ * Protocolo de Desancoragem: Uso seletivo de Face Mesh para garantir a face da V22.0
+ * mas com liberdade total para gerar o corpo sentado e o cenário de luxo.
  */
 class GoogleImageService {
     constructor() {
@@ -21,21 +21,22 @@ class GoogleImageService {
             const keyPath = path.join(__dirname, '../../vyxfotos-493415-3d24a459e5c7.json');
             if (fs.existsSync(keyPath)) authOptions.keyFilename = keyPath;
         }
+
         this.auth = new GoogleAuth(authOptions);
         this.apiUrl = `https://${this.location}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${this.location}/publishers/google/models/${this.modelId}:predict`;
     }
 
     async generateWithFaceID(imageFile, theme, customText, gender) {
         try {
-            console.log(`[Google-AI V27] Gerando Hibrido Elite: ${theme}`);
+            console.log(`[Google-AI V28] Resgate Corpo Inteiro Sentado: ${theme}`);
             const themePrompts = require('../constants/themePrompts');
             let promptFinal = themePrompts[theme] || themePrompts['executivo'];
 
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // Protocolo de Fidelidade V27: Máxima Identidade + Limpeza de Fundo
-            const atomicWipeInstruction = "Strictly follow the facial structure of [1]. Maintain natural skin pores and textures. DO NOT use beauty filters. RELIGHT the subject. DELETE original background (no gaming chair).";
+            // Protocolo V28: Foco em Face e RELIGHTING total de cenário.
+            const atomicWipeInstruction = "Strictly preserve the unique facial identity of [1]. DO NOT smooth skin. Keep authentic pores and textures. RELIGHT the subject. ENTIRELY IGNORE AND DELETE the original background (no gaming chair, no red curtains). Focus on a luxury seated posture.";
 
             const requestBody = {
                 instances: [
@@ -46,7 +47,10 @@ class GoogleImageService {
                                 referenceType: "REFERENCE_TYPE_SUBJECT",
                                 referenceId: 1,
                                 referenceImage: { bytesBase64Encoded: imageData, mimeType: mimeType },
-                                subjectImageConfig: { subjectType: "SUBJECT_TYPE_PERSON", subjectDescription: atomicWipeInstruction }
+                                subjectImageConfig: { 
+                                    subjectType: "SUBJECT_TYPE_PERSON", 
+                                    subjectDescription: atomicWipeInstruction 
+                                }
                             },
                             {
                                 referenceType: "REFERENCE_TYPE_CONTROL",
@@ -69,11 +73,12 @@ class GoogleImageService {
             });
 
             const responseJson = await response.json();
-            if (!response.ok) throw new Error(`Erro API: ${JSON.stringify(responseJson)}`);
+            if (!response.ok) throw new Error(`Google API Error: ${JSON.stringify(responseJson)}`);
 
             const imageBase64 = responseJson?.predictions?.[0]?.bytesBase64Encoded;
-            if (!imageBase64) throw new Error("Sem imagem.");
+            if (!imageBase64) throw new Error("IA não retornou imagem.");
 
+            console.log(`[Google-AI V28] SUCESSO! Foto de Resgate gerada.`);
             return {
                 status: "success",
                 output_url: `data:image/png;base64,${imageBase64}`,
@@ -81,9 +86,10 @@ class GoogleImageService {
             };
 
         } catch (error) {
-            console.error('[Google-AI V27] FALHA:', error.message);
+            console.error('[Google-AI V28] FALHA:', error.message);
             throw error;
         }
     }
 }
+
 module.exports = new GoogleImageService();
