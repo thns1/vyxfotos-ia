@@ -49,16 +49,14 @@ class ImagePipelineService {
                 throw new Error(`Falha ao subir imagem: ${uploadErr.message}`);
             }
 
-            // 3. Geração Face-to-Face (fal-ai/face-to-face = InstantID)
-            console.log(`[Backend-AI] Iniciando renderização neural...`);
-            const result = await fal.subscribe("fal-ai/face-to-face", {
+            // 3. Geração InstantID
+            console.log(`[Backend-AI] Iniciando renderização neural (InstantID)...`);
+            const result = await fal.subscribe("fal-ai/instantid", {
                 input: {
                     face_image_url: imageUrl,
                     prompt: temaCena,
                     negative_prompt: "cartoon, anime, ugly, deformed, blurry, low quality, distorted, bad anatomy, text, watermark",
-                    image_size: "portrait_4_3",
-                    num_inference_steps: 35,
-                    guidance_scale: 7.5
+                    image_size: "portrait_4_3"
                 },
                 logs: true,
                 onQueueUpdate: (update) => {
