@@ -67,109 +67,87 @@ class GoogleImageService {
             // Ordem: Manter identidade biométrica e APLICAR LUZ, mas PROIBIR filtros de beleza.
             const atomicWipeInstruction = "Strictly preserve the authentic facial identity of [1]. DO NOT smooth the skin. DO NOT use beauty filters or airbrushing. Keep natural skin textures, visible pores, and unique characteristics of [1]. RELIGHT the subject with professional studio lighting but maintain the raw, unretouched character of the person.";
 
-            const requestBody = {
-                instances: [
-                    {
-                        // Instância 1: Retrato Profissional (V22.0)
-                        prompt: promptFinal,
-                        referenceImages: [
-                            {
-                                referenceType: "REFERENCE_TYPE_SUBJECT",
-                                referenceId: 1,
-                                referenceImage: {
-                                    bytesBase64Encoded: imageData,
-                                    mimeType: mimeType
+            // 5. Função auxiliar para chamar a API do Vertex AI
+            const callVertexAI = async (prompt) => {
+                const requestBody = {
+                    instances: [
+                        {
+                            prompt: prompt,
+                            referenceImages: [
+                                {
+                                    referenceType: "REFERENCE_TYPE_SUBJECT",
+                                    referenceId: 1,
+                                    referenceImage: {
+                                        bytesBase64Encoded: imageData,
+                                        mimeType: mimeType
+                                    },
+                                    subjectImageConfig: {
+                                        subjectType: "SUBJECT_TYPE_PERSON",
+                                        subjectDescription: atomicWipeInstruction
+                                    }
                                 },
-                                subjectImageConfig: {
-                                    subjectType: "SUBJECT_TYPE_PERSON",
-                                    subjectDescription: atomicWipeInstruction
+                                {
+                                    referenceType: "REFERENCE_TYPE_CONTROL",
+                                    referenceId: 2,
+                                    referenceImage: {
+                                        bytesBase64Encoded: imageData,
+                                        mimeType: mimeType
+                                    },
+                                    controlImageConfig: {
+                                        controlType: "CONTROL_TYPE_FACE_MESH"
+                                    }
                                 }
-                            },
-                            {
-                                referenceType: "REFERENCE_TYPE_CONTROL",
-                                referenceId: 2,
-                                referenceImage: {
-                                    bytesBase64Encoded: imageData,
-                                    mimeType: mimeType
-                                },
-                                controlImageConfig: {
-                                    controlType: "CONTROL_TYPE_FACE_MESH"
-                                }
-                            }
-                        ]
+                            ]
+                        }
+                    ],
+                    parameters: {
+                        sampleCount: 1,
+                        aspectRatio: "3:4"
+                    }
+                };
+
+                const client = await this.auth.getClient();
+                const tokenResponse = await client.getAccessToken();
+                const token = tokenResponse.token;
+
+                const response = await fetch(this.apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
                     },
-                    {
-                         // Instância 2: Corpo Inteiro (Full Body Shot)
-                         prompt: `${promptFinal}. Full body shot from head to toe, standing posture, wide angle studio shot.`,
-                         referenceImages: [
-                             {
-                                 referenceType: "REFERENCE_TYPE_SUBJECT",
-                                 referenceId: 1,
-                                 referenceImage: {
-                                     bytesBase64Encoded: imageData,
-                                     mimeType: mimeType
-                                 },
-                                 subjectImageConfig: {
-                                     subjectType: "SUBJECT_TYPE_PERSON",
-                                     subjectDescription: atomicWipeInstruction
-                                 }
-                             },
-                             {
-                                 referenceType: "REFERENCE_TYPE_CONTROL",
-                                 referenceId: 2,
-                                 referenceImage: {
-                                     bytesBase64Encoded: imageData,
-                                     mimeType: mimeType
-                                 },
-                                 controlImageConfig: {
-                                     controlType: "CONTROL_TYPE_FACE_MESH"
-                                 }
-                             }
-                         ]
-                     }
-                ],
-                parameters: {
-                    sampleCount: 1,
-                    aspectRatio: "3:4"
+                    body: JSON.stringify(requestBody)
+                });
+
+                const responseJson = await response.json();
+                if (!response.ok) {
+                    throw new Error(`Google API Error ${response.status}: ${JSON.stringify(responseJson.error || responseJson)}`);
                 }
+                return responseJson?.predictions?.[0]?.bytesBase64Encoded;
             };
 
-            // 5. Obtém token de acesso
-            const client = await this.auth.getClient();
-            const tokenResponse = await client.getAccessToken();
-            const token = tokenResponse.token;
-
-            // 6. Chama a REST API do Vertex AI
-            console.log('[Google-AI V10] Chamando Vertex AI REST (Multi-Angle)...');
-            const response = await fetch(this.apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestBody)
-            });
-
-            const responseJson = await response.json();
+            // 6. Executa as gerações consecutivamente (API não aceita multi-instance com Subject Reference)
+            console.log('[Google-AI V10] Gerando Retrato (Passo 1/2)...');
+            const portraitBase64 = await callVertexAI(promptFinal);
             
-            if (!response.ok) {
-                throw new Error(`Google API Error ${response.status}: ${JSON.stringify(responseJson.error || responseJson)}`);
+            console.log('[Google-AI V10] Gerando Corpo Inteiro (Passo 2/2)...');
+            const fullBodyPrompt = `${promptFinal}. Full body shot head to toe, standing posture, wide angle studio shot.`;
+            const fullBodyBase64 = await callVertexAI(fullBodyPrompt);
+
+            // 7. Consolida os resultados
+            const generatedImages = [];
+            if (portraitBase64) generatedImages.push(`data:image/png;base64,${portraitBase64}`);
+            if (fullBodyBase64) generatedImages.push(`data:image/png;base64,${fullBodyBase64}`);
+
+            if (generatedImages.length === 0) {
+                throw new Error(`Google não retornou nenhuma imagem.`);
             }
 
-            // 7. Extrai todas as imagens geradas (Multi-Angle)
-            const predictions = responseJson?.predictions || [];
-            if (predictions.length === 0) {
-                throw new Error(`Google não retornou nenhuma imagem. Resposta: ${JSON.stringify(responseJson).substring(0, 300)}`);
-            }
-
-            // Mapeia para um array de Data URLs
-            const generatedImages = predictions.map(p => `data:image/png;base64,${p.bytesBase64Encoded}`);
-
-            console.log(`[Google-AI V10] SUCESSO! ${generatedImages.length} imagens geradas (incluindo Corpo Inteiro).`);
+            console.log(`[Google-AI V10] SUCESSO! ${generatedImages.length} imagens geradas consecutivamente.`);
             return {
                 status: "success",
-                output_urls: generatedImages, // Retorna array agora!
-                output_url: generatedImages[0], // Legado para compatibilidade imediata
+                output_urls: generatedImages,
+                output_url: generatedImages[0],
                 orderId: `PEDIDO_G_${Date.now()}`
             };
 
