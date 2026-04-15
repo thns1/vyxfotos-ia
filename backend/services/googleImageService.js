@@ -63,9 +63,9 @@ class GoogleImageService {
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 4. Hyper-Fidelity V19.0: Identidade + Face Mesh (Malha Facial)
-            // Usamos a mesma foto como Gabarito Estrutural para fidelidade absoluta.
-            const hyperFidelityInstruction = "Absolute identity mirror of the person in [1]. Preserve exact facial proportions, bone structure, and RAW skin texture with visible pores. Zero retouching.";
+            // 4. Substituição Atômica V20.0: Extração Limpa + Neutralização de Luz
+            // Ordem: Isolar o humano, DELETAR o fundo original e ignorar a luz rosa/amadora.
+            const atomicWipeInstruction = "Strictly preserve the identity of [1]. IGNORE and DISCARD the original background, clothing, and the pinkish amateur lighting of reference [1]. Replace everything except the person with a high-end corporate studio environment and neutral white lighting.";
 
             const requestBody = {
                 instances: [
@@ -81,7 +81,7 @@ class GoogleImageService {
                                 },
                                 subjectImageConfig: {
                                     subjectType: "SUBJECT_TYPE_PERSON",
-                                    subjectDescription: hyperFidelityInstruction
+                                    subjectDescription: atomicWipeInstruction
                                 }
                             },
                             {
