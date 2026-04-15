@@ -4,9 +4,10 @@ const { GoogleAuth } = require('google-auth-library');
 const fetch = require('node-fetch');
 
 /**
- * SERVIÇO GOOGLE VERTEX AI - V33.0 (ZORDON MODE - TOTAL REPLACEMENT)
- * Foco: Quebrar o espelhamento persistente da selfie original.
- * Técnica: Inversão de comando no subjectDescription + Lente 70mm.
+ * SERVIÇO GOOGLE VERTEX AI - V35.0 (DNA GEMINI WEB - UNLOCKED)
+ * - Removida a trava de Face Mesh (Causa do efeito 'espelhamento' e zoom excessivo).
+ * - Implementado o protocolo de Sujeito Solo (Exatamente como o Gemini Web opera).
+ * - Fidelidade 1:1 baseada puramente no SubjectID 1.
  */
 class GoogleImageService {
     constructor() {
@@ -26,16 +27,16 @@ class GoogleImageService {
 
     async generateWithFaceID(imageFile, theme, customText, gender = 'masculino') {
         try {
-            console.log(`[Google-AI V33] MODO ZORDON (TOTAL REPLACEMENT): ${theme}`);
+            console.log(`[Google-AI V35] MODO GEMINI-WEB (UNLOCKED): ${theme}`);
             const themePrompts = require('../constants/themePrompts');
             let promptFinal = themePrompts[theme] || themePrompts['executivo'];
 
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // PROTOCOLO V33: Substituição Atômica Positiva
-            // Mudamos de "Não use" para "SUBSTITUA TUDO".
-            const atomicWipeInstruction = "ONLY USE [1] FOR FACIAL BIOMETRICS. COMPLETELY REPLACE AND OVERWRITE ALL OTHER PIXELS (CLOTHES, BACKGROUND, CHAIR, CURTAINS) WITH A NEW LUXURY SCENARIO. THE PERSON [1] MUST BE SEATED IN A NEW LUXURY ARMCHAIR. RELIGHT TO MATCH A BRIGHT EXECUTIVE OFFICE.";
+            // PROTOCOLO V35: Identidade Fluida e Profissional
+            // Instrução clara para a IA usar apenas o rosto do [1] e gerar TODO O RESTO do zero.
+            const atomicWipeInstruction = "STRICTLY PRESERVE THE AUTHENTIC FACIAL BIOMETRICS OF [1]. GENERATE A COMPLETELY NEW SCENARIO, NEW CLOTHING AND NEW POSE FROM SCRATCH BASED ON THE PROMPT. DISCARD ALL ORIGINAL CONTEXT.";
 
             const requestBody = {
                 instances: [
@@ -47,12 +48,6 @@ class GoogleImageService {
                                 referenceId: 1,
                                 referenceImage: { bytesBase64Encoded: imageData, mimeType: mimeType },
                                 subjectImageConfig: { subjectType: "SUBJECT_TYPE_PERSON", subjectDescription: atomicWipeInstruction }
-                            },
-                            {
-                                referenceType: "REFERENCE_TYPE_CONTROL",
-                                referenceId: 2,
-                                referenceImage: { bytesBase64Encoded: imageData, mimeType: mimeType },
-                                controlImageConfig: { controlType: "CONTROL_TYPE_FACE_MESH" }
                             }
                         ]
                     }
@@ -79,7 +74,7 @@ class GoogleImageService {
             };
 
         } catch (error) {
-            console.error('[Google-AI V33] FALHA:', error.message);
+            console.error('[Google-AI V35] FALHA:', error.message);
             throw error;
         }
     }
