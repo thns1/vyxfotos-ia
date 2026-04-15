@@ -43,6 +43,7 @@ export default function Landing() {
   const [generatedImage, setGeneratedImage] = useState(null); // Imagem REAL cuspidada pela IA
   const [user, setUser] = useState(null);
   const [countdown, setCountdown] = useState(30);
+  const [gender, setGender] = useState('masculino'); // 'masculino' ou 'feminino'
   const [hasImageArrival, setHasImageArrival] = useState(false);
   // Lógica de Suspense: Só libera quando contador chegar a 0 E a imagem chegar
   useEffect(() => {
@@ -192,6 +193,7 @@ export default function Landing() {
         formData.append('selfieFile', file);
         formData.append('theme', selectedTheme);
         formData.append('customTheme', customTheme);
+        formData.append('gender', gender); // Envia o gênero selecionado pelo usuário
 
         // Detecção de Ambiente (Localhouse vs Produção na Nuvem)
         const BASE_API_URL = window.location.hostname === 'localhost' 
@@ -540,6 +542,35 @@ export default function Landing() {
               <h2 className="text-3xl font-black text-ivory">Forneça os Dados Biométricos.</h2>
               <p className="text-ivory/60">Para a renderização do cenário <b className="text-champagne">{selectedTheme === 'custom' ? customTheme : THEMES.find(t=>t.id===selectedTheme)?.name}</b>, anexe uma selfie limpa e iluminada de frente.</p>
               
+              {/* SELETOR DE GÊNERO */}
+              <div className="flex flex-col items-center gap-3">
+                <p className="text-xs font-mono tracking-[0.2em] uppercase text-ivory/40">Você é:</p>
+                <div className="flex gap-3 p-1 bg-black/40 rounded-full border border-white/10">
+                  <button
+                    id="gender-masculino"
+                    onClick={() => setGender('masculino')}
+                    className={`px-6 py-2 rounded-full text-sm font-bold tracking-wide transition-all duration-300 ${
+                      gender === 'masculino'
+                        ? 'bg-champagne text-obsidian shadow-[0_0_15px_rgba(201,168,76,0.4)]'
+                        : 'text-ivory/50 hover:text-ivory'
+                    }`}
+                  >
+                    👔 Masculino
+                  </button>
+                  <button
+                    id="gender-feminino"
+                    onClick={() => setGender('feminino')}
+                    className={`px-6 py-2 rounded-full text-sm font-bold tracking-wide transition-all duration-300 ${
+                      gender === 'feminino'
+                        ? 'bg-champagne text-obsidian shadow-[0_0_15px_rgba(201,168,76,0.4)]'
+                        : 'text-ivory/50 hover:text-ivory'
+                    }`}
+                  >
+                    👗 Feminino
+                  </button>
+                </div>
+              </div>
+
               <div className="w-full p-12 border border-dashed border-champagne/40 rounded-[2.5rem] bg-black/30 hover:bg-champagne/10 hover:border-champagne transition-all duration-300 cursor-pointer relative group">
                 <input 
                   type="file" 

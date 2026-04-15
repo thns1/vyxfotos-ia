@@ -3,10 +3,11 @@ const { GoogleAuth } = require('google-auth-library');
 const themePrompts = require('../constants/themePrompts');
 
 /**
- * SERVIÇO DE GERAÇÃO DE IMAGENS - GOOGLE IMAGEN 3 ELITE (V8.4 - REST)
+ * SERVIÇO DE GERAÇÃO DE IMAGENS - GOOGLE IMAGEN 3 ELITE (V10.0)
  *
- * Usa a REST API direta do Vertex AI (não gRPC).
- * Isso elimina problemas de serialização de proto e é 100% estável.
+ * Motor: Vertex AI REST API (sem gRPC)
+ * Novidade: Suporte a Gênero (Masculino/Feminino) com substituição automática nos prompts.
+ * Fidelidade: Subject Customization + Face Mesh Control para identidade absoluta.
  */
 class GoogleImageService {
     constructor() {
@@ -14,47 +15,62 @@ class GoogleImageService {
         this.location = 'us-central1';
         this.apiUrl = `https://${this.location}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${this.location}/publishers/google/models/imagen-3.0-capability-001:predict`;
 
-        // Configuração do cliente de autenticação
         const authConfig = { scopes: ['https://www.googleapis.com/auth/cloud-platform'] };
         if (process.env.GOOGLE_CREDS_JSON) {
             authConfig.credentials = JSON.parse(process.env.GOOGLE_CREDS_JSON);
         }
         this.auth = new GoogleAuth(authConfig);
 
-        console.log('[Google-AI V8.4] Motor REST Imagen 3 Elite configurado.');
+        console.log('[Google-AI V10] Motor REST configurado. Suporte a Gênero ativado.');
     }
 
-    async generateWithFaceID(imageFile, theme, customText) {
+    /**
+     * Substitui termos de gênero no prompt baseado na seleção do usuário.
+     * Isso garante que a IA gere o traje e o corpo correto (terno vs blazer/vestido).
+     */
+    _applyGender(prompt, gender) {
+        if (gender === 'feminino') {
+            return prompt
+                .replace(/\b(man|men|male|gentleman|businessman)\b/gi, 'woman')
+                .replace(/\b(his)\b/gi, 'her')
+                .replace(/\b(he)\b/gi, 'she')
+                .replace(/tailored mens executive suit/gi, "women's tailored blazer or executive suit")
+                .replace(/mens executive/gi, "women's executive")
+                .replace(/a man's/gi, "a woman's");
+        }
+        // Para masculino, mantém o prompt como está (já escrito no masculino)
+        return prompt;
+    }
+
+    async generateWithFaceID(imageFile, theme, customText, gender = 'masculino') {
         try {
-            console.log(`[Google-AI] Iniciando geração. Tema: ${theme}`);
+            console.log(`[Google-AI V10] Geração iniciada. Tema: "${theme}" | Gênero: "${gender}"`);
 
-            // 1. Prompt de Elite V9.1 (Núcleo + Estilo do PDF)
-            let promptElite;
-            const styleBase = themePrompts[theme] || themePrompts['executivo'];
-
+            // 1. Seleciona o prompt base do PDF
+            let promptBase;
             if (customText && customText.trim().length > 3) {
-                // Para temas customizados (Sonhos), usamos o Núcleo de Fidelidade + Texto do Usuário
-                const coreFidelity = styleBase; // No tema 'custom' e 'sonhos', o styleBase é apenas o FIDELIDADE_BASE
-                promptElite = `${coreFidelity} maintaining exact facial structure as shown in [2], in ${customText.trim()}, high-end professional photography.`;
+                // Tema livre: usa o núcleo de fidelidade do tema + descrição do usuário
+                promptBase = `${themePrompts['executivo']} The scene setting is: ${customText.trim()}.`;
             } else {
-                // Para temas pré-definidos, usamos o prompt completo do PDF que já contém o [1] e o estilo [2]
-                // Adicionamos o [2] explicitamente no início para garantir a trava geométrica
-                promptElite = `Using [2] as absolute facial geometry guide: ${styleBase}`;
+                promptBase = themePrompts[theme] || themePrompts['executivo'];
             }
 
-            console.log(`[Google-AI] Prompt: "${promptElite.substring(0, 100)}..."`);
+            // 2. Aplica o gênero selecionado pelo usuário
+            const promptFinal = this._applyGender(promptBase, gender);
+            console.log(`[Google-AI V10] Prompt (primeiros 120 chars): "${promptFinal.substring(0, 120)}..."`);
 
-            // 2. Converte selfie para Base64
+            // 3. Converte selfie para Base64
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 3. Monta o body REST com Dupla Referência (Sujeito + Face Mesh) para Fidelidade Máxima
+            // 4. Monta a requisição: Subject Customization [1] + Face Mesh Control [2]
             const requestBody = {
                 instances: [
                     {
-                        prompt: promptElite,
+                        prompt: promptFinal,
                         referenceImages: [
                             {
+                                // [1] = Identidade: quem é a pessoa (rosto, pele, traços)
                                 referenceType: "REFERENCE_TYPE_SUBJECT",
                                 referenceId: 1,
                                 referenceImage: {
@@ -62,11 +78,11 @@ class GoogleImageService {
                                     mimeType: mimeType
                                 },
                                 subjectImageConfig: {
-                                    subjectType: "SUBJECT_TYPE_PERSON",
-                                    subjectDescription: "the specific person with identical facial structure, eyes, nose, and jawline as shown in the reference image"
+                                    subjectType: "SUBJECT_TYPE_PERSON"
                                 }
                             },
                             {
+                                // [2] = Geometria: forma exata da estrutura facial (impede distorção)
                                 referenceType: "REFERENCE_TYPE_CONTROL",
                                 referenceId: 2,
                                 referenceImage: {
@@ -86,13 +102,13 @@ class GoogleImageService {
                 }
             };
 
-            // 4. Obtém token de acesso
+            // 5. Obtém token de acesso
             const client = await this.auth.getClient();
             const tokenResponse = await client.getAccessToken();
             const token = tokenResponse.token;
 
-            // 5. Chama a REST API do Vertex AI
-            console.log('[Google-AI] Chamando Vertex AI REST...');
+            // 6. Chama a REST API do Vertex AI
+            console.log('[Google-AI V10] Chamando Vertex AI REST...');
             const response = await fetch(this.apiUrl, {
                 method: 'POST',
                 headers: {
@@ -103,13 +119,13 @@ class GoogleImageService {
             });
 
             const responseJson = await response.json();
-            console.log('[Google-AI] Resposta:', JSON.stringify(responseJson).substring(0, 200));
+            console.log('[Google-AI V10] Status:', response.status, '| Resposta:', JSON.stringify(responseJson).substring(0, 200));
 
             if (!response.ok) {
                 throw new Error(`Google API Error ${response.status}: ${JSON.stringify(responseJson.error || responseJson)}`);
             }
 
-            // 6. Extrai a imagem da resposta
+            // 7. Extrai a imagem da resposta
             const prediction = responseJson?.predictions?.[0];
             const imageBase64 = prediction?.bytesBase64Encoded;
 
@@ -117,6 +133,7 @@ class GoogleImageService {
                 throw new Error(`Google não retornou imagem. Resposta: ${JSON.stringify(responseJson).substring(0, 300)}`);
             }
 
+            console.log('[Google-AI V10] SUCESSO! Imagem gerada com fidelidade de identidade.');
             return {
                 status: "success",
                 output_url: `data:image/png;base64,${imageBase64}`,
@@ -124,7 +141,7 @@ class GoogleImageService {
             };
 
         } catch (error) {
-            console.error('[Google-AI] FALHA CRÍTICA:', error.message);
+            console.error('[Google-AI V10] FALHA:', error.message);
             throw error;
         }
     }

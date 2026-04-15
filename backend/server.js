@@ -104,15 +104,16 @@ app.post('/api/generate', upload.single('selfieFile'), async (req, res) => {
         const file = req.file;
         const theme = req.body.theme;
         const customTheme = req.body.customTheme;
+        const gender = req.body.gender || 'masculino'; // 'masculino' ou 'feminino'
 
         if (!file) {
             return res.status(400).json({ error: "Nenhuma foto/selfie fornecida na requisição." });
         }
 
-        console.log(`[API] Nova Rquisição de Geração: Tema: "${theme}"`);
+        console.log(`[API] Nova Requisição de Geração: Tema: "${theme}" | Gênero: "${gender}"`);
 
-        // Dispara o PipeLine Principal que foi programado junto de FaceID
-        const result = await ImagePipelineService.generateWithFaceID(file, theme, customTheme);
+        // Dispara o PipeLine Principal com informação de gênero
+        const result = await ImagePipelineService.generateWithFaceID(file, theme, customTheme, gender);
 
         // SALVA NA FILA DE PENDENTES (Para o Webhook encontrar depois da compra)
         try {
