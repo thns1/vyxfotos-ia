@@ -28,14 +28,14 @@ class GoogleImageService {
         try {
             console.log(`[Google-AI] Iniciando geração. Tema: ${theme}`);
 
-            // 1. Prompt com marcação [1] para subject customization
+            // 1. Prompt com marcação [1] para identidade e [2] para estrutura facial (Face Mesh)
             let promptElite;
             if (customText && customText.trim().length > 3) {
-                promptElite = `A high-quality professional portrait of [1] in ${customText.trim()}, 85mm portrait photography, sharp focus, cinematic lighting, 8k resolution.`;
+                promptElite = `A high-quality professional portrait of person [1] maintaining exact facial structure as shown in [2], in ${customText.trim()}, 85mm portrait photography, sharp focus, cinematic lighting, 8k resolution.`;
             } else {
                 const base = themePrompts[theme] || themePrompts['executivo'];
-                // Insere marcação [1] no começo do prompt
-                promptElite = `Portrait of [1], ${base}`;
+                // Insere marcação [1] e [2] no começo do prompt para ancorar identidade e geometria
+                promptElite = `Professional portrait of person [1] with exact facial geometry of [2], ${base}`;
             }
 
             console.log(`[Google-AI] Prompt: "${promptElite.substring(0, 100)}..."`);
@@ -44,7 +44,7 @@ class GoogleImageService {
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 3. Monta o body REST no formato correto do Imagen 3 Subject Customization
+            // 3. Monta o body REST com Dupla Referência (Sujeito + Face Mesh) para Fidelidade Máxima
             const requestBody = {
                 instances: [
                     {
@@ -58,7 +58,19 @@ class GoogleImageService {
                                     mimeType: mimeType
                                 },
                                 subjectImageConfig: {
-                                    subjectType: "SUBJECT_TYPE_PERSON"
+                                    subjectType: "SUBJECT_TYPE_PERSON",
+                                    subjectDescription: "the specific person with identical facial structure, eyes, nose, and jawline as shown in the reference image"
+                                }
+                            },
+                            {
+                                referenceType: "REFERENCE_TYPE_CONTROL",
+                                referenceId: 2,
+                                referenceImage: {
+                                    bytesBase64Encoded: imageData,
+                                    mimeType: mimeType
+                                },
+                                controlImageConfig: {
+                                    controlType: "CONTROL_TYPE_FACE_MESH"
                                 }
                             }
                         ]
