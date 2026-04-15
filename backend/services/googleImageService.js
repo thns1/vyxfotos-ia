@@ -63,7 +63,10 @@ class GoogleImageService {
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 4. Reset de Estabilidade V13.2: Voltando ao formato básico funcional
+            // 4. Calibragem V15.0: Identidade Capilar e Facial
+            // Foco absoluto em manter o cabelo original curto e o rosto alongado do Thiago
+            const highFidelityDescription = "Person with original short dark groomed hair and an elongated face shape. Preserve exact hair length and facial proportions from [1].";
+
             const requestBody = {
                 instances: [
                     {
@@ -77,7 +80,8 @@ class GoogleImageService {
                                     mimeType: mimeType
                                 },
                                 subjectImageConfig: {
-                                    subjectType: "SUBJECT_TYPE_PERSON"
+                                    subjectType: "SUBJECT_TYPE_PERSON",
+                                    subjectDescription: highFidelityDescription
                                 }
                             }
                         ]
