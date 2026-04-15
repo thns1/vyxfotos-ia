@@ -63,10 +63,7 @@ class GoogleImageService {
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 4. Calibragem V13.1: Simplificação para Estabilidade
-            // Removemos o negativePrompt que causa erro em alguns modelos de customização
-            const highFidelityDescription = "Person with elongated face, dark eyes, and specific goatee pattern.";
-
+            // 4. Reset de Estabilidade V13.2: Voltando ao formato básico funcional
             const requestBody = {
                 instances: [
                     {
@@ -80,8 +77,7 @@ class GoogleImageService {
                                     mimeType: mimeType
                                 },
                                 subjectImageConfig: {
-                                    subjectType: "SUBJECT_TYPE_PERSON",
-                                    subjectDescription: highFidelityDescription
+                                    subjectType: "SUBJECT_TYPE_PERSON"
                                 }
                             }
                         ]
@@ -92,10 +88,6 @@ class GoogleImageService {
                     aspectRatio: "3:4"
                 }
             };
-            
-            // Parâmetros de segurança e geração
-            requestBody.parameters.personGeneration = "ALLOW_ADULT";
-            requestBody.parameters.safetySetting = "BLOCK_ONLY_HIGH";
 
             // 5. Obtém token de acesso
             const client = await this.auth.getClient();
