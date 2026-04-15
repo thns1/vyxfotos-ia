@@ -3,84 +3,90 @@ const themePrompts = require('../constants/themePrompts');
 const { fal } = require("@fal-ai/client");
 
 /**
- * SERVIÇO DE GERAÇÃO DE IMAGENS - VYXFOTOS REAL-AI
- * Integração oficial com Fal.ai para geração de retratos profissionais.
+ * SERVIÇO DE GERAÇÃO DE IMAGENS - VYXFOTOS V4
+ * Motor: fal-ai/flux-pulid (FLUX + PuLID)
+ * O melhor modelo do Fal.ai para preservação de identidade facial fotorrealista.
+ * A selfie de referência preserva 100% das feições (olhos, nariz, boca, cabelo).
+ * O prompt descreve apenas cenário, estilo e iluminação.
  */
 class ImagePipelineService {
     constructor() {
         if (process.env.FAL_KEY) {
-            fal.config({
-                credentials: process.env.FAL_KEY,
-            });
-            console.log("[Backend-AI] Fal.ai Client Configurado com sucesso.");
+            fal.config({ credentials: process.env.FAL_KEY });
+            console.log("[Backend-AI] Motor V4 (flux-pulid) configurado com sucesso.");
         } else {
-            console.warn("[Backend-AI] AVISO CRÍTICO: FAL_KEY não está definida no ambiente!");
+            console.warn("[Backend-AI] AVISO: FAL_KEY não definida!");
         }
     }
 
     async generateWithFaceID(imageFile, theme, customText) {
         try {
             if (!process.env.FAL_KEY) {
-                throw new Error("FAL_KEY não configurada no servidor. Adicione no painel do Render.");
+                throw new Error("FAL_KEY não configurada no servidor.");
             }
 
-            console.log(`[Backend-AI] Motor Real Acionado - Tema: ${theme}`);
+            console.log(`[Backend-AI V4] Acionando motor FLUX-PuLID. Tema: "${theme}"`);
 
-            // 1. Prepara o prompt (Cenário)
-            const temaCena = customText && customText.trim() !== ''
-                ? customText
-                : (themePrompts[theme] || themePrompts['luxo']);
+            // 1. Prepara o prompt — descreve CENÁRIO e ESTILO, não a pessoa
+            //    (as feições vêm da selfie de referência automaticamente pelo PuLID)
+            let temaCena;
+            if (customText && customText.trim().length > 3) {
+                // Para tema "sonhos", o usuário descreve o cenário livremente
+                temaCena = `${themePrompts['sonhos'].replace('breathtaking dreamlike landscape, surreal and majestic', customText.trim())}, photorealistic portrait.`;
+            } else {
+                temaCena = themePrompts[theme] || themePrompts['executivo'];
+            }
 
-            console.log(`[Backend-AI] Prompt: "${temaCena.substring(0, 60)}..."`);
+            console.log(`[Backend-AI V4] Prompt: "${temaCena.substring(0, 80)}..."`);
 
-            // 2. Upload da Selfie para a nuvem do Fal.ai
-            // A API v1.x do @fal-ai/client usa fal.storage.upload() com um Blob
-            console.log(`[Backend-AI] Fazendo upload do arquivo: ${imageFile.path}`);
+            // 2. Upload da selfie para o armazenamento do Fal.ai
+            console.log(`[Backend-AI V4] Uploading selfie: ${imageFile.path}`);
             const imageData = fs.readFileSync(imageFile.path);
-            const mimeType = imageFile.mimetype || 'image/jpeg';
-            const fileBlob = new Blob([imageData], { type: mimeType });
+            const fileBlob = new Blob([imageData], { type: imageFile.mimetype || 'image/jpeg' });
 
-            let imageUrl;
+            let referenceImageUrl;
             try {
-                imageUrl = await fal.storage.upload(fileBlob);
-                console.log(`[Backend-AI] Upload Concluído. URL: ${imageUrl}`);
+                referenceImageUrl = await fal.storage.upload(fileBlob);
+                console.log(`[Backend-AI V4] Upload OK: ${referenceImageUrl}`);
             } catch (uploadErr) {
-                console.error("[Backend-AI] Erro no Upload para Fal.ai:", uploadErr.message);
-                throw new Error(`Falha ao subir imagem: ${uploadErr.message}`);
+                throw new Error(`Falha no upload da selfie: ${uploadErr.message}`);
             }
 
-            // 3. Geração InstantID com Foco em Fidelidade Humana V3
-            console.log(`[Backend-AI] Iniciando renderização neural de ALTA FIDELIDADE...`);
-            const result = await fal.subscribe("fal-ai/instantid", {
+            // 3. Geração com FLUX-PuLID
+            // PuLID injeta a identidade facial da selfie diretamente na geração FLUX,
+            // produzindo resultados fotorrealistas que preservam os traços da pessoa.
+            console.log(`[Backend-AI V4] Iniciando geração FLUX-PuLID...`);
+            const result = await fal.subscribe("fal-ai/flux-pulid", {
                 input: {
-                    face_image_url: imageUrl,
                     prompt: temaCena,
-                    negative_prompt: "abstract, colorful art, high contrast, over-saturated, (bad anatomy, blurry, cartoon, anime, illustration, 3d, rendering, plastic, smooth skin:1.3), messy hair, closed eyes, watermark, signature, vibrant colors, neon, pop art",
-                    image_size: "portrait_4_3",
-                    num_inference_steps: 50,
-                    guidance_scale: 5.0,
-                    ip_adapter_scale: 0.8,
-                    controlnet_conditioning_scale: 0.8
+                    reference_image_url: referenceImageUrl,
+                    num_inference_steps: 25,
+                    guidance_scale: 4.0,
+                    num_images: 1,
                 },
                 logs: true,
                 onQueueUpdate: (update) => {
                     if (update.status === "IN_PROGRESS") {
                         const lastLog = update.logs?.at(-1)?.message || '';
-                        if (lastLog) console.log(`[Fal.ai] ${lastLog}`);
+                        if (lastLog) console.log(`[Fal.ai PuLID] ${lastLog}`);
                     }
                 }
             });
 
-            console.log("[Backend-AI] Resultado bruto do Fal:", JSON.stringify(result, null, 2));
+            console.log("[Backend-AI V4] Resultado:", JSON.stringify(result?.data || result, null, 2));
 
-            // Ajuste no caminho da URL: O modelo InstantID retorna dentro de 'data'
-            const outputUrl = result?.data?.image?.url || result?.images?.[0]?.url || result?.image?.url;
+            // Extrai a URL do resultado (PuLID retorna result.data.images[0].url)
+            const outputUrl =
+                result?.data?.images?.[0]?.url ||
+                result?.images?.[0]?.url ||
+                result?.data?.image?.url ||
+                result?.image?.url;
 
             if (!outputUrl) {
-                throw new Error(`A IA não retornou URL. Resposta: ${JSON.stringify(result)}`);
+                throw new Error(`PuLID não retornou URL. Resposta: ${JSON.stringify(result)}`);
             }
 
-            console.log(`[Backend-AI] SUCESSO! Foto gerada: ${outputUrl}`);
+            console.log(`[Backend-AI V4] SUCESSO! Imagem gerada: ${outputUrl}`);
 
             return {
                 status: "success",
@@ -90,7 +96,7 @@ class ImagePipelineService {
             };
 
         } catch (error) {
-            console.error(`[Backend-AI] FALHA CRÍTICA:`, error.message);
+            console.error(`[Backend-AI V4] FALHA:`, error.message);
             throw error;
         }
     }

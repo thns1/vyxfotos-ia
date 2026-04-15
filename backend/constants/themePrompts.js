@@ -1,17 +1,19 @@
 /**
- * THEME PROMPTS (Cátalogo Oficial de IA)
- * 
- * Estes prompts são a Engenharia Reversa daqueles exemplos de alta conversão.
- * Eles substituem o texto no workflow do SDXL no momento da geração.
+ * THEME PROMPTS - VYXFOTOS V4 (FLUX-PuLID Optimized)
+ *
+ * IMPORTANTE: Esses prompts são otimizados para o modelo fal-ai/flux-pulid.
+ * Com PuLID, a identidade do rosto (olhos, nariz, boca, cabelo) vem 100% da 
+ * selfie de referência. O prompt deve descrever SOMENTE o cenário, roupa e 
+ * iluminação — nunca a anatomia da pessoa, pois isso confunde o modelo.
  */
 module.exports = {
-  aniversario: "High-end professional photography of the person in a luxury studio. Extreme focus on face, hyper-detailed iris and pupils, natural skin texture with visible pores, realistic lip anatomy, sharp eyebrows. Elegant studio lighting, 85mm lens, f/1.8, professional studio quality, sharp focus on face features.",
-  
-  sonhos: "Exquisite fine-art photography featuring the person. High-fidelity facial features, microscopic skin texture, individual hair strands, precise lip and nose structure. The setting is majestic and surreal but with photorealistic lighting and textures. Hyper-detailed eyes, sharp focus on the person anatomy.",
-  
-  luxo: "Cinematic portrait of the person wearing premium luxury attire in a high-end penthouse. Absolute realism, highly detailed facial anatomy, realistic eyes with reflections, natural skin texture with pores. Soft beauty dish lighting, 85mm prime lens, f/1.8, professional studio setup, sharp focus on facial structure.",
-  
-  executivo: "Extreme high-quality professional corporate headshot of the person. Meticulous detail on face, realistic iris and pupils, skin texture with visible pores, perfectly defined nose and mouth anatomy. Wearing a tailored charcoal blazer, modern office background. 8k resolution, photorealistic, sharp eyes.",
-  
-  ferrari_kid: "Professional editorial photography of a child. Hyper-realistic facial features, sharp focus on eyes and expression, natural skin texture. Red racing suit with detailed fabric texture, automotive studio background, cinematic strobe lighting, top-tier realism, sharp focus."
+  executivo: `A confident business executive wearing an impeccably tailored dark charcoal blazer over a crisp white dress shirt, standing in a sleek modern corporate office. Floor-to-ceiling glass windows with a soft city skyline blur in the background. Rembrandt studio lighting, premium LinkedIn headshot style, photorealistic, cinematic, sharp focus, 8k quality.`,
+
+  luxo: `An elegant person dressed in minimalist high-end luxury fashion — a tailored black coat or silk blouse — inside a sophisticated penthouse suite with marble floors and floor-to-ceiling windows overlooking a glowing city. Soft diffused beauty dish lighting, Vogue editorial style, photorealistic, cinematic bokeh, 8k quality.`,
+
+  aniversario: `A person celebrating a lavish birthday inside an elegant private venue with warm golden ambient lighting. Tasteful decorations — crystal centerpieces, soft floral arrangements — blurred softly in the background. Joyful expression, photorealistic portrait, cinematic lighting, 8k quality.`,
+
+  sonhos: `A person standing in a breathtaking dreamlike landscape, surreal and majestic. Cinematic epic lighting, hyper-detailed environment, photorealistic portrait, sharp face, masterpiece quality, 8k.`,
+
+  ferrari_kid: `A child wearing a vibrant red and white Formula 1 professional racing suit with sponsor logos, standing inside a luxury supercar showroom next to a sleek Ferrari. Dramatic spot lighting, reflective polished floor, cinematic portrait, photorealistic, sharp details, 8k quality.`,
 };
