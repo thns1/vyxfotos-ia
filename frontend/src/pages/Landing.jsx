@@ -213,7 +213,8 @@ export default function Landing() {
         } else {
            console.error("Backend Error:", result.error);
            setIsGenerating(false);
-           alert("Houve um erro no servidor de Imagens da Vyxfotos.");
+           const errorMsg = result.detail || result.error || "Erro desconhecido";
+           alert(`Erro no Motor de Imagens:\n${errorMsg}`);
         }
 
       } catch (error) {
