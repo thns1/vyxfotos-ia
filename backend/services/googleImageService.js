@@ -70,6 +70,7 @@ class GoogleImageService {
             const requestBody = {
                 instances: [
                     {
+                        // Instância 1: Retrato Profissional (V22.0)
                         prompt: promptFinal,
                         referenceImages: [
                             {
@@ -96,7 +97,36 @@ class GoogleImageService {
                                 }
                             }
                         ]
-                    }
+                    },
+                    {
+                         // Instância 2: Corpo Inteiro (Full Body Shot)
+                         prompt: `${promptFinal}. Full body shot from head to toe, standing posture, wide angle studio shot.`,
+                         referenceImages: [
+                             {
+                                 referenceType: "REFERENCE_TYPE_SUBJECT",
+                                 referenceId: 1,
+                                 referenceImage: {
+                                     bytesBase64Encoded: imageData,
+                                     mimeType: mimeType
+                                 },
+                                 subjectImageConfig: {
+                                     subjectType: "SUBJECT_TYPE_PERSON",
+                                     subjectDescription: atomicWipeInstruction
+                                 }
+                             },
+                             {
+                                 referenceType: "REFERENCE_TYPE_CONTROL",
+                                 referenceId: 2,
+                                 referenceImage: {
+                                     bytesBase64Encoded: imageData,
+                                     mimeType: mimeType
+                                 },
+                                 controlImageConfig: {
+                                     controlType: "CONTROL_TYPE_FACE_MESH"
+                                 }
+                             }
+                         ]
+                     }
                 ],
                 parameters: {
                     sampleCount: 1,
@@ -110,7 +140,7 @@ class GoogleImageService {
             const token = tokenResponse.token;
 
             // 6. Chama a REST API do Vertex AI
-            console.log('[Google-AI V10] Chamando Vertex AI REST...');
+            console.log('[Google-AI V10] Chamando Vertex AI REST (Multi-Angle)...');
             const response = await fetch(this.apiUrl, {
                 method: 'POST',
                 headers: {
@@ -121,24 +151,25 @@ class GoogleImageService {
             });
 
             const responseJson = await response.json();
-            console.log('[Google-AI V10] Status:', response.status, '| Resposta:', JSON.stringify(responseJson).substring(0, 200));
-
+            
             if (!response.ok) {
                 throw new Error(`Google API Error ${response.status}: ${JSON.stringify(responseJson.error || responseJson)}`);
             }
 
-            // 7. Extrai a imagem da resposta
-            const prediction = responseJson?.predictions?.[0];
-            const imageBase64 = prediction?.bytesBase64Encoded;
-
-            if (!imageBase64) {
-                throw new Error(`Google não retornou imagem. Resposta: ${JSON.stringify(responseJson).substring(0, 300)}`);
+            // 7. Extrai todas as imagens geradas (Multi-Angle)
+            const predictions = responseJson?.predictions || [];
+            if (predictions.length === 0) {
+                throw new Error(`Google não retornou nenhuma imagem. Resposta: ${JSON.stringify(responseJson).substring(0, 300)}`);
             }
 
-            console.log('[Google-AI V10] SUCESSO! Imagem gerada com fidelidade de identidade.');
+            // Mapeia para um array de Data URLs
+            const generatedImages = predictions.map(p => `data:image/png;base64,${p.bytesBase64Encoded}`);
+
+            console.log(`[Google-AI V10] SUCESSO! ${generatedImages.length} imagens geradas (incluindo Corpo Inteiro).`);
             return {
                 status: "success",
-                output_url: `data:image/png;base64,${imageBase64}`,
+                output_urls: generatedImages, // Retorna array agora!
+                output_url: generatedImages[0], // Legado para compatibilidade imediata
                 orderId: `PEDIDO_G_${Date.now()}`
             };
 

@@ -10,30 +10,45 @@ export default function Checkout() {
   const [user, setUser] = useState(null);
   const [selectedPkgId, setSelectedPkgId] = useState('p7'); // Performance selecionado por padrão
 
+  const [allImages, setAllImages] = useState([]);
+  const [currentIdx, setCurrentIdx] = useState(0);
+
   useEffect(() => {
-    // Escuta estado do usuário
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
       setUser(currentUser);
     });
 
-    // Carrega dados do Checkout do LocalStorage (Persistência F5)
     const savedImage = localStorage.getItem('vyx_generated_image');
+    const savedImages = localStorage.getItem('vyx_generated_images');
     const savedOrderId = localStorage.getItem('vyx_order_id');
 
     if (savedImage && savedOrderId) {
-      setGeneratedImage(savedImage);
       setOrderId(savedOrderId);
+      if (savedImages) {
+        const parsed = JSON.parse(savedImages);
+        setAllImages(parsed);
+        setGeneratedImage(parsed[0]);
+      } else {
+        setAllImages([savedImage]);
+        setGeneratedImage(savedImage);
+      }
     } else {
-      // Se não tem nada salvo, volta pra home
       navigate('/');
     }
 
     return () => unsubscribe();
   }, [navigate]);
 
+  const handleNextImage = () => {
+    const next = (currentIdx + 1) % allImages.length;
+    setCurrentIdx(next);
+    setGeneratedImage(allImages[next]);
+  };
+
   const handleLogout = async () => {
     await auth.signOut();
     localStorage.removeItem('vyx_generated_image');
+    localStorage.removeItem('vyx_generated_images');
     localStorage.removeItem('vyx_order_id');
     window.location.href = '/';
   };
@@ -84,7 +99,8 @@ export default function Checkout() {
             {/* Esquerda: A Imagem Protegida */}
             <div className="relative w-full max-w-md mx-auto aspect-[4/5] bg-black rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] group select-none">
               <div 
-                className="absolute inset-0 bg-cover bg-center transition-all duration-700"
+                key={currentIdx}
+                className="absolute inset-0 bg-cover bg-center transition-all duration-700 animate-fade-in"
                 style={{ backgroundImage: `url(${generatedImage})` }}
               ></div>
               
@@ -99,8 +115,19 @@ export default function Checkout() {
                      </div>
                    ))}
                 </div>
+                
+                {allImages.length > 1 && (
+                  <button 
+                    onClick={handleNextImage}
+                    className="absolute top-6 right-6 px-4 py-2 bg-champagne text-obsidian font-bold text-[10px] rounded-full shadow-lg hover:scale-105 transition-transform z-30 flex items-center gap-2"
+                  >
+                    <span>{currentIdx === 0 ? "Ver Corpo Inteiro" : "Ver Retrato"}</span>
+                    <span>🔄</span>
+                  </button>
+                )}
+
                 <span className="absolute bottom-10 px-6 py-3 bg-obsidian/90 backdrop-blur-md border border-white/10 rounded-full text-[10px] md:text-xs font-mono tracking-widest text-white/80 z-20 shadow-2xl">
-                  Ativo Protegido | Compre a Licença
+                  {currentIdx === 0 ? "Retrato Profissional" : "Corpo Inteiro (Bonus)"} | Ativo Protegido
                 </span>
               </div>
             </div>

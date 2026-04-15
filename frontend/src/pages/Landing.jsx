@@ -209,12 +209,18 @@ export default function Landing() {
         const result = await response.json();
         
         if(result.success) {
-           const totalTime = 30; // Reduzido para 30 segundos para o motor Google
+           const totalTime = 30;
            console.log("Sucesso no Processamento Neural: ", result.data);
-           // Armazena o Protocolo para não perder o link do cliente e o dinheiro!
+           
+           const imageUrls = result.data.output_urls || [result.data.output_url];
+           
            setOrderId(result.data.orderId);
-           setGeneratedImage(result.data.output_url); // INJETA FOTO REAL!
-           // Libera para o cliente visualizar a imagem borrada e comprar a original
+           setGeneratedImage(imageUrls[0]); // Define a primeira como principal (Retrato)
+           
+           // Armazena o array completo no localStorage para o Checkout
+           localStorage.setItem('vyx_generated_images', JSON.stringify(imageUrls));
+           localStorage.setItem('vyx_generated_image', imageUrls[0]);
+           
            setHasImageArrival(true); 
         } else {
            console.error("Backend Error:", result.error);
