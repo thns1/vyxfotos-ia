@@ -81,7 +81,7 @@ class GoogleImageService {
                                 },
                                 subjectImageConfig: {
                                     subjectType: "SUBJECT_TYPE_PERSON",
-                                    subjectDescription: highFidelityDescription
+                                    subjectDescription: universalExtractionProtocol
                                 }
                             }
                         ]
