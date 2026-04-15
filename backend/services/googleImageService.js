@@ -31,8 +31,11 @@ class GoogleImageService {
             const themePrompts = require('../constants/themePrompts');
             let promptBase = themePrompts[theme] || themePrompts['executivo'];
 
-            // Ajuste crucial: Trocamos 'full body' (que quebra a escala) por 'medium-wide shot' (igual ao print do app).
-            const promptFinal = promptBase.replace(/full body head to toe/gi, "medium-wide shot, waist up, capturing head and torso in a professional executive posture");
+            // Ajuste crucial V36.1: Forçamos o recuo da lente para Plano Médio (DNA Gemini Web)
+            // Trocamos 'Portrait' e '85mm' por termos de afastamento.
+            const promptFinal = promptBase
+                .replace(/portrait photograph/gi, "medium-wide shot photograph, waist up, showing head and torso")
+                .replace(/85mm portrait lens/gi, "50mm wide professional lens");
 
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
