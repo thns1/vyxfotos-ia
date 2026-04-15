@@ -1,42 +1,43 @@
 /**
- * VYXFOTOS.IA - PROMPTS DE TELETRANSPORTE (V16.1 - CENÁRIO FORÇADO)
+ * VYXFOTOS.IA - PROTOCOLO DE FIDELIDADE GLOBAL (V17.0 - ESTÚDIO ELITE)
  * 
- * Regra: Forçar a IA a ignorar o fundo original e teletransportar o rosto para um novo ambiente.
+ * Regra: Aplicar iluminação de estúdio profissional e isolamento total em qualquer cenário.
+ * Foco: Qualidade de Estúdio Fotográfico Comercial.
  */
 
 const themePrompts = {
   // 01 - CLASSICO
-  'executivo': "The person [1] in a COMPLETELY NEW SETTING: a High-end corporate office background. The person is wearing a navy blue executive suit. 85mm RAW photo, ignore original background of [1], zero retouching on face.",
+  'executivo': "A high-end professional studio portrait of [1] wearing a navy blue executive suit. 3-point studio strobe lighting, softbox illumination, clean professional corporate background with deep bokeh. Professional DSLR 85mm lens, sharp focus on eyes, perfect subject separation from background. Discard original environment.",
 
   // 02 - MODERNO
-  'moderno': "The person [1] in a NEW ENVIRONMENT: a modern office background. Wearing a gray blazer, no tie. RAW photo, ignore [1]'s original background, exact face preservation.",
+  'moderno': "A professional corporate studio photo of [1] wearing a gray blazer. Modern minimalist office studio background, soft daylight studio lighting, realistic skin texture, professional composition. Identity of [1] preserved in a new professional light.",
 
   // 03 - PREMIUM
-  'premium': "A high-fidelity RAW photo of [1] in a NEW SCENE: a luxury executive library background. Wearing a black suit. Discard [1]'s original background, identity mirror of [1].",
+  'premium': "A prestigious RAW studio portrait of [1] wearing a custom black suit. Professional executive library studio setting, cinematic rim lighting, 85mm portrait lens, ultra-high resolution. Copy identity from [1] into this new elite light.",
 
   // 04 - INTERNACIONAL
-  'internacional': "The person [1] teletransported to a NEW SETTING: a modern architectural blurred city background. Wearing a professional suit. Ignore [1]'s selfie background.",
+  'internacional': "A cosmopolitan business studio portrait of [1] wearing a luxury suit. Blurred architectural studio backdrop, professional side lighting, authentic identity preservation. High-end commercial photography style.",
 
   // 05 - FEMININO
-  'feminino': "The person [1] in a NEW PROFESSIONAL SETTING: elegant office background. Wearing a tailored blazer. RAW photo, ignore original background and clothing of [1].",
+  'feminino': "A professional executive studio portrait of [1] wearing a luxury tailored blazer. Soft beauty studio lighting, elegant neutral background, sharp focus, consistent identity with [1].",
 
   // 06 - SMART CASUAL
-  'smart_casual': "The person [1] in a NEW CORPORATE SETTING: clean startup office. Wearing a blazer and white shirt. Ignore [1]'s original gaming chair or bedroom background.",
+  'smart_casual': "A modern tech-executive studio photo of [1] wearing a structured blazer. Clean startup studio environment, natural studio lighting, professional 85mm lens, clear separation of [1] from background.",
 
   // 07 - LUXO
-  'luxo': "A prestigious RAW portrait of [1] in a NEW ELEGANT SCENE: dark professional background. Wearing a black suit. Absolute identity mirror, discard selfie background.",
+  'luxo': "A prestigious high-contrast studio portrait of [1] wearing a black suit. Dark elegant studio background, warm dramatic professional lighting, realistic skin and hair texture. Absolute identity anchor.",
 
   // 08 - FINANCEIRO
-  'financeiro': "The person [1] in a NEW FORMAL SETTING: traditional gray office background. Wearing a navy suit. Identity mirror, ignore original context of [1].",
+  'financeiro': "A formal banking executive studio portrait of [1] wearing a navy suit. Traditional gray studio background, flat professional studio lighting, high resolution, faithful to [1].",
 
   // 09 - LINKEDIN
-  'linkedin': "A professional RAW headshot of [1] in a NEW NEUTRAL SETTING: soft office background. Wearing a business suit. Natural lighting, ignore original selfie background.",
+  'linkedin': "A clean professional LinkedIn studio headshot of [1] wearing a business suit. Neutral studio background, soft daylight illumination, direct professional gaze, unretouched identity.",
 
   // 10 - URBANO
-  'urbano': "The person [1] in a NEW URBAN SETTING: blurred metropolis metropolis background. Wearing a navy suit. Golden hour, ignore [1]'s original bedroom context.",
+  'urbano': "A modern professional studio portrait of [1] wearing a navy suit. Blurred city metropolis studio backdrop, golden hour studio lighting, cinematic 85mm look, realistic subject extraction.",
 
-  'sonhos': "A RAW realistic photo of [1] in a new scene.",
-  'custom': "A RAW realistic photo of [1] in a new scene."
+  'sonhos': "A realistic professional studio portrait of [1].",
+  'custom': "A realistic professional studio portrait of [1]."
 };
 
 module.exports = themePrompts;

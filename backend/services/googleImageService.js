@@ -63,9 +63,9 @@ class GoogleImageService {
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 4. Blindagem V16.1: Teletransporte de Cenário Final
-            // Ordem: Manter 100% a identidade focial/capilar de [1] mas IGNORAR fundo e roupas originais.
-            const highFidelityDescription = "Absolute identity mirror of the person in [1]. Focus ONLY on the face and hair identity. IGNORE and DISCARD the original background and clothing of [1] completely.";
+            // 4. Protocolo de Fidelidade Global V17.0: Extração Universal + Estúdio Elite
+            // Ordem Global: Isolar o ser humano de [1] e descartar 100% do ambiente, objetos e luz original.
+            const universalExtractionProtocol = "Absolute identity mirror of the human subject in reference [1]. Focus EXCLUSIVELY on the person's face and hair identity. IGNORE, DISCARD, and DELETE 100% of the surrounding environment, background objects, and original lighting from reference [1]. The subject must be treated as a clean extraction for a new professional studio scene.";
 
             const requestBody = {
                 instances: [
