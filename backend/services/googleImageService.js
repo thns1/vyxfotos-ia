@@ -1,158 +1,116 @@
 const fs = require('fs');
 const { GoogleAuth } = require('google-auth-library');
-const themePrompts = require('../constants/themePrompts');
+const fetch = require('node-fetch');
 
 /**
- * SERVIÇO DE GERAÇÃO DE IMAGENS - GOOGLE IMAGEN 3 ELITE (V10.0)
- *
- * Motor: Vertex AI REST API (sem gRPC)
- * Novidade: Suporte a Gênero (Masculino/Feminino) com substituição automática nos prompts.
- * Fidelidade: Subject Customization + Face Mesh Control para identidade absoluta.
+ * SERVIÇO GOOGLE VERTEX AI - V24.0 (FULL BODY ELITE - SINGULAR)
  */
 class GoogleImageService {
     constructor() {
-        this.projectId = 'vyxfotos-493415';
+        this.projectId = process.env.GOOGLE_PROJECT_ID || 'vyxfotos-493415';
         this.location = 'us-central1';
-        this.apiUrl = `https://${this.location}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${this.location}/publishers/google/models/imagen-3.0-capability-001:predict`;
-
-        const authConfig = { scopes: ['https://www.googleapis.com/auth/cloud-platform'] };
-        if (process.env.GOOGLE_CREDS_JSON) {
-            authConfig.credentials = JSON.parse(process.env.GOOGLE_CREDS_JSON);
-        }
-        this.auth = new GoogleAuth(authConfig);
-
-        console.log('[Google-AI V10] Motor REST configurado. Suporte a Gênero ativado.');
+        this.modelId = 'imagen-3.0-capability-001';
+        this.auth = new GoogleAuth({
+            scopes: 'https://www.googleapis.com/auth/cloud-platform',
+        });
+        this.apiUrl = `https://${this.location}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${this.location}/publishers/google/models/${this.modelId}:predict`;
     }
 
-    /**
-     * Substitui termos de gênero no prompt baseado na seleção do usuário.
-     * Isso garante que a IA gere o traje e o corpo correto (terno vs blazer/vestido).
-     */
-    _applyGender(prompt, gender) {
-        if (gender === 'feminino') {
-            return prompt
-                .replace(/\b(man|men|male|gentleman|businessman)\b/gi, 'woman')
-                .replace(/\b(his)\b/gi, 'her')
-                .replace(/\b(he)\b/gi, 'she')
-                .replace(/tailored mens executive suit/gi, "women's tailored blazer or executive suit")
-                .replace(/mens executive/gi, "women's executive")
-                .replace(/a man's/gi, "a woman's");
-        }
-        // Para masculino, mantém o prompt como está (já escrito no masculino)
-        return prompt;
-    }
-
-    async generateWithFaceID(imageFile, theme, customText, gender = 'masculino') {
+    async generateWithFaceID(imageFile, theme, customText, gender) {
         try {
-            console.log(`[Google-AI V10] Geração iniciada. Tema: "${theme}" | Gênero: "${gender}"`);
+            console.log(`[Google-AI V24] Iniciando Geração Unica: Tema="${theme}" | Genero="${gender}"`);
 
-            // 1. Seleciona o prompt base do PDF
-            let promptBase;
-            if (customText && customText.trim().length > 3) {
-                // Tema livre: usa o núcleo de fidelidade do tema + descrição do usuário
-                promptBase = `${themePrompts['executivo']} The scene setting is: ${customText.trim()}.`;
-            } else {
-                promptBase = themePrompts[theme] || themePrompts['executivo'];
+            // 1. Carrega Prompts do Arquivo de Constantes
+            const themePrompts = require('../constants/themePrompts');
+            let basePrompt = themePrompts[theme] || themePrompts['executivo'];
+
+            // 2. Processa Custom Text (Se existir)
+            let promptFinal = basePrompt;
+            if ((theme === 'custom' || theme === 'sonhos') && customText) {
+                promptFinal = `A professional full body RAW photo of [1] ${customText}. Natural skin textures, visible pores, standing posture. NO BEAUTY FILTERS.`;
             }
 
-            // 2. Aplica o gênero selecionado pelo usuário
-            const promptFinal = this._applyGender(promptBase, gender);
-            console.log(`[Google-AI V10] Prompt (primeiros 120 chars): "${promptFinal.substring(0, 120)}..."`);
+            console.log(`[Google-AI V24] Prompt: "${promptFinal.substring(0, 100)}..."`);
 
             // 3. Converte selfie para Base64
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 4. Natural Skin V22.0: Foco em Realismo Humano (Anti-AI Filter)
-            // Ordem: Manter identidade biométrica e APLICAR LUZ, mas PROIBIR filtros de beleza.
-            const atomicWipeInstruction = "Strictly preserve the authentic facial identity of [1]. DO NOT smooth the skin. DO NOT use beauty filters or airbrushing. Keep natural skin textures, visible pores, and unique characteristics of [1]. RELIGHT the subject with professional studio lighting but maintain the raw, unretouched character of the person.";
+            // 4. Instrução de Fidelidade Bruta V24
+            const atomicWipeInstruction = "Strictly preserve the identity of [1]. DO NOT smooth the skin. DO NOT use beauty filters. Keep natural skin textures, visible pores. RELIGHT the subject with professional studio lighting but maintain the raw, unretouched character. DISCARD and DELETE the original background (no gaming chair, no red curtains).";
 
-            // 5. Função auxiliar para chamar a API do Vertex AI
-            const callVertexAI = async (prompt) => {
-                const requestBody = {
-                    instances: [
-                        {
-                            prompt: prompt,
-                            referenceImages: [
-                                {
-                                    referenceType: "REFERENCE_TYPE_SUBJECT",
-                                    referenceId: 1,
-                                    referenceImage: {
-                                        bytesBase64Encoded: imageData,
-                                        mimeType: mimeType
-                                    },
-                                    subjectImageConfig: {
-                                        subjectType: "SUBJECT_TYPE_PERSON",
-                                        subjectDescription: atomicWipeInstruction
-                                    }
+            const requestBody = {
+                instances: [
+                    {
+                        prompt: promptFinal,
+                        referenceImages: [
+                            {
+                                referenceType: "REFERENCE_TYPE_SUBJECT",
+                                referenceId: 1,
+                                referenceImage: {
+                                    bytesBase64Encoded: imageData,
+                                    mimeType: mimeType
                                 },
-                                {
-                                    referenceType: "REFERENCE_TYPE_CONTROL",
-                                    referenceId: 2,
-                                    referenceImage: {
-                                        bytesBase64Encoded: imageData,
-                                        mimeType: mimeType
-                                    },
-                                    controlImageConfig: {
-                                        controlType: "CONTROL_TYPE_FACE_MESH"
-                                    }
+                                subjectImageConfig: {
+                                    subjectType: "SUBJECT_TYPE_PERSON",
+                                    subjectDescription: atomicWipeInstruction
                                 }
-                            ]
-                        }
-                    ],
-                    parameters: {
-                        sampleCount: 1,
-                        aspectRatio: "3:4"
+                            },
+                            {
+                                referenceType: "REFERENCE_TYPE_CONTROL",
+                                referenceId: 2,
+                                referenceImage: {
+                                    bytesBase64Encoded: imageData,
+                                    mimeType: mimeType
+                                },
+                                controlImageConfig: {
+                                    controlType: "CONTROL_TYPE_FACE_MESH"
+                                }
+                            }
+                        ]
                     }
-                };
-
-                const client = await this.auth.getClient();
-                const tokenResponse = await client.getAccessToken();
-                const token = tokenResponse.token;
-
-                const response = await fetch(this.apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-
-                const responseJson = await response.json();
-                if (!response.ok) {
-                    throw new Error(`Google API Error ${response.status}: ${JSON.stringify(responseJson.error || responseJson)}`);
+                ],
+                parameters: {
+                    sampleCount: 1,
+                    aspectRatio: "3:4"
                 }
-                return responseJson?.predictions?.[0]?.bytesBase64Encoded;
             };
 
-            // 6. Executa as gerações consecutivamente (API não aceita multi-instance com Subject Reference)
-            console.log('[Google-AI V10] Gerando Retrato (Passo 1/2)...');
-            const portraitBase64 = await callVertexAI(promptFinal);
-            
-            console.log('[Google-AI V10] Gerando Corpo Inteiro (Passo 2/2)...');
-            const fullBodyPrompt = `${promptFinal}. Full body shot head to toe, standing posture, wide angle studio shot.`;
-            const fullBodyBase64 = await callVertexAI(fullBodyPrompt);
+            // 5. Executa a Chamada
+            const client = await this.auth.getClient();
+            const tokenResponse = await client.getAccessToken();
+            const token = tokenResponse.token;
 
-            // 7. Consolida os resultados
-            const generatedImages = [];
-            if (portraitBase64) generatedImages.push(`data:image/png;base64,${portraitBase64}`);
-            if (fullBodyBase64) generatedImages.push(`data:image/png;base64,${fullBodyBase64}`);
+            const response = await fetch(this.apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
 
-            if (generatedImages.length === 0) {
-                throw new Error(`Google não retornou nenhuma imagem.`);
+            const responseJson = await response.json();
+            if (!response.ok) {
+                throw new Error(`Google API Error ${response.status}: ${JSON.stringify(responseJson.error || responseJson)}`);
             }
 
-            console.log(`[Google-AI V10] SUCESSO! ${generatedImages.length} imagens geradas consecutivamente.`);
+            const prediction = responseJson?.predictions?.[0];
+            const imageBase64 = prediction?.bytesBase64Encoded;
+
+            if (!imageBase64) {
+                throw new Error("Google não retornou imagem.");
+            }
+
+            console.log(`[Google-AI V24] SUCESSO! Foto ELITE de corpo inteiro gerada.`);
             return {
                 status: "success",
-                output_urls: generatedImages,
-                output_url: generatedImages[0],
+                output_url: `data:image/png;base64,${imageBase64}`,
                 orderId: `PEDIDO_G_${Date.now()}`
             };
 
         } catch (error) {
-            console.error('[Google-AI V10] FALHA:', error.message);
+            console.error('[Google-AI V24] FALHA:', error.message);
             throw error;
         }
     }

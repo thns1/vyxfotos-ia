@@ -209,17 +209,13 @@ export default function Landing() {
         const result = await response.json();
         
         if(result.success) {
-           const totalTime = 30;
            console.log("Sucesso no Processamento Neural: ", result.data);
            
-           const imageUrls = result.data.output_urls || [result.data.output_url];
-           
            setOrderId(result.data.orderId);
-           setGeneratedImage(imageUrls[0]); // Define a primeira como principal (Retrato)
+           setGeneratedImage(result.data.output_url); 
            
-           // Armazena o array completo no localStorage para o Checkout
-           localStorage.setItem('vyx_generated_images', JSON.stringify(imageUrls));
-           localStorage.setItem('vyx_generated_image', imageUrls[0]);
+           localStorage.setItem('vyx_generated_image', result.data.output_url);
+           localStorage.setItem('vyx_order_id', result.data.orderId);
            
            setHasImageArrival(true); 
         } else {
