@@ -1,18 +1,18 @@
 /**
- * THEME PROMPTS - VYXFOTOS V6 (PhotoMaker Optimized)
+ * THEME PROMPTS - VYXFOTOS V7 (ELITE REALISM)
  *
- * IMPORTANTE: Esses prompts usam o modelo fal-ai/photomaker.
- * O token "img" é OBRIGATÓRIO — é ele que diz ao PhotoMaker onde colocar
- * o rosto da selfie. Sem "img", o modelo ignora a referência.
+ * Otimizados para motor Flux-PuLID.
+ * O foco é descrever apenas CENÁRIO, LUZ e CÂMERA.
+ * A identidade facial é injetada via id_weight no backend.
  */
 module.exports = {
-  executivo: `a photo of img wearing a tailored deep navy executive suit and crisp white dress shirt, confident corporate professional, standing in a sleek modern office with glass walls and city view, three-point Rembrandt studio lighting, 85mm portrait lens, f/2.2, sharp focus on face, photorealistic, cinematic, 8k quality`,
+  executivo: `highly detailed professional executive portrait photograph, standing in a sleek modern luxury office, crisp white dress shirt, navy tailored blazer, Rembrandt studio lighting, 85mm portrait lens, f/2.2, ISO 100, sharp focus, photorealistic skin texture, 8k quality, raw style`,
 
-  luxo: `a photo of img dressed in minimalist high-end luxury fashion inside a sophisticated penthouse with floor-to-ceiling windows overlooking a glowing city at night, soft beauty dish lighting, golden hour ambiance, Vogue editorial style, 85mm f/1.8, medium bust shot, photorealistic, cinematic bokeh, 8k`,
+  luxo: `premium fashion editorial portrait photo, sophisticated penthouse background, night city view bokeh, elegant minimalist luxury fashion, warm golden hour studio lighting, 85mm f/1.8, medium bust shot, realistic skin texture, cinematic 8k, raw style`,
 
-  aniversario: `a photo of img celebrating a milestone birthday inside a luxurious elegant venue, warm golden atmospheric lighting, refined evening wear, tasteful bokeh decorations in background, natural joyful expression, 85mm lens, razor-sharp focus on face, photorealistic, cinematic quality, 8k`,
+  aniversario: `professional portrait of a person in a lavish birthday celebration, elegant private venue, warm ambient golden lighting, refined evening wear, sharp focus on subject, blurred luxury background, photorealistic texture, masterpiece 8k`,
 
-  sonhos: `a photo of img standing in a breathtaking and majestic surreal landscape, dramatic epic cinematic lighting, hyper-detailed environment, natural expression, sharp focus on face, photorealistic masterpiece, 8k`,
+  sonhos: `majestic fine-art photography, breathtaking surreal landscape environment, dramatic epic cinematic lighting, hyper-detailed setting, sharp focus on face, photorealistic masterpiece, 8k, high fidelity`,
 
-  ferrari_kid: `a photo of img child wearing a vibrant red Formula 1 professional racing suit, standing inside a luxury supercar showroom next to a sleek Ferrari, dramatic spot lighting, polished reflective floor, cinematic portrait, sharp focus on face, photorealistic, 8k`,
+  ferrari_kid: `professional editorial portrait of a child in a red Formula 1 racing suit, luxury supercar showroom interior, sleek Ferrari in background, dramatic spot lighting, reflective floor, sharp focus, photorealistic 8k`
 };

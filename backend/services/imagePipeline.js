@@ -3,92 +3,59 @@ const themePrompts = require('../constants/themePrompts');
 const { fal } = require("@fal-ai/client");
 
 /**
- * SERVIÇO DE GERAÇÃO DE IMAGENS - VYXFOTOS V6
- * Motor: fal-ai/photomaker
- *
- * PhotoMaker usa "stacked ID embedding" — um sistema científicamente superior
- * ao PuLID/InstantID para preservação de identidade facial em retratos.
- * O token "img" no prompt ancora a identidade da selfie na cena gerada.
+ * SERVIÇO DE GERAÇÃO DE IMAGENS - VYXFOTOS V7 (ELITE IDENTITY)
+ * Motor: fal-ai/flux-pulid
+ * 
+ * Este motor combina o realismo do FLUX com a tecnologia PuLID.
+ * Calibrado para fidelidade facial extrema (id_weight: 1.0).
  */
 class ImagePipelineService {
     constructor() {
         if (process.env.FAL_KEY) {
             fal.config({ credentials: process.env.FAL_KEY });
-            console.log("[Backend-AI V6] Motor PhotoMaker configurado com sucesso.");
-        } else {
-            console.warn("[Backend-AI V6] AVISO: FAL_KEY não definida no ambiente!");
+            console.log("[Backend-AI V7] Motor Flux-PuLID (Elite) configurado.");
         }
     }
 
     async generateWithFaceID(imageFile, theme, customText) {
         try {
-            if (!process.env.FAL_KEY) {
-                throw new Error("FAL_KEY não configurada no servidor.");
-            }
+            if (!process.env.FAL_KEY) throw new Error("FAL_KEY ausente.");
 
-            console.log(`[Backend-AI V6] Acionando PhotoMaker. Tema: "${theme}"`);
-
-            // 1. Prepara o prompt com o token "img" obrigatório
-            let temaCena;
+            // 1. Prompt focado apenas em CENÁRIO e LUZ (Identidade vem 100% da imagem)
+            let temaCena = themePrompts[theme] || themePrompts['executivo'];
+            
+            // Se for tema livre (sonhos), usamos o texto do usuário
             if (customText && customText.trim().length > 3) {
-                // Sonhos: incorpora descrição do usuário mantendo o token "img"
-                temaCena = `a photo of img in ${customText.trim()}, photorealistic portrait, natural expression, sharp focus on face, cinematic lighting, 8k masterpiece`;
-            } else {
-                temaCena = themePrompts[theme] || themePrompts['executivo'];
+                temaCena = `a high-quality professional portrait photo of a person in ${customText.trim()}, 85mm lens, f/2.2, sharp focus, photorealistic, 8k quality`;
             }
 
-            console.log(`[Backend-AI V6] Prompt: "${temaCena.substring(0, 100)}..."`);
+            console.log(`[Backend-AI V7] Gerando com motor Elite. Tema: ${theme}`);
 
-            // 2. Upload da selfie para o Fal.ai Storage
-            console.log(`[Backend-AI V6] Uploading selfie...`);
+            // 2. Upload
             const imageData = fs.readFileSync(imageFile.path);
             const fileBlob = new Blob([imageData], { type: imageFile.mimetype || 'image/jpeg' });
+            const referenceImageUrl = await fal.storage.upload(fileBlob);
 
-            let referenceImageUrl;
-            try {
-                referenceImageUrl = await fal.storage.upload(fileBlob);
-                console.log(`[Backend-AI V6] Upload OK: ${referenceImageUrl}`);
-            } catch (uploadErr) {
-                throw new Error(`Falha no upload da selfie: ${uploadErr.message}`);
-            }
-
-            // 3. Geração com PhotoMaker
-            // PhotoMaker usa "stacked ID embedding" para fixar a identidade da selfie.
-            // O token "img" no prompt diz ao modelo ONDE e COMO colocar o rosto real.
-            console.log(`[Backend-AI V6] Iniciando geração PhotoMaker...`);
-            const result = await fal.subscribe("fal-ai/photomaker", {
+            // 3. Geração com Calibração de Identidade Máxima
+            const result = await fal.subscribe("fal-ai/flux-pulid", {
                 input: {
                     prompt: temaCena,
-                    input_image_urls: [referenceImageUrl],
-                    negative_prompt: "nsfw, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, abstract art, cartoon, anime, painting, illustration, plastic face, over-smoothed skin",
-                    style: "Photographic (Default)",
-                    num_inference_steps: 30,
-                    guidance_scale: 5.0,
-                    style_strength_ratio: 20,
+                    reference_image_url: referenceImageUrl,
+                    // Parâmetros de ELITE para fidelidade total
+                    id_weight: 1.0,           // Força máxima na identidade da selfie
+                    num_inference_steps: 40,   // Alta densidade de pixels
+                    guidance_scale: 3.5,       // Evita o aspecto de "pintura"
+                    num_images: 1,
+                    image_size: "portrait_4_3"
                 },
-                logs: true,
-                onQueueUpdate: (update) => {
-                    if (update.status === "IN_PROGRESS") {
-                        const lastLog = update.logs?.at(-1)?.message || '';
-                        if (lastLog) console.log(`[PhotoMaker] ${lastLog}`);
-                    }
-                }
+                logs: true
             });
 
-            console.log("[Backend-AI V6] Resposta recebida:", JSON.stringify(result?.data || result, null, 2));
+            const outputUrl = result?.data?.images?.[0]?.url || result?.images?.[0]?.url;
 
-            // PhotoMaker retorna: result.data.images[0].url
-            const outputUrl =
-                result?.data?.images?.[0]?.url ||
-                result?.images?.[0]?.url ||
-                result?.data?.image?.url ||
-                result?.image?.url;
+            if (!outputUrl) throw new Error("Falha ao obter URL da imagem.");
 
-            if (!outputUrl) {
-                throw new Error(`PhotoMaker não retornou URL de imagem. Resposta completa: ${JSON.stringify(result)}`);
-            }
-
-            console.log(`[Backend-AI V6] SUCESSO! Imagem gerada: ${outputUrl}`);
+            console.log(`[Backend-AI V7] SUCESSO: ${outputUrl}`);
 
             return {
                 status: "success",
@@ -97,7 +64,7 @@ class ImagePipelineService {
             };
 
         } catch (error) {
-            console.error(`[Backend-AI V6] FALHA CRÍTICA:`, error.message);
+            console.error(`[Backend-AI V7] Erro:`, error.message);
             throw error;
         }
     }
