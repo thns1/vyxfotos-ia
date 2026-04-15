@@ -1,15 +1,15 @@
 /**
- * TEMAS V24.0: FULL BODY ELITE (SINGLE SHOT)
- * Foco absoluto em afastar a câmera e manter a qualidade RAW de pele.
+ * TEMAS V25.0: ELITE FULL BODY FOCUS
+ * Comandos agressivos para deletar fundo e afastar a câmera.
  */
 module.exports = {
-    'executivo': "A professional full body standing portrait of [1] head to toe, dressed in a luxury navy blue executive suit, standing in a minimalist high-end corporate office. AUTHENTIC STUDIO LIGHTING. Visible skin pores, unretouched, 8k resolution, cinematic atmosphere. DISCARD ORIGINAL BACKGROUND.",
+    'executivo': "RAW PHOTO, WIDE SHOT, FULL BODY STANDING PHOTO of [1] head to toe, dressed in a luxury tailored navy blue executive suit, standing in a high-end minimalist corporate office. AUTHENTIC STUDIO LIGHTING. Visible skin pores, unretouched, extremely realistic, highly detailed skin texture. COMPLETELY DELETE ORIGINAL BACKGROUND FROM [1], NO GAMING CHAIR.",
     
-    'luxo': "A professional full body standing portrait of [1] head to toe, dressed in a tailored charcoal designer suit, standing in a luxury marble penthouse at sunset. AUTHENTIC STUDIO LIGHTING. RAW photography, visible skin texture, natural lighting, ultra-realistic. DELETE ORIGINAL BACKGROUND.",
+    'luxo': "RAW PHOTO, WIDE SHOT, FULL BODY STANDING PHOTO of [1] head to toe, dressed in a charcoal bespoke designer suit, standing in a luxury marble penthouse. AUTHENTIC STUDIO LIGHTING. Visible skin pores, raw skin texture, natural highlights, unretouched. COMPLETELY REMOVE ORIGINAL BACKGROUND FROM [1], NO RED CURTAINS.",
     
-    'aniversario': "A professional full body standing portrait of [1] head to toe, dressed in a premium celebratory blazer, standing in a luxury VIP gala hall with soft gold accents. AUTHENTIC STUDIO LIGHTING. Unretouched, natural skin details, visible pores, elite photography. NO GAMING CHAIR.",
+    'aniversario': "RAW PHOTO, WIDE SHOT, FULL BODY STANDING PHOTO of [1] head to toe, dressed in a premium elite blazer, standing in a VIP reception hall. AUTHENTIC STUDIO LIGHTING. Real skin imperfections, pores, 8k resolution. IGNORE ORIGINAL BACKGROUND.",
     
-    'sonhos': "A professional full body standing portrait of [1] head to toe, standing in a masterpiece artistic scenario. AUTHENTIC STUDIO LIGHTING. High fidelity skin details, RAW texture, 8k resolution.",
+    'sonhos': "RAW PHOTO, WIDE SHOT, FULL BODY STANDING PHOTO of [1] head to toe, standing in a masterpiece artistic scenario. AUTHENTIC STUDIO LIGHTING. High fidelity skin details, RAW texture, 8k resolution.",
     
-    'custom': "A professional full body standing portrait of [1] head to toe, AUTHENTIC STUDIO LIGHTING, RAW photography, visible skin pores."
+    'custom': "RAW PHOTO, WIDE SHOT, FULL BODY STANDING PHOTO of [1] head to toe. AUTHENTIC STUDIO LIGHTING, raw photography, visible skin pores. DELETE ORIGINAL BACKGROUND FROM [1]."
 };

@@ -4,7 +4,7 @@ const { GoogleAuth } = require('google-auth-library');
 const fetch = require('node-fetch');
 
 /**
- * SERVIÇO GOOGLE VERTEX AI - V24.2 (ENV AUTH FIX + ELITE FOCUS)
+ * SERVIÇO GOOGLE VERTEX AI - V25.0 (ELITE FULL BODY - RESCUE)
  */
 class GoogleImageService {
     constructor() {
@@ -12,30 +12,15 @@ class GoogleImageService {
         this.location = 'us-central1';
         this.modelId = 'imagen-3.0-capability-001';
         
-        // Configuração de Autenticação Universal
-        let authOptions = {
-            scopes: 'https://www.googleapis.com/auth/cloud-platform'
-        };
-
-        // 1. Tenta carregar credenciais da variável de ambiente (Caso prioritário para Render/Produção)
+        // Ambiente Híbrido
+        let authOptions = { scopes: 'https://www.googleapis.com/auth/cloud-platform' };
         if (process.env.GOOGLE_CREDS_JSON) {
             try {
-                const credentials = JSON.parse(process.env.GOOGLE_CREDS_JSON);
-                authOptions.credentials = credentials;
-                console.log('[Google-AI V24.2] Autenticação via GOOGLE_CREDS_JSON (Produção).');
-            } catch (e) {
-                console.error('[Google-AI V24.2] Erro ao parsear GOOGLE_CREDS_JSON:', e.message);
-            }
-        } 
-        // 2. Fallback para arquivo local (Desenvolvimento)
-        else {
+                authOptions.credentials = JSON.parse(process.env.GOOGLE_CREDS_JSON);
+            } catch (e) { console.error('Erro na ENV:', e.message); }
+        } else {
             const keyPath = path.join(__dirname, '../../vyxfotos-493415-3d24a459e5c7.json');
-            if (fs.existsSync(keyPath)) {
-                authOptions.keyFilename = keyPath;
-                console.log(`[Google-AI V24.2] Autenticação via arquivo local: ${keyPath}`);
-            } else {
-                console.warn('[Google-AI V24.2] Nenhuma credencial encontrada (ENV ou JSON). O GoogleAuth tentará o padrão do sistema.');
-            }
+            if (fs.existsSync(keyPath)) authOptions.keyFilename = keyPath;
         }
 
         this.auth = new GoogleAuth(authOptions);
@@ -44,24 +29,23 @@ class GoogleImageService {
 
     async generateWithFaceID(imageFile, theme, customText, gender) {
         try {
-            console.log(`[Google-AI V24.2] Gerando Elite Single Shot: ${theme}`);
+            console.log(`[Google-AI V25] MODO ELITE FULL BODY: ${theme}`);
 
-            // 1. Carrega Prompts
+            // 1. Carrega Prompts do Arquivo de Constantes
             const themePrompts = require('../constants/themePrompts');
-            let basePrompt = themePrompts[theme] || themePrompts['executivo'];
+            let promptFinal = themePrompts[theme] || themePrompts['executivo'];
 
-            // 2. Processa Custom/Sonhos
-            let promptFinal = basePrompt;
             if ((theme === 'custom' || theme === 'sonhos') && customText) {
-                promptFinal = `A professional full body RAW photo of [1] ${customText}. Natural skin textures, visible pores, head to toe.`;
+                promptFinal = `RAW PHOTO, WIDE SHOT, FULL BODY PHOTO of [1] ${customText}. Natural skin pores, standing head to toe. DISCARD ORIGINAL BACKGROUND.`;
             }
 
-            // 3. Converte Base64
+            // 2. Converte selfie para Base64
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 4. Instrução de Fidelidade (V24 - Antropométrica)
-            const atomicWipeInstruction = "Strictly preserve the identity of [1]. DO NOT smooth skin. NO beauty filters. Keep pores/textures. RELIGHT with studio lamps. DISCARD background (DELETE gaming chair/curtains). Focus on a full body standing posture from head to toe.";
+            // 3. Instrução Atômica de Limpeza e Identidade (MODO BRUTO V25)
+            // A prioridade aqui é EXCLUIR o fundo e MANTER a face 22.0
+            const atomicWipeInstruction = "STRICTLY PRESERVE THE IDENTITY OF [1]. DO NOT SMOOTH SKIN. NO BEAUTY FILTERS. RAW SKIN TEXTURES AND PORES. COMPLETELY DELETE ORIGINAL BACKGROUND, NO GAMING CHAIR, NO ROOM OBJECTS. FOCUS ON A PROFESSIONAL FULL BODY STANDING POSTURE FROM HEAD TO TOE IN A LUXURY SCENARIO.";
 
             const requestBody = {
                 instances: [
@@ -86,7 +70,7 @@ class GoogleImageService {
                 parameters: { sampleCount: 1, aspectRatio: "3:4" }
             };
 
-            // 5. Chamada API
+            // 5. Chamada Final
             const client = await this.auth.getClient();
             const tokenResponse = await client.getAccessToken();
             const token = tokenResponse.token;
@@ -103,8 +87,9 @@ class GoogleImageService {
             const prediction = responseJson?.predictions?.[0];
             const imageBase64 = prediction?.bytesBase64Encoded;
 
-            if (!imageBase64) throw new Error("Google não retornou imagem.");
+            if (!imageBase64) throw new Error("IA não retornou imagem.");
 
+            console.log(`[Google-AI V25] SUCESSO! Foto de Elite gerada.`);
             return {
                 status: "success",
                 output_url: `data:image/png;base64,${imageBase64}`,
@@ -112,7 +97,7 @@ class GoogleImageService {
             };
 
         } catch (error) {
-            console.error('[Google-AI V24.2] FALHA:', error.message);
+            console.error('[Google-AI V25] FALHA:', error.message);
             throw error;
         }
     }
