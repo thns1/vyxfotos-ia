@@ -45,8 +45,8 @@ class GoogleImageService {
                             {
                                 referenceId: 1,
                                 referenceType: "REFERENCE_TYPE_SUBJECT",
-                                // Ajuste crucial: O campo correto para o motor Generate-001
-                                referenceImage: { 
+                                // Correção V39.2: Campo correto para o motor Generate-001 é 'image'
+                                image: { 
                                     bytesBase64Encoded: imageData
                                 },
                                 subjectImageConfig: { 
