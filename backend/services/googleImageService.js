@@ -63,9 +63,9 @@ class GoogleImageService {
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 4. Substituição Atômica V20.0: Extração Limpa + Neutralização de Luz
-            // Ordem: Isolar o humano, DELETAR o fundo original e ignorar a luz rosa/amadora.
-            const atomicWipeInstruction = "Strictly preserve the identity of [1]. IGNORE and DISCARD the original background, clothing, and the pinkish amateur lighting of reference [1]. Replace everything except the person with a high-end corporate studio environment and neutral white lighting.";
+            // 4. Studio Relighting V21.0: Re-iluminação Profissional do Sujeito
+            // Ordem: Manter identidade biométrica, mas APLICAR LUZ DE ESTÚDIO no rosto.
+            const atomicWipeInstruction = "Strictly preserve the exact facial identity of [1]. However, you MUST RELIGHT the subject's face and body with high-end professional 3-point studio strobe lighting. Eliminate the dull original lighting of [1] and create beautiful studio contrast, shadows, and crisp details on the person. The subject is immersed in a luxury corporate studio environment.";
 
             const requestBody = {
                 instances: [
