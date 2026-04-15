@@ -4,16 +4,17 @@ const { GoogleAuth } = require('google-auth-library');
 const fetch = require('node-fetch');
 
 /**
- * SERVIÇO GOOGLE VERTEX AI - V38.0 (THE LAST STAND - IDENTITY RESTORED)
- * - Identidade: Volta obrigatória do Face Mesh (Fidelidade 1:1).
- * - Enquadramento: Mudança para Ratio 1:1 (Quadrado) para forçar o zoom-out.
- * - Prompt: Injeção de 'Wide Shot' bruto no início.
+ * SERVIÇO GOOGLE VERTEX AI - V39.0 (GEMINI WEB PROTOCOL - GENERATE-001)
+ * - Modelo: imagen-3.0-generate-001 (Motor soberano do Google).
+ * - Estratégia: Simulação 1:1 do comportamento do Gemini Web.
+ * - Foco: Qualidade orgânica, 0% de filtros de plástico, zoom natural.
  */
 class GoogleImageService {
     constructor() {
         this.projectId = process.env.GOOGLE_PROJECT_ID || 'vyxfotos-493415';
         this.location = 'us-central1';
-        this.apiUrl = `https://${this.location}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${this.location}/publishers/google/models/imagen-3.0-capability-001:predict`;
+        // Trocamos para o modelo GENERATE-001 (Mais potente e orgânico)
+        this.apiUrl = `https://${this.location}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${this.location}/publishers/google/models/imagen-3.0-generate-001:predict`;
 
         let authOptions = { scopes: 'https://www.googleapis.com/auth/cloud-platform' };
         if (process.env.GOOGLE_CREDS_JSON) {
@@ -27,20 +28,18 @@ class GoogleImageService {
 
     async generateWithFaceID(imageFile, theme, customText, gender = 'masculino') {
         try {
-            console.log(`[Google-AI V38] A ÚLTIMA TRINCHEIRA (RESCUE IDENTITY): ${theme}`);
+            console.log(`[Google-AI V39] MODO GEMINI-WEB (GENERATE-001): ${theme}`);
             const themePrompts = require('../constants/themePrompts');
             let promptBase = themePrompts[theme] || themePrompts['executivo'];
-
-            // V38: Forçamos o zoom out agressivo no prompt e mudamos para 1:1
-            const promptFinal = "ULTRA WIDE SHOT FROM 5 METERS AWAY, showing person from waist up. " + promptBase
-                .replace(/portrait photograph/gi, "full shot photograph")
-                .replace(/85mm portrait lens/gi, "35mm wide angle lens");
 
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // PROTOCOLO V38: Volta da Identidade Real + Limpeza de Fundo
-            const atomicWipeInstruction = "STRICTLY PRESERVE THE IDENTITY OF [1]. ABSOLUTELY ERASE THE ORIGINAL BACKGROUND, GAMING CHAIR AND RED CURTAINS. REPLACE WITH THE NEW LUXURY OFFICE SCENE. FOCUS ON THE SUIT AND THE POSE.";
+            // PROTOCOLO V39: Simulação direta do Upload + Prompt do Gemini Web
+            // Removemos todas as amarras mecânicas.
+            const promptFinal = promptBase
+                .replace(/portrait photograph/gi, "medium-wide shot photograph, waist up")
+                .replace(/85mm/gi, "50mm");
 
             const requestBody = {
                 instances: [
@@ -51,18 +50,20 @@ class GoogleImageService {
                                 referenceType: "REFERENCE_TYPE_SUBJECT",
                                 referenceId: 1,
                                 referenceImage: { bytesBase64Encoded: imageData, mimeType: mimeType },
-                                subjectImageConfig: { subjectType: "SUBJECT_TYPE_PERSON", subjectDescription: atomicWipeInstruction }
-                            },
-                            {
-                                referenceType: "REFERENCE_TYPE_CONTROL",
-                                referenceId: 2,
-                                referenceImage: { bytesBase64Encoded: imageData, mimeType: mimeType },
-                                controlImageConfig: { controlType: "CONTROL_TYPE_FACE_MESH" }
+                                subjectImageConfig: { 
+                                    subjectType: "SUBJECT_TYPE_PERSON", 
+                                    subjectDescription: "The exact individual from [1]. Maintain high-fidelity organic skin texture. Organic RAW quality. No plastic skin. No generic faces. Replace all background elements."
+                                }
                             }
                         ]
                     }
                 ],
-                parameters: { sampleCount: 1, aspectRatio: "1:1" } // Mudança para Quadrado para forçar a IA a se afastar
+                parameters: { 
+                    sampleCount: 1, 
+                    aspectRatio: "1:1",
+                    // Parâmetros de fidelidade negativa para evitar o 'chorume'
+                    negativePrompt: "gaming chair, red curtains, artificial skin, plastic texture, smooth skin, cartoon, generic man, blurred face"
+                }
             };
 
             const client = await this.auth.getClient();
@@ -84,7 +85,7 @@ class GoogleImageService {
             };
 
         } catch (error) {
-            console.error('[Google-AI V38] FALHA:', error.message);
+            console.error('[Google-AI V39] FALHA:', error.message);
             throw error;
         }
     }
