@@ -4,7 +4,8 @@ const { GoogleAuth } = require('google-auth-library');
 const fetch = require('node-fetch');
 
 /**
- * SERVIÇO GOOGLE VERTEX AI - V25.0 (ELITE FULL BODY - RESCUE)
+ * SERVIÇO GOOGLE VERTEX AI - V26.0 (RESTORE ELITE + WIDE ANGLE FOCUS)
+ * Removido Face Mesh para permitir afastamento da câmera sem "ancorar" na selfie original.
  */
 class GoogleImageService {
     constructor() {
@@ -12,12 +13,11 @@ class GoogleImageService {
         this.location = 'us-central1';
         this.modelId = 'imagen-3.0-capability-001';
         
-        // Ambiente Híbrido
         let authOptions = { scopes: 'https://www.googleapis.com/auth/cloud-platform' };
         if (process.env.GOOGLE_CREDS_JSON) {
             try {
                 authOptions.credentials = JSON.parse(process.env.GOOGLE_CREDS_JSON);
-            } catch (e) { console.error('Erro na ENV:', e.message); }
+            } catch (e) { console.error('Erro Auth ENV:', e.message); }
         } else {
             const keyPath = path.join(__dirname, '../../vyxfotos-493415-3d24a459e5c7.json');
             if (fs.existsSync(keyPath)) authOptions.keyFilename = keyPath;
@@ -29,23 +29,19 @@ class GoogleImageService {
 
     async generateWithFaceID(imageFile, theme, customText, gender) {
         try {
-            console.log(`[Google-AI V25] MODO ELITE FULL BODY: ${theme}`);
+            console.log(`[Google-AI V26] Restaurando Elite: ${theme}`);
 
-            // 1. Carrega Prompts do Arquivo de Constantes
+            // 1. Carrega Prompts Estáveis
             const themePrompts = require('../constants/themePrompts');
             let promptFinal = themePrompts[theme] || themePrompts['executivo'];
-
-            if ((theme === 'custom' || theme === 'sonhos') && customText) {
-                promptFinal = `RAW PHOTO, WIDE SHOT, FULL BODY PHOTO of [1] ${customText}. Natural skin pores, standing head to toe. DISCARD ORIGINAL BACKGROUND.`;
-            }
 
             // 2. Converte selfie para Base64
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 3. Instrução Atômica de Limpeza e Identidade (MODO BRUTO V25)
-            // A prioridade aqui é EXCLUIR o fundo e MANTER a face 22.0
-            const atomicWipeInstruction = "STRICTLY PRESERVE THE IDENTITY OF [1]. DO NOT SMOOTH SKIN. NO BEAUTY FILTERS. RAW SKIN TEXTURES AND PORES. COMPLETELY DELETE ORIGINAL BACKGROUND, NO GAMING CHAIR, NO ROOM OBJECTS. FOCUS ON A PROFESSIONAL FULL BODY STANDING POSTURE FROM HEAD TO TOE IN A LUXURY SCENARIO.";
+            // 3. Protocolo de Fidelidade V22.0 (RESTAURADO)
+            // Ordem absoluta para manter identidade mas IGNORAR o cenário da selfie.
+            const atomicWipeInstruction = "Strictly preserve the facial identity of [1]. DO NOT smooth the skin. DO NOT use beauty filters. Keep natural skin textures and visible pores. RELIGHT the subject with professional studio lighting. COMPLETELY IGNORE AND DELETE THE ORIGINAL BACKGROUND (NO GAMING CHAIR).";
 
             const requestBody = {
                 instances: [
@@ -56,13 +52,10 @@ class GoogleImageService {
                                 referenceType: "REFERENCE_TYPE_SUBJECT",
                                 referenceId: 1,
                                 referenceImage: { bytesBase64Encoded: imageData, mimeType: mimeType },
-                                subjectImageConfig: { subjectType: "SUBJECT_TYPE_PERSON", subjectDescription: atomicWipeInstruction }
-                            },
-                            {
-                                referenceType: "REFERENCE_TYPE_CONTROL",
-                                referenceId: 2,
-                                referenceImage: { bytesBase64Encoded: imageData, mimeType: mimeType },
-                                controlImageConfig: { controlType: "CONTROL_TYPE_FACE_MESH" }
+                                subjectImageConfig: { 
+                                    subjectType: "SUBJECT_TYPE_PERSON", 
+                                    subjectDescription: atomicWipeInstruction 
+                                }
                             }
                         ]
                     }
@@ -70,7 +63,7 @@ class GoogleImageService {
                 parameters: { sampleCount: 1, aspectRatio: "3:4" }
             };
 
-            // 5. Chamada Final
+            // 4. Executa Chamada
             const client = await this.auth.getClient();
             const tokenResponse = await client.getAccessToken();
             const token = tokenResponse.token;
@@ -84,12 +77,10 @@ class GoogleImageService {
             const responseJson = await response.json();
             if (!response.ok) throw new Error(`Google API Error: ${JSON.stringify(responseJson)}`);
 
-            const prediction = responseJson?.predictions?.[0];
-            const imageBase64 = prediction?.bytesBase64Encoded;
+            const imageBase64 = responseJson?.predictions?.[0]?.bytesBase64Encoded;
+            if (!imageBase64) throw new Error("Sem imagem.");
 
-            if (!imageBase64) throw new Error("IA não retornou imagem.");
-
-            console.log(`[Google-AI V25] SUCESSO! Foto de Elite gerada.`);
+            console.log(`[Google-AI V26] SUCESSO! Qualidade Elite Restaurada.`);
             return {
                 status: "success",
                 output_url: `data:image/png;base64,${imageBase64}`,
@@ -97,7 +88,7 @@ class GoogleImageService {
             };
 
         } catch (error) {
-            console.error('[Google-AI V25] FALHA:', error.message);
+            console.error('[Google-AI V26] FALHA:', error.message);
             throw error;
         }
     }
