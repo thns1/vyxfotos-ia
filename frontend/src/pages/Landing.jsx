@@ -42,7 +42,7 @@ export default function Landing() {
   const [isThankYouScreen, setIsThankYouScreen] = useState(false);
   const [generatedImage, setGeneratedImage] = useState(null); // Imagem REAL cuspidada pela IA
   const [user, setUser] = useState(null);
-  const [countdown, setCountdown] = useState(15);
+  const [countdown, setCountdown] = useState(30);
   const [hasImageArrival, setHasImageArrival] = useState(false);
   // Lógica de Suspense: Só libera quando contador chegar a 0 E a imagem chegar
   useEffect(() => {
