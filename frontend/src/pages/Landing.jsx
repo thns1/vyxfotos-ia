@@ -298,7 +298,7 @@ export default function Landing() {
 
                 {/* CHAMADA DE TESTE GRÁTIS - LOGO ABAIXO DO TÍTULO */}
                 <div className="flex justify-center pt-2 pb-4">
-                  <div className="px-6 py-2 rounded-full border-2 border-champagne bg-obsidian/40 backdrop-blur-md shadow-[0_0_15px_rgba(201,168,76,0.4)]">
+                  <div className="px-6 py-2 rounded-full border-2 border-champagne bg-obsidian/40 backdrop-blur-md shadow-[0_0_15px_rgba(201,168,76,0.4)] animate-pulse">
                     <span className="text-champagne font-black text-sm md:text-base tracking-widest uppercase flex items-center gap-2">
                        Faça o teste de graça 👇
                     </span>
