@@ -5,9 +5,13 @@
  * Eles substituem o texto no workflow do SDXL no momento da geração.
  */
 module.exports = {
-  aniversario: "Professional studio portrait celebrating a birthday. Tangible and highly realistic indoor photography studio setting with subtle elegant party decorations softly blurred in the background. Softbox photography, realistic skin, sharp 85mm lens, high-end authentic aesthetic, 8k.",
-  sonhos: "Wildly creative surreal and luxury dream photography, going completely beyond the bounds of reality. A person placed in an unimaginable, impossible, yet photorealistic setting (e.g. standing in front of a hypercar in a futuristic Paris, floating on the moon, or inside a glowing bioluminescent forest). Massive scale, gorgeous surreal high-fashion fine-art photography, cinematic lighting, hyper-realistic masterpiece, 8k.",
-  luxo: "High fashion editorial portrait, wearing elegant and minimalist luxury clothing. Authentic photography shot inside a very expensive luxury penthouse or high-end studio, with subtle tangible luxury furniture gently blurred in the background, soft beauty dish lighting, highly detailed flawless skin, Vogue magazine aesthetic, clean, 8k.",
-  executivo: "Professional corporate headshot photography. Confident expression, wearing a premium tailored blazer. Tangible highly realistic modern corporate office with subtle glass panels and soft indoor lighting blurred in the background, extremely realistic, sharp focus on face, premium LinkedIn corporate style, 8k.",
-  ferrari_kid: "High-end portrait of a kid wearing a red professional racing suit. Posed inside a highly realistic luxury garage or high-standard studio with subtle tangible car elements softly blurred in the background. Elegant minimalist strobe lighting, hyper-realistic, extremely detailed, authentic editorial style, 8k."
+  aniversario: "RAW photo, masterpiece, 8k, professional portrait of a person celebrating a birthday. High-end indoor studio setting with elegant minimalist decorations in the background. Soft lighting, 85mm lens, f/1.8, shallow depth of field, blurred background, highly detailed skin texture, pores, realistic eyes, cinematic atmosphere.",
+  
+  sonhos: "RAW photo, masterpiece, 8k, ultra-realistic fine-art photography. A person in a surreal, dreamlike world, bioluminescent forest at night. Cinematic lighting, glowing particles, hyper-detailed setting, 35mm lens, f/2.8, masterpiece quality, vibrant colors, sharp focus on face, majestic atmosphere.",
+  
+  luxo: "RAW photo, masterpiece, 8k, elegant high-fashion editorial portrait. Person wearing high-end minimalist luxury clothing in a modern opulent penthouse. Rembrandt lighting, professional beauty dish softbox, 85mm lens, f/1.4, perfect bokeh, highly detailed skin pores, realistic hair, luxury aesthetic, sharp focus.",
+  
+  executivo: "RAW photo, masterpiece, 8k, professional corporate executive portrait. Person wearing a bespoke tailored premium blazer. Modern minimalist corporate office with soft architectural lighting in the background. Sharp 85mm prime lens, professional photography studio setup, natural skin texture, realistic reflections, LinkedIn top-tier style, sharp eyes.",
+  
+  ferrari_kid: "RAW photo, masterpiece, 8k, professional editorial portrait of a kid in a professional racing suit. Realistic luxury automotive studio background, soft red and white studio lights. L85mm lens, cinematic lighting, sharp focus on child's expression, authentic photography, hyper-detailed fibers of the suit."
 };
