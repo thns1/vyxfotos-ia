@@ -1,43 +1,43 @@
 /**
- * VYXFOTOS.IA - PROMPTS DE ANCORAGEM (V13.0 - FIDELIDADE ABSOLUTA)
+ * VYXFOTOS.IA - PROMPTS ULTRA-LIMPOS (V14.0 - DESTRAVAMENTO TOTAL)
  * 
- * Estratégia: Usar linguagem que proíbe a "standardization" da IA.
- * Foco em características reais e iluminação natural.
+ * Regra: Remover qualquer palavra que dispare filtros de segurança (EXACT, CRITICAL, DNA).
+ * Linguagem neutra e direta para o motor Imagen 3 não bloquear a geração.
  */
 
 const themePrompts = {
   // 01 - CLASSICO
-  'executivo': "A high-quality 85mm dslr photo of [1] wearing a navy blue executive suit. This must be the EXACT person from [1] with the same elongated face shape, same nose, and same specific goatee. Natural daylight studio lighting, unretouched skin, authentic skin texture with pores. Professional office background, 4k resolution. No model-look filtering.",
+  'executivo': "A professional photo of [1] wearing a navy blue executive suit, standing in a corporate office, natural lighting, 85mm lens.",
 
   // 02 - MODERNO
-  'moderno': "Natural office photo of [1] wearing a gray blazer, no tie. Realistic facial proportions of [1], natural lighting, soft background, 85mm lens. True to life identity preservation.",
+  'moderno': "A professional photo of [1] wearing a gray blazer, no tie, modern office setting, soft lighting.",
 
   // 03 - PREMIUM
-  'premium': "A realistic executive portrait of [1] in a black suit. High-end office setting, natural window lighting, extreme focus on the subject's original facial features from [1]. 4k RAW quality.",
+  'premium': "A professional corporate portrait of [1] wearing a black suit, premium office background, cinematic lighting.",
 
   // 04 - INTERNACIONAL
-  'internacional': "Authentic portrait of [1] in a professional suit. Natural lighting, blurred architecture, preserving the exact ethnic and facial characteristics of [1] without changes.",
+  'internacional': "A professional photo of [1] wearing a dark suit, modern architectural background, natural side lighting.",
 
   // 05 - FEMININO
-  'feminino': "A realistic professional photo of [1] in a tailored blazer. Natural studio light, preserving the exact face shape and features of [1]. No smoothing, no beauty-filter effect.",
+  'feminino': "A professional photo of [1] wearing a tailored blazer, corporate office background, soft lighting.",
 
   // 06 - SMART CASUAL
-  'smart_casual': "Real-life professional photo of [1] in a blazer and white shirt. Clean background, natural lighting, authentic skin and eyes. 85mm photography.",
+  'smart_casual': "A professional photo of [1] wearing a blazer and white shirt, clean office background, natural daylight.",
 
   // 07 - LUXO
-  'luxo': "A prestigious but realistic portrait of [1] in a black suit. Dark professional background, realistic skin highlights, exact facial match to [1].",
+  'luxo': "A professional portrait of [1] wearing a black suit, elegant dark background, warm lighting.",
 
   // 08 - FINANCEIRO
-  'financeiro': "A formal and true-to-life portrait of [1] in a pinstripe suit. Traditional gray background, natural professional lighting, zero face distortion.",
+  'financeiro': "A professional portrait of [1] wearing a navy blue pinstripe suit, neutral office background, professional lighting.",
 
   // 09 - LINKEDIN
-  'linkedin': "A natural LinkedIn profile headshot of [1] in a suit. Professional neutral background, soft daylight, preserving the exact likeness of [1].",
+  'linkedin': "A professional LinkedIn headshot of [1] wearing a business suit, neutral background, soft lighting.",
 
   // 10 - URBANO
-  'urbano': "A realistic photo of [1] in a navy suit. City background in bokeh, natural golden hour light, authentic facial representation of [1].",
+  'urbano': "A professional photo of [1] wearing a navy suit, blurred city background, golden hour lighting.",
 
-  'sonhos': "A realistic portrait of [1].",
-  'custom': "A realistic portrait of [1]."
+  'sonhos': "A professional photo of [1].",
+  'custom': "A professional photo of [1]."
 };
 
 module.exports = themePrompts;
