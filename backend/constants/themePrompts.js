@@ -7,14 +7,14 @@
  */
 
 // Núcleo de fidelidade - âncora do rosto na foto [1]
-const FIDELIDADE_BASE = "The EXACT same person from reference photo [1]: same face shape, same eyes, same nose, same mouth, same skin tone, same hair. PRESERVE all facial features identically. Photorealistic portrait, visible skin texture, natural pores, zero artificial smoothing.";
+const FIDELIDADE_BASE = "The EXACT same person from reference photo [1]: same face shape, same eye color, same nose, same mouth, same skin tone, same hair color and style, same beard if present. PRESERVE all facial features and proportions identically — no distortion, no idealization. Photorealistic portrait with natural skin texture, visible pores, natural imperfections. SAME eye color as reference — do NOT change or enhance eyes.";
 
 // Enquadramento padrão para todos os temas executivos
-const ENQUADRAMENTO = "Framing: MID-BUST SHOT showing face, shoulders and upper chest. Executive suit clearly visible. NOT a headshot, NOT a passport photo. Subject fills 60% of the frame vertically. Expression: serious, composed and authoritative professional expression — neutral mouth (no smile), strong direct eye contact with camera, strong confident jaw, conveying executive authority and trustworthiness.";
+const ENQUADRAMENTO = "Framing: MID-BUST SHOT showing face, neck, shoulders and upper chest with suit visible. NOT a headshot. Natural, relaxed posture. Expression: serious and professional yet natural — relaxed neutral mouth, calm direct eye contact with camera, composed confident look without over-dramatization. Natural, candid feel.";
 
 const themePrompts = {
   // 01 - CLASSICO (Default - Poder Executivo)
-  'executivo': `${FIDELIDADE_BASE} ${ENQUADRAMENTO} Outfit: tailored executive suit in deep navy blue, crisp white dress shirt, silk tie. Confident composed expression, upright posture, shoulders back. Lighting: professional three-point studio lighting — 45-degree key light, soft fill eliminating harsh shadows, subtle rim light separating subject from background. Background: seamless studio gradient in neutral light gray (#E8E8E8), shallow depth of field, smooth bokeh. Camera: 85mm portrait lens, f/2.2, ISO 100, eye-level framing. Quality: 4K RAW, zero retouching, zero AI artifacts. Corporate studio photography.`,
+  'executivo': `${FIDELIDADE_BASE} ${ENQUADRAMENTO} Outfit: tailored executive suit in deep navy blue, crisp white dress shirt, silk tie. Lighting: soft natural window light from the side, gentle fill light on the opposite side — balanced, low-contrast, no harsh shadows. Think natural daylight studio, not dramatic stage lighting. Background: seamless neutral light gray (#E8E8E8), soft shallow depth of field bokeh. Camera: 85mm portrait lens, f/2.8, ISO 200. Quality: 4K photorealistic, natural skin color, zero over-processing. Corporate studio photography with a natural feel.`,
 
   // 02 - MODERNO
   'moderno': `${FIDELIDADE_BASE} ${ENQUADRAMENTO} Outfit: contemporary executive suit in charcoal gray, light blue dress shirt, no tie — modern sophisticated style. Relaxed accessible expression. Lighting: high-key studio lighting, broad soft main light, very light shadows. Background: soft off-white (#F5F5F0), seamless, slight vignette at edges. Camera: 85mm f/2.0, shoulder-up framing. 4K RAW finish, zero skin smoothing.`,
