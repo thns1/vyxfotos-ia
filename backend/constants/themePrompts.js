@@ -1,42 +1,41 @@
 /**
- * VYXFOTOS.IA - PROMPTS V32.0 (ELITE SEATED FINAL)
- * Foco: Destruir o espelhamento da foto original.
- * Regra: Câmera afastada a 5 metros para mostrar corpo inteiro sentado.
+ * VYXFOTOS.IA - PROMPTS V33.0 (ZORDON MODE - ABSOLUTE OVERWRITE)
+ * Foco: Matar o espelhamento persistente usando lente de cinema e ordens afirmativas.
  */
 
 const themePrompts = {
   // 01 - EXECUTIVO
-  'executivo': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT, camera 5 meters from subject. Full body photo showing [1] from head to toe, seated comfortably in a luxury leather executive armchair. [1] DRESSED IN a premium navy blue corporate suit. THE ENTIRE SELFIE BACKGROUND AND CHAIR IS ERASED AND REPLACED BY A MINIMALIST LUXURY OFFICE. Soft natural light. 8k resolution, unretouched skin.",
+  'executivo': "AUTHENTIC RAW 70mm PHOTOGRAPHY, Panavision wide shot. Full body photo showing [1] head to toe, seated in a NEW luxury leather executive armchair. THE ORIGINAL SELFIE BACKGROUND IS COMPLETELY OVERWRITTEN BY A MINIMALIST LUXURY CORPORATE OFFICE. Natural light from a window. [1] DRESSED IN a premium flawless Italian suit. High-end professional texture, unretouched.",
 
   // 02 - MODERNO
-  'moderno': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT, camera far away. Full body photo of [1] seated in a modern designer chair. [1] DRESSED IN a sharp gray blazer. COMPLETELY DISCARD THE ORIGINAL SELFIE BACKGROUND AND CLOTHES. Professional office at sunset. High-fidelity skin texture, 8k.",
+  'moderno': "AUTHENTIC RAW 70mm PHOTOGRAPHY, cinematic wide angle. Full body photo of [1] seated in a contemporary designer chair. REPLACE AND OVERWRITE all original pixels of [1]. DRESSED IN a sharp modern blazer. Luxury tech office environment. Sharp focus, raw skin texture, 8k.",
 
   // 03 - PREMIUM
-  'premium': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT, full body head to knees. [1] seated in a prestigiou office sofa. [1] DRESSED IN a black executive suit and tie. IGNORE ALL PIXELS OF THE ORIGINAL GAMING CHAIR AND BACKGROUND. Luxury penthouse setting. Cinematic depth of field.",
+  'premium': "AUTHENTIC RAW 70mm PHOTOGRAPHY, wide lens head to feet. [1] seated in a prestigious luxury sofa. OVERWRITE original context of [1] with a high-end luxury penthouse at sunset. [1] DRESSED IN a black executive suit. Absolute subject separation, cinematic lighting.",
 
   // 04 - INTERNACIONAL
-  'internacional': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT, head to toe. [1] seated in a designer urban chair. COMPLETELY NEW architectural background. [1] DRESSED IN a professional dark suit. DELETE original home environment context from [1]. Natural light.",
+  'internacional': "AUTHENTIC RAW 70mm PHOTOGRAPHY, panoramic wide shot. [1] seated in a designer chair. OVERWRITE original home environment with a premium architectural office background. [1] DRESSED IN a professional dark suit. Natural lighting, high-fidelity identity.",
 
   // 05 - FEMININO
-  'feminino': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT, full length. [1] seated elegantly in a luxury office chair. [1] DRESSED IN a tailored designer blazer. REMOVE all elements of the original selfie background. Luxury minimalist studio.",
+  'feminino': "AUTHENTIC RAW 70mm PHOTOGRAPHY, wide length shot. [1] seated elegantly in a designer office chair. OVERWRITE original background with a high-end minimalist luxury studio. [1] DRESSED IN a premium blazer, natural skin character, sharp eyes.",
 
   // 06 - SMART CASUAL
-  'smart_casual': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT. [1] seated casually in a contemporary office armchair. [1] DRESSED IN a structured blazer and shirt. DELETE home-office background from [1]. Real skin character, visible pores.",
+  'smart_casual': "AUTHENTIC RAW 70mm PHOTOGRAPHY, cinematic wide shot. [1] seated comfortably in a modern office lounge. OVERWRITE original home background and clothes. [1] DRESSED IN a structured blazer and shirt. Real skin character, visible pores.",
 
   // 07 - LUXO
-  'luxo': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT, camera far back. [1] seated in a velvet luxury sofa. [1] DRESSED IN a black tailored suit. DISCARD original context and chair of [1]. Prestigious moody lighting. High contrast RAW photography.",
+  'luxo': "AUTHENTIC RAW 70mm PHOTOGRAPHY, ultra-wide cinematic lens. [1] seated in a velvet luxury armchair. OVERWRITE original context of [1] with a prestigious library background. [1] DRESSED IN a black tailored suit. Moody dramatic lighting, commercial quality.",
 
   // 08 - FINANCEIRO
-  'financeiro': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT, head to knees. [1] seated in an executive chair. [1] DRESSED IN a pinstripe suit. DELETE original lighting and clothes from [1]. Professional financial district background.",
+  'financeiro': "AUTHENTIC RAW 70mm PHOTOGRAPHY, wide head to knees shot. [1] seated in a NEW executive chair. OVERWRITE all original pixels of [1]'s background. [1] DRESSED IN a pinstripe suit. Professional financial district scenario.",
 
   // 09 - LINKEDIN
-  'linkedin': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT. [1] seated in a professional office armchair. [1] DRESSED IN a business suit. REMOVE [1]'s original background and gaming chair completely. High-fidelity identity, natural skin.",
+  'linkedin': "AUTHENTIC RAW 70mm PHOTOGRAPHY, wide lens portrait. [1] seated in a professional office armchair. OVERWRITE [1]'s original gaming chair and background completely. [1] DRESSED IN a business suit. High-fidelity identity, sharp details.",
 
   // 10 - URBANO
-  'urbano': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT. [1] seated in a stylish urban lounge armchair. [1] DRESSED IN a navy suit and white shirt. DELETE original home-office furniture and clothes. Natural cinematic photo.",
+  'urbano': "AUTHENTIC RAW 70mm PHOTOGRAPHY, wide angle shot. [1] seated in a stylish urban lounge armchair. OVERWRITE original home environment and clothes. [1] DRESSED IN a navy suit and white shirt. Cinematic natural lighting.",
 
-  'sonhos': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT. [1] seated in an elegant scenario, head to toe. NEW clothes, NEW background, authentic identity.",
-  'custom': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT. [1] seated in a luxury armchair, full body head to toe. NEW scenario, NEW clothes, high fidelity face."
+  'sonhos': "AUTHENTIC RAW 70mm PHOTOGRAPHY, Panavision wide shot. [1] seated in an elegant scenario, head to toe. NEW clothes, NEW scenario, OVERWRITING original pixels.",
+  'custom': "AUTHENTIC RAW 70mm PHOTOGRAPHY, wide angle head to toe. [1] seated in a luxury armchair. OVERWRITING original background and clothes, high-fidelity face."
 };
 
 module.exports = themePrompts;

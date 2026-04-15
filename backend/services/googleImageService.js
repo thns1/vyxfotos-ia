@@ -4,9 +4,9 @@ const { GoogleAuth } = require('google-auth-library');
 const fetch = require('node-fetch');
 
 /**
- * SERVIÇO GOOGLE VERTEX AI - V32.0 (THE PIXEL ERADICATOR)
- * Foco: Destruição total do cenário original + Enquadramento Seated forçado.
- * Objetivo: Parar o "espelhamento" da selfie original com cadeira gamer.
+ * SERVIÇO GOOGLE VERTEX AI - V33.0 (ZORDON MODE - TOTAL REPLACEMENT)
+ * Foco: Quebrar o espelhamento persistente da selfie original.
+ * Técnica: Inversão de comando no subjectDescription + Lente 70mm.
  */
 class GoogleImageService {
     constructor() {
@@ -26,16 +26,16 @@ class GoogleImageService {
 
     async generateWithFaceID(imageFile, theme, customText, gender = 'masculino') {
         try {
-            console.log(`[Google-AI V32] MODO EXTERMINADOR DE PIXELS: ${theme}`);
+            console.log(`[Google-AI V33] MODO ZORDON (TOTAL REPLACEMENT): ${theme}`);
             const themePrompts = require('../constants/themePrompts');
             let promptFinal = themePrompts[theme] || themePrompts['executivo'];
 
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // PROTOCOLO V32: Erradicação do Background
-            // Esta instrução diz para a IA: "Só sobra o rosto da pessoa. O resto deve ser deletado."
-            const atomicWipeInstruction = "STRICTLY PRESERVE THE FACIAL IDENTITY OF [1]. ENTIRELY ERASE, IGNORE, AND DELETE ALL PIXELS OF THE ORIGINAL BACKGROUND, CLOTHING, AND FURNITURE FROM [1]. NO GAMING CHAIR. NO RED CURTAINS. Relight the person's face to match a high-end luxury office. Focus on a wide shot seated posture.";
+            // PROTOCOLO V33: Substituição Atômica Positiva
+            // Mudamos de "Não use" para "SUBSTITUA TUDO".
+            const atomicWipeInstruction = "ONLY USE [1] FOR FACIAL BIOMETRICS. COMPLETELY REPLACE AND OVERWRITE ALL OTHER PIXELS (CLOTHES, BACKGROUND, CHAIR, CURTAINS) WITH A NEW LUXURY SCENARIO. THE PERSON [1] MUST BE SEATED IN A NEW LUXURY ARMCHAIR. RELIGHT TO MATCH A BRIGHT EXECUTIVE OFFICE.";
 
             const requestBody = {
                 instances: [
@@ -72,8 +72,6 @@ class GoogleImageService {
             if (!response.ok) throw new Error(`Google Error: ${JSON.stringify(responseJson)}`);
 
             const imageBase64 = responseJson?.predictions?.[0]?.bytesBase64Encoded;
-            if (!imageBase64) throw new Error("IA falhou.");
-
             return {
                 status: "success",
                 output_url: `data:image/png;base64,${imageBase64}`,
@@ -81,7 +79,7 @@ class GoogleImageService {
             };
 
         } catch (error) {
-            console.error('[Google-AI V32] FALHA:', error.message);
+            console.error('[Google-AI V33] FALHA:', error.message);
             throw error;
         }
     }
