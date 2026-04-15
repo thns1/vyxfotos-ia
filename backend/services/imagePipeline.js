@@ -27,48 +27,47 @@ class ImagePipelineService {
 
             console.log(`[Backend-AI V4] Acionando motor FLUX-PuLID. Tema: "${theme}"`);
 
-            // 1. Prepara o prompt — descreve CENÁRIO e ESTILO, não a pessoa
-            //    (as feições vêm da selfie de referência automaticamente pelo PuLID)
+            // 1. Prepara o prompt — descreve CENÁRIO e ESTILO
+            //    A identidade facial é forçada pelos novos prompts V5 (Elite)
             let temaCena;
             if (customText && customText.trim().length > 3) {
                 // Para tema "sonhos", o usuário descreve o cenário livremente
-                temaCena = `${themePrompts['sonhos'].replace('breathtaking dreamlike landscape, surreal and majestic', customText.trim())}, photorealistic portrait.`;
+                temaCena = `${themePrompts['sonhos'].replace('Majestic and surreal environment but with hyper-realistic textures and lighting', customText.trim())}, photorealistic masterpiece.`;
             } else {
                 temaCena = themePrompts[theme] || themePrompts['executivo'];
             }
 
-            console.log(`[Backend-AI V4] Prompt: "${temaCena.substring(0, 80)}..."`);
+            console.log(`[Backend-AI V5] Prompt Elite selecionado.`);
 
             // 2. Upload da selfie para o armazenamento do Fal.ai
-            console.log(`[Backend-AI V4] Uploading selfie: ${imageFile.path}`);
+            console.log(`[Backend-AI V5] Uploading selfie: ${imageFile.path}`);
             const imageData = fs.readFileSync(imageFile.path);
             const fileBlob = new Blob([imageData], { type: imageFile.mimetype || 'image/jpeg' });
 
             let referenceImageUrl;
             try {
                 referenceImageUrl = await fal.storage.upload(fileBlob);
-                console.log(`[Backend-AI V4] Upload OK: ${referenceImageUrl}`);
+                console.log(`[Backend-AI V5] Upload OK: ${referenceImageUrl}`);
             } catch (uploadErr) {
                 throw new Error(`Falha no upload da selfie: ${uploadErr.message}`);
             }
 
-            // 3. Geração com FLUX-PuLID
-            // PuLID injeta a identidade facial da selfie diretamente na geração FLUX,
-            // produzindo resultados fotorrealistas que preservam os traços da pessoa.
-            console.log(`[Backend-AI V4] Iniciando geração FLUX-PuLID...`);
+            // 3. Geração com FLUX-PuLID (V5 Elite)
+            console.log(`[Backend-AI V5] Iniciando renderização ELITE (50 steps)...`);
             const result = await fal.subscribe("fal-ai/flux-pulid", {
                 input: {
                     prompt: temaCena,
                     reference_image_url: referenceImageUrl,
-                    num_inference_steps: 25,
-                    guidance_scale: 4.0,
+                    negative_prompt: "monochrome, lowres, bad anatomy, worst quality, low quality, (abstract art, colorful mess, pop art, vibrant colors, messy lighting:1.3), text, watermark, signature",
+                    num_inference_steps: 50,
+                    guidance_scale: 4.5,
                     num_images: 1,
                 },
                 logs: true,
                 onQueueUpdate: (update) => {
                     if (update.status === "IN_PROGRESS") {
                         const lastLog = update.logs?.at(-1)?.message || '';
-                        if (lastLog) console.log(`[Fal.ai PuLID] ${lastLog}`);
+                        if (lastLog) console.log(`[Fal.ai V5 Elite] ${lastLog}`);
                     }
                 }
             });
