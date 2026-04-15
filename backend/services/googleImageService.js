@@ -61,19 +61,24 @@ class GoogleImageService {
             // 2. Converte selfie para Base64
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
 
-            // 3. Monta a requisição para o Vertex AI (Formato Simplificado Imagen 3)
+            // 3. Monta a requisição para o Vertex AI (Subject Customization V8.3)
             const instance = {
                 prompt: promptElite,
-                image: {
-                    bytesBase64Encoded: imageData,
-                    mimeType: imageFile.mimetype || 'image/jpeg'
-                }
+                subjectReferences: [
+                    {
+                        referenceId: "1",
+                        subjectType: "SUBJECT_TYPE_PERSON",
+                        image: {
+                            bytesBase64Encoded: imageData,
+                            mimeType: imageFile.mimetype || 'image/jpeg'
+                        }
+                    }
+                ]
             };
 
             const parameters = {
                 sampleCount: 1,
-                aspectRatio: "3:4",
-                addWatermark: false
+                aspectRatio: "3:4"
             };
 
             const request = {
