@@ -10,7 +10,7 @@
 const FIDELIDADE_BASE = "The EXACT same person from reference photo [1]: same face shape, same eyes, same nose, same mouth, same skin tone, same hair. PRESERVE all facial features identically. Photorealistic portrait, visible skin texture, natural pores, zero artificial smoothing.";
 
 // Enquadramento padrão para todos os temas executivos
-const ENQUADRAMENTO = "Framing: MID-BUST SHOT showing face, shoulders and upper chest. Executive suit clearly visible. NOT a headshot, NOT a passport photo. Subject fills 60% of the frame vertically.";
+const ENQUADRAMENTO = "Framing: MID-BUST SHOT showing face, shoulders and upper chest. Executive suit clearly visible. NOT a headshot, NOT a passport photo. Subject fills 60% of the frame vertically. Expression: serious, composed and authoritative professional expression — neutral mouth (no smile), strong direct eye contact with camera, strong confident jaw, conveying executive authority and trustworthiness.";
 
 const themePrompts = {
   // 01 - CLASSICO (Default - Poder Executivo)
