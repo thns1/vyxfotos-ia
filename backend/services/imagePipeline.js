@@ -62,7 +62,7 @@ class ImagePipelineService {
                     input_image_urls: [referenceImageUrl],
                     negative_prompt: "nsfw, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, abstract art, cartoon, anime, painting, illustration, plastic face, over-smoothed skin",
                     style: "Photographic (Default)",
-                    num_inference_steps: 50,
+                    num_inference_steps: 30,
                     guidance_scale: 5.0,
                     style_strength_ratio: 20,
                 },
