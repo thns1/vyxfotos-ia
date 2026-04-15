@@ -5,13 +5,13 @@
  * Eles substituem o texto no workflow do SDXL no momento da geração.
  */
 module.exports = {
-  aniversario: "RAW photo, masterpiece, 8k, professional portrait of a person celebrating a birthday. High-end indoor studio setting with elegant minimalist decorations in the background. Soft lighting, 85mm lens, f/1.8, shallow depth of field, blurred background, highly detailed skin texture, pores, realistic eyes, cinematic atmosphere.",
+  aniversario: "High-end professional photography of the person in a luxury studio. Extreme focus on face, hyper-detailed iris and pupils, natural skin texture with visible pores, realistic lip anatomy, sharp eyebrows. Elegant studio lighting, 85mm lens, f/1.8, professional studio quality, sharp focus on face features.",
   
-  sonhos: "RAW photo, masterpiece, 8k, ultra-realistic fine-art photography. A person in a surreal, dreamlike world, bioluminescent forest at night. Cinematic lighting, glowing particles, hyper-detailed setting, 35mm lens, f/2.8, masterpiece quality, vibrant colors, sharp focus on face, majestic atmosphere.",
+  sonhos: "Exquisite fine-art photography featuring the person. High-fidelity facial features, microscopic skin texture, individual hair strands, precise lip and nose structure. The setting is majestic and surreal but with photorealistic lighting and textures. Hyper-detailed eyes, sharp focus on the person anatomy.",
   
-  luxo: "RAW photo, masterpiece, 8k, elegant high-fashion editorial portrait. Person wearing high-end minimalist luxury clothing in a modern opulent penthouse. Rembrandt lighting, professional beauty dish softbox, 85mm lens, f/1.4, perfect bokeh, highly detailed skin pores, realistic hair, luxury aesthetic, sharp focus.",
+  luxo: "Cinematic portrait of the person wearing premium luxury attire in a high-end penthouse. Absolute realism, highly detailed facial anatomy, realistic eyes with reflections, natural skin texture with pores. Soft beauty dish lighting, 85mm prime lens, f/1.8, professional studio setup, sharp focus on facial structure.",
   
-  executivo: "RAW photo, masterpiece, 8k, professional corporate executive portrait. Person wearing a bespoke tailored premium blazer. Modern minimalist corporate office with soft architectural lighting in the background. Sharp 85mm prime lens, professional photography studio setup, natural skin texture, realistic reflections, LinkedIn top-tier style, sharp eyes.",
+  executivo: "Extreme high-quality professional corporate headshot of the person. Meticulous detail on face, realistic iris and pupils, skin texture with visible pores, perfectly defined nose and mouth anatomy. Wearing a tailored charcoal blazer, modern office background. 8k resolution, photorealistic, sharp eyes.",
   
-  ferrari_kid: "RAW photo, masterpiece, 8k, professional editorial portrait of a kid in a professional racing suit. Realistic luxury automotive studio background, soft red and white studio lights. L85mm lens, cinematic lighting, sharp focus on child's expression, authentic photography, hyper-detailed fibers of the suit."
+  ferrari_kid: "Professional editorial photography of a child. Hyper-realistic facial features, sharp focus on eyes and expression, natural skin texture. Red racing suit with detailed fabric texture, automotive studio background, cinematic strobe lighting, top-tier realism, sharp focus."
 };

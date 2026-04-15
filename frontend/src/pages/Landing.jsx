@@ -42,7 +42,7 @@ export default function Landing() {
   const [isThankYouScreen, setIsThankYouScreen] = useState(false);
   const [generatedImage, setGeneratedImage] = useState(null); // Imagem REAL cuspidada pela IA
   const [user, setUser] = useState(null);
-  const [countdown, setCountdown] = useState(30);
+  const [countdown, setCountdown] = useState(45);
   const [hasImageArrival, setHasImageArrival] = useState(false);
   // Lógica de Suspense: Só libera quando contador chegar a 0 E a imagem chegar
   useEffect(() => {
@@ -182,7 +182,7 @@ export default function Landing() {
       const file = e.target.files[0];
       
       setIsGenerating(true);
-      setCountdown(15); // Reset do contador ao iniciar nova geração
+      setCountdown(45); // Reset do contador ao iniciar nova geração
       setGeneratedImage(null); // Limpa gerações antigas
       setStep(3); // Mostra as telas rodando
       window.scrollTo(0, 0);

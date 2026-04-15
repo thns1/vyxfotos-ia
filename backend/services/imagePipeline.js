@@ -49,17 +49,17 @@ class ImagePipelineService {
                 throw new Error(`Falha ao subir imagem: ${uploadErr.message}`);
             }
 
-            // 3. Geração InstantID com Calibração Pro-Photo V2
-            console.log(`[Backend-AI] Iniciando renderização neural de ALTA QUALIDADE...`);
+            // 3. Geração InstantID com Foco em Fidelidade Humana V3
+            console.log(`[Backend-AI] Iniciando renderização neural de ALTA FIDELIDADE...`);
             const result = await fal.subscribe("fal-ai/instantid", {
                 input: {
                     face_image_url: imageUrl,
                     prompt: temaCena,
-                    negative_prompt: "cartoon, anime, illustration, (plastic:1.2), smooth skin, 3d render, doll, toy, drawing, painting, bad eyes, text, watermark, signature, blurry, low resolution, digital artifacts, deformed, unnatural lighting",
+                    negative_prompt: "abstract, colorful art, high contrast, over-saturated, (bad anatomy, blurry, cartoon, anime, illustration, 3d, rendering, plastic, smooth skin:1.3), messy hair, closed eyes, watermark, signature, vibrant colors, neon, pop art",
                     image_size: "portrait_4_3",
                     num_inference_steps: 50,
-                    guidance_scale: 7.5,
-                    ip_adapter_scale: 0.65,
+                    guidance_scale: 5.0,
+                    ip_adapter_scale: 0.8,
                     controlnet_conditioning_scale: 0.8
                 },
                 logs: true,
