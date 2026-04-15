@@ -63,9 +63,9 @@ class GoogleImageService {
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 4. Calibragem V15.0: Identidade Capilar e Facial
-            // Foco absoluto em manter o cabelo original curto e o rosto alongado do Thiago
-            const highFidelityDescription = "Person with original short dark groomed hair and an elongated face shape. Preserve exact hair length and facial proportions from [1].";
+            // 4. Blindagem Facial V16.0: Identidade Absoluta (Identity Mirroring)
+            // Ordem de comando para o Google: Cópia idêntica, zero retoque, zero mudança.
+            const highFidelityDescription = "Absolute identity mirror of the person in reference photo [1]. Preserve every facial detail, exact hair style, and real-world texture from [1] with zero retouching, zero grooming, and zero identity smoothing.";
 
             const requestBody = {
                 instances: [
