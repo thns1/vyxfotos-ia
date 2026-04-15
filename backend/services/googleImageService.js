@@ -63,8 +63,9 @@ class GoogleImageService {
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 4. Calibragem V12.1: Isolando o rosto do cenário original
-            const highFidelityDescription = "The face and distinctive facial features of the person in [1]. Focus only on the identity, ignoring the original background and clothing.";
+            // 4. Calibragem V13.0: DNA Facial Absoluto
+            // Aqui descrevemos o Thiago real para a IA não usar um 'modelo padrão'
+            const highFidelityDescription = "Person with an elongated face shape, deep-set dark eyes, thick dark eyebrows, and a specific goatee and mustache pattern. Preserve the exact facial proportions, nose shape, and natural skin texture from [1] without any idealization or model-like changes.";
 
             const requestBody = {
                 instances: [
@@ -88,7 +89,8 @@ class GoogleImageService {
                 ],
                 parameters: {
                     sampleCount: 1,
-                    aspectRatio: "3:4"
+                    aspectRatio: "3:4",
+                    negativePrompt: "different person, generic face, model look, idealized features, changed face shape, distorted nose, broad jaw, commercial beauty look, face lift, fake skin"
                 }
             };
             

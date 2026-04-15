@@ -1,43 +1,43 @@
 /**
- * VYXFOTOS.IA - PROMPTS EQUILIBRADOS (V12.1) 
+ * VYXFOTOS.IA - PROMPTS DE ANCORAGEM (V13.0 - FIDELIDADE ABSOLUTA)
  * 
- * Foco: Forçar a transformação do traje e cenário mantendo a identidade [1].
- * Prioridade: Ação/Outro cenário primeiro, identidade depois.
+ * Estratégia: Usar linguagem que proíbe a "standardization" da IA.
+ * Foco em características reais e iluminação natural.
  */
 
 const themePrompts = {
   // 01 - CLASSICO
-  'executivo': "A high-quality 85mm DSLR photo of [1] wearing an expensive deep navy blue executive suit, white dress shirt and silk tie. Professional corporate office background, natural lighting, blurred bokeh, 4k resolution.",
+  'executivo': "A high-quality 85mm dslr photo of [1] wearing a navy blue executive suit. This must be the EXACT person from [1] with the same elongated face shape, same nose, and same specific goatee. Natural daylight studio lighting, unretouched skin, authentic skin texture with pores. Professional office background, 4k resolution. No model-look filtering.",
 
   // 02 - MODERNO
-  'moderno': "A professional business portrait of [1] wearing a charcoal gray suit jacket, no tie, modern office setting, soft natural light, 85mm lens.",
+  'moderno': "Natural office photo of [1] wearing a gray blazer, no tie. Realistic facial proportions of [1], natural lighting, soft background, 85mm lens. True to life identity preservation.",
 
   // 03 - PREMIUM
-  'premium': "A prestigious executive portrait of [1] wearing a black tailor-made suit, gold cufflinks, blurred luxury office library, cinematic lighting, ultra-realistic.",
+  'premium': "A realistic executive portrait of [1] in a black suit. High-end office setting, natural window lighting, extreme focus on the subject's original facial features from [1]. 4k RAW quality.",
 
   // 04 - INTERNACIONAL
-  'internacional': "A cosmopolitan executive portrait of [1] wearing a high-end brown suit, blurred modern architecture background, Rembrandt side lighting.",
+  'internacional': "Authentic portrait of [1] in a professional suit. Natural lighting, blurred architecture, preserving the exact ethnic and facial characteristics of [1] without changes.",
 
   // 05 - FEMININO
-  'feminino': "A professional business photo of [1] wearing a luxury tailored blazer, elegant office background, soft studio lighting, high resolution.",
+  'feminino': "A realistic professional photo of [1] in a tailored blazer. Natural studio light, preserving the exact face shape and features of [1]. No smoothing, no beauty-filter effect.",
 
   // 06 - SMART CASUAL
-  'smart_casual': "A modern professional portrait of [1] wearing a structured blazer over a premium shirt, startup office background, clean minimal aesthetic.",
+  'smart_casual': "Real-life professional photo of [1] in a blazer and white shirt. Clean background, natural lighting, authentic skin and eyes. 85mm photography.",
 
   // 07 - LUXO
-  'luxo': "A luxury portrait of [1] wearing a deep black executive suit, elegant dark studio background, golden rim lighting, prestigious look.",
+  'luxo': "A prestigious but realistic portrait of [1] in a black suit. Dark professional background, realistic skin highlights, exact facial match to [1].",
 
   // 08 - FINANCEIRO
-  'financeiro': "A formal executive portrait of [1] wearing a navy pinstripe suit, traditional gray office background, professional flat lighting.",
+  'financeiro': "A formal and true-to-life portrait of [1] in a pinstripe suit. Traditional gray background, natural professional lighting, zero face distortion.",
 
   // 09 - LINKEDIN
-  'linkedin': "A clean professional LinkedIn headshot of [1] wearing a sharp business suit, neutral background, direct gaze, professional corporate look.",
+  'linkedin': "A natural LinkedIn profile headshot of [1] in a suit. Professional neutral background, soft daylight, preserving the exact likeness of [1].",
 
   // 10 - URBANO
-  'urbano': "A modern executive photo of [1] wearing a navy suit, blurred city metropolis background, sunset golden hour lighting, cinematic bokeh.",
+  'urbano': "A realistic photo of [1] in a navy suit. City background in bokeh, natural golden hour light, authentic facial representation of [1].",
 
-  'sonhos': "A cinematic artistic portrait of [1].",
-  'custom': "A professional portrait of [1]."
+  'sonhos': "A realistic portrait of [1].",
+  'custom': "A realistic portrait of [1]."
 };
 
 module.exports = themePrompts;
