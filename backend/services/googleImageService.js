@@ -63,9 +63,9 @@ class GoogleImageService {
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 4. Identidade Absoluta V18.1: Reset de Motor
-            // Foco 100% na foto [1]. Sem descrições extras para não confundir a IA.
-            const identityMirror = "Absolute identity mirror of the person in [1].";
+            // 4. Hyper-Fidelity V19.0: Identidade + Face Mesh (Malha Facial)
+            // Usamos a mesma foto como Gabarito Estrutural para fidelidade absoluta.
+            const hyperFidelityInstruction = "Absolute identity mirror of the person in [1]. Preserve exact facial proportions, bone structure, and RAW skin texture with visible pores. Zero retouching.";
 
             const requestBody = {
                 instances: [
@@ -81,8 +81,20 @@ class GoogleImageService {
                                 },
                                 subjectImageConfig: {
                                     subjectType: "SUBJECT_TYPE_PERSON",
-                                    subjectDescription: identityMirror
+                                    subjectDescription: hyperFidelityInstruction
                                 }
+                            },
+                            {
+                                referenceType: "REFERENCE_TYPE_CONTROL",
+                                referenceId: 2,
+                                referenceImage: {
+                                    bytesBase64Encoded: imageData,
+                                    mimeType: mimeType
+                                },
+                                controlImageConfig: {
+                                    controlType: "CONTROL_TYPE_FACE_MESH"
+                                }
+                            }
                             }
                         ]
                     }
