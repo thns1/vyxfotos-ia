@@ -63,14 +63,13 @@ class GoogleImageService {
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 4. Monta a requisição: Subject Customization [1] + Face Mesh Control [2]
+            // 4. Monta requisição: apenas Subject Customization [1] — simples e eficaz
             const requestBody = {
                 instances: [
                     {
                         prompt: promptFinal,
                         referenceImages: [
                             {
-                                // [1] = Identidade: quem é a pessoa (rosto, pele, traços)
                                 referenceType: "REFERENCE_TYPE_SUBJECT",
                                 referenceId: 1,
                                 referenceImage: {
@@ -79,18 +78,6 @@ class GoogleImageService {
                                 },
                                 subjectImageConfig: {
                                     subjectType: "SUBJECT_TYPE_PERSON"
-                                }
-                            },
-                            {
-                                // [2] = Geometria: forma exata da estrutura facial (impede distorção)
-                                referenceType: "REFERENCE_TYPE_CONTROL",
-                                referenceId: 2,
-                                referenceImage: {
-                                    bytesBase64Encoded: imageData,
-                                    mimeType: mimeType
-                                },
-                                controlImageConfig: {
-                                    controlType: "CONTROL_TYPE_FACE_MESH"
                                 }
                             }
                         ]
