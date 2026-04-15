@@ -42,7 +42,7 @@ export default function Landing() {
   const [isThankYouScreen, setIsThankYouScreen] = useState(false);
   const [generatedImage, setGeneratedImage] = useState(null); // Imagem REAL cuspidada pela IA
   const [user, setUser] = useState(null);
-  const [countdown, setCountdown] = useState(60);
+  const [countdown, setCountdown] = useState(30);
   const [hasImageArrival, setHasImageArrival] = useState(false);
   // Lógica de Suspense: Só libera quando contador chegar a 0 E a imagem chegar
   useEffect(() => {
@@ -182,7 +182,7 @@ export default function Landing() {
       const file = e.target.files[0];
       
       setIsGenerating(true);
-      setCountdown(60); // Reset do contador ao iniciar nova geração
+      setCountdown(30); // Cronômetro acelerado para 30s (Motor Google)
       setGeneratedImage(null); // Limpa gerações antigas
       setStep(3); // Mostra as telas rodando
       window.scrollTo(0, 0);
@@ -207,6 +207,7 @@ export default function Landing() {
         const result = await response.json();
         
         if(result.success) {
+           const totalTime = 30; // Reduzido para 30 segundos para o motor Google
            console.log("Sucesso no Processamento Neural: ", result.data);
            // Armazena o Protocolo para não perder o link do cliente e o dinheiro!
            setOrderId(result.data.orderId);

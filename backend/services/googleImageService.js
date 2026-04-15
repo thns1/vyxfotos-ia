@@ -28,14 +28,18 @@ class GoogleImageService {
         try {
             console.log(`[Google-AI] Iniciando geração. Tema: ${theme}`);
 
-            // 1. Prompt com marcação [1] para identidade e [2] para estrutura facial (Face Mesh)
+            // 1. Prompt de Elite V9.1 (Núcleo + Estilo do PDF)
             let promptElite;
+            const styleBase = themePrompts[theme] || themePrompts['executivo'];
+
             if (customText && customText.trim().length > 3) {
-                promptElite = `A high-quality professional portrait of person [1] maintaining exact facial structure as shown in [2], in ${customText.trim()}, 85mm portrait photography, sharp focus, cinematic lighting, 8k resolution.`;
+                // Para temas customizados (Sonhos), usamos o Núcleo de Fidelidade + Texto do Usuário
+                const coreFidelity = styleBase; // No tema 'custom' e 'sonhos', o styleBase é apenas o FIDELIDADE_BASE
+                promptElite = `${coreFidelity} maintaining exact facial structure as shown in [2], in ${customText.trim()}, high-end professional photography.`;
             } else {
-                const base = themePrompts[theme] || themePrompts['executivo'];
-                // Insere marcação [1] e [2] no começo do prompt para ancorar identidade e geometria
-                promptElite = `Professional portrait of person [1] with exact facial geometry of [2], ${base}`;
+                // Para temas pré-definidos, usamos o prompt completo do PDF que já contém o [1] e o estilo [2]
+                // Adicionamos o [2] explicitamente no início para garantir a trava geométrica
+                promptElite = `Using [2] as absolute facial geometry guide: ${styleBase}`;
             }
 
             console.log(`[Google-AI] Prompt: "${promptElite.substring(0, 100)}..."`);
