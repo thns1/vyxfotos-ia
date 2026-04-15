@@ -4,16 +4,13 @@ const { GoogleAuth } = require('google-auth-library');
 const fetch = require('node-fetch');
 
 /**
- * SERVIÇO GOOGLE VERTEX AI - V39.0 (GEMINI WEB PROTOCOL - GENERATE-001)
- * - Modelo: imagen-3.0-generate-001 (Motor soberano do Google).
- * - Estratégia: Simulação 1:1 do comportamento do Gemini Web.
- * - Foco: Qualidade orgânica, 0% de filtros de plástico, zoom natural.
+ * SERVIÇO GOOGLE VERTEX AI - V39.1 (GEMINI WEB PROTOCOL - FIX)
+ * - Correção da estrutura de bytes para o modelo 'generate-001'.
  */
 class GoogleImageService {
     constructor() {
         this.projectId = process.env.GOOGLE_PROJECT_ID || 'vyxfotos-493415';
         this.location = 'us-central1';
-        // Trocamos para o modelo GENERATE-001 (Mais potente e orgânico)
         this.apiUrl = `https://${this.location}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${this.location}/publishers/google/models/imagen-3.0-generate-001:predict`;
 
         let authOptions = { scopes: 'https://www.googleapis.com/auth/cloud-platform' };
@@ -28,18 +25,17 @@ class GoogleImageService {
 
     async generateWithFaceID(imageFile, theme, customText, gender = 'masculino') {
         try {
-            console.log(`[Google-AI V39] MODO GEMINI-WEB (GENERATE-001): ${theme}`);
+            console.log(`[Google-AI V39.1] CORRIGINDO PAYLOAD GENERATE-001: ${theme}`);
             const themePrompts = require('../constants/themePrompts');
             let promptBase = themePrompts[theme] || themePrompts['executivo'];
 
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // PROTOCOLO V39: Simulação direta do Upload + Prompt do Gemini Web
-            // Removemos todas as amarras mecânicas.
+            // Ajuste de Prompt para Plano Médio (DNA Gemini Web)
             const promptFinal = promptBase
                 .replace(/portrait photograph/gi, "medium-wide shot photograph, waist up")
-                .replace(/85mm/gi, "50mm");
+                .replace(/85mm portrait lens/gi, "50mm wide lens");
 
             const requestBody = {
                 instances: [
@@ -47,12 +43,15 @@ class GoogleImageService {
                         prompt: promptFinal,
                         referenceImages: [
                             {
-                                referenceType: "REFERENCE_TYPE_SUBJECT",
                                 referenceId: 1,
-                                referenceImage: { bytesBase64Encoded: imageData, mimeType: mimeType },
+                                referenceType: "REFERENCE_TYPE_SUBJECT",
+                                // Ajuste crucial: O campo correto para o motor Generate-001
+                                referenceImage: { 
+                                    bytesBase64Encoded: imageData
+                                },
                                 subjectImageConfig: { 
                                     subjectType: "SUBJECT_TYPE_PERSON", 
-                                    subjectDescription: "The exact individual from [1]. Maintain high-fidelity organic skin texture. Organic RAW quality. No plastic skin. No generic faces. Replace all background elements."
+                                    subjectDescription: "The exact individual from [1]. RAW organic skin texture. High-fidelity identity. Professional scenario." 
                                 }
                             }
                         ]
@@ -61,8 +60,7 @@ class GoogleImageService {
                 parameters: { 
                     sampleCount: 1, 
                     aspectRatio: "1:1",
-                    // Parâmetros de fidelidade negativa para evitar o 'chorume'
-                    negativePrompt: "gaming chair, red curtains, artificial skin, plastic texture, smooth skin, cartoon, generic man, blurred face"
+                    negativePrompt: "gaming chair, red curtains, artificial skin, plastic, cartoon, generic man"
                 }
             };
 
@@ -85,7 +83,7 @@ class GoogleImageService {
             };
 
         } catch (error) {
-            console.error('[Google-AI V39] FALHA:', error.message);
+            console.error('[Google-AI V39.1] FALHA:', error.message);
             throw error;
         }
     }
