@@ -69,8 +69,8 @@ class ImagePipelineService {
 
             console.log("[Backend-AI] Resultado bruto do Fal:", JSON.stringify(result, null, 2));
 
-            // O modelo pode retornar: result.images[0].url ou result.image.url
-            const outputUrl = result?.images?.[0]?.url || result?.image?.url;
+            // Ajuste no caminho da URL: O modelo InstantID retorna dentro de 'data'
+            const outputUrl = result?.data?.image?.url || result?.images?.[0]?.url || result?.image?.url;
 
             if (!outputUrl) {
                 throw new Error(`A IA não retornou URL. Resposta: ${JSON.stringify(result)}`);
