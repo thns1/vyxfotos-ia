@@ -1,13 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 const { GoogleAuth } = require('google-auth-library');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const fetch = require('node-fetch');
 
 /**
- * SERVIÇO GOOGLE VERTEX AI - V36.0 (HYBRID ELITE - THE RESURRECTION)
- * - Reativado o Face Mesh para restaurar a identidade biometria 1:1.
- * - Ajuste de enquadramento para 'Mid-shot' (Cintura para cima), igual ao sucesso do Gemini Web.
- * - Foco em eliminar o efeito genérico da V35.
+ * SERVIÇO GOOGLE VERTEX AI - V37.0 (GEMINI FUSION PROTOCOL)
+ * - Etapa 1: Análise Multimodal com Gemini 1.5 Pro (Vision).
+ * - Etapa 2: Geração Orgânica com Imagen 3 (Subject Personalization).
+ * - Objetivo: Qualidade idêntica ao Gemini Web UI.
  */
 class GoogleImageService {
     constructor() {
@@ -15,33 +16,95 @@ class GoogleImageService {
         this.location = 'us-central1';
         this.apiUrl = `https://${this.location}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${this.location}/publishers/google/models/imagen-3.0-capability-001:predict`;
 
-        let authOptions = { scopes: 'https://www.googleapis.com/auth/cloud-platform' };
+        // Autenticação
+        let credentials;
         if (process.env.GOOGLE_CREDS_JSON) {
-            try { authOptions.credentials = JSON.parse(process.env.GOOGLE_CREDS_JSON); } catch (e) {}
+            try { credentials = JSON.parse(process.env.GOOGLE_CREDS_JSON); } catch (e) {}
+        }
+        
+        const authOptions = { scopes: 'https://www.googleapis.com/auth/cloud-platform' };
+        if (credentials) {
+            authOptions.credentials = credentials;
         } else {
             const keyPath = path.join(__dirname, '../../vyxfotos-493415-3d24a459e5c7.json');
             if (fs.existsSync(keyPath)) authOptions.keyFilename = keyPath;
         }
+        
         this.auth = new GoogleAuth(authOptions);
+        
+        // Inicializa SDK do Gemini para Análise Visual
+        // Usamos a API Key do Gemini se disponível, ou o token do Vertex
+        this.genAI = new GoogleGenerativeAI(credentials?.private_key_id || process.env.GEMINI_API_KEY || "DUMMY");
+    }
+
+    /**
+     * Usa o Gemini 1.5 Pro para analisar a selfie e criar um 'mapa de identidade' textual.
+     */
+    async _analyzeSubject(base64Image, mimeType) {
+        try {
+            console.log('[Google-AI V37] Iniciando Análise Visual Gemini 1.5 Pro...');
+            
+            // Em ambiente Vertex AI, usamos o token do GoogleAuth para o Gemini também
+            const client = await this.auth.getClient();
+            const tokenResponse = await client.getAccessToken();
+            
+            // Endpoint do Gemini 1.5 Pro no Vertex AI
+            const geminiUrl = `https://${this.location}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${this.location}/publishers/google/models/gemini-1.5-pro:generateContent`;
+            
+            const prompt = "Describe this person's facial features in extreme technical detail for an AI image generator. Include: hair style and color, eye shape and color, nose structure, eyebrow density, beard/facial hair style, face shape, and unique skin marks. Output only the description in English.";
+
+            const response = await fetch(geminiUrl, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${tokenResponse.token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [
+                            { text: prompt },
+                            { inlineData: { mimeType: mimeType, data: base64Image } }
+                        ]
+                    }],
+                    generationConfig: { maxOutputTokens: 200 }
+                })
+            });
+
+            const json = await response.json();
+            const description = json?.candidates?.[0]?.content?.parts?.[0]?.text;
+            
+            if (!description) {
+                console.warn('[Google-AI V37] Gemini Vision falhou, usando descrição padrão.');
+                return "The exact individual from the reference photo, maintaining all biometric characteristics.";
+            }
+
+            console.log('[Google-AI V37] Descrição Gerada:', description.substring(0, 50) + "...");
+            return description;
+
+        } catch (error) {
+            console.error('[Google-AI V37] Erro na análise Visual:', error.message);
+            return "The exact individual from the reference photo.";
+        }
     }
 
     async generateWithFaceID(imageFile, theme, customText, gender = 'masculino') {
         try {
-            console.log(`[Google-AI V36] RESGATANDO IDENTIDADE REAL: ${theme}`);
             const themePrompts = require('../constants/themePrompts');
             let promptBase = themePrompts[theme] || themePrompts['executivo'];
-
-            // Ajuste crucial V36.1: Forçamos o recuo da lente para Plano Médio (DNA Gemini Web)
-            // Trocamos 'Portrait' e '85mm' por termos de afastamento.
-            const promptFinal = promptBase
-                .replace(/portrait photograph/gi, "medium-wide shot photograph, waist up, showing head and torso")
-                .replace(/85mm portrait lens/gi, "50mm wide professional lens");
 
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // PROTOCOLO V36: Blindagem de Face + Liberdade de Cenário
-            const atomicWipeInstruction = "ONLY USE [1] FOR CRITICAL FACIAL BIOMETRICS. COMPLETELY DISCARD THE ORIGINAL BACKGROUND, CLOTHES AND THE GAMING CHAIR. GENERATE A NEW PROFESSIONAL UPPER BODY POSTURE SEATED IN A LUXURY OFFICE. NO GENERIC FACES.";
+            // ETAPA 1: Visão Gemini - Extraindo a identidade orgânica
+            const subjectAnalysis = await this._analyzeSubject(imageData, mimeType);
+
+            // ETAPA 2: Configuração do Prompt e Instruções
+            const promptFinal = promptBase
+                .replace(/portrait photograph/gi, "medium-wide shot photograph, waist up, capturing head and torso")
+                .replace(/85mm portrait lens/gi, "50mm wide lens");
+
+            // ETAPA 3: Geração Imagen 3 (SEM FACE MESH - MODO GEMINI WEB)
+            const atomicWipeInstruction = `STRICTLY PRESERVE THE IDENTITY OF [1]. 
+            SUBJECT CHARACTERISTICS: ${subjectAnalysis}. 
+            DISCARD THE ORIGINAL BACKGROUND, CLOTHING, AND GAMING CHAIR. 
+            GENERATE ORGANIC RAW SKIN TEXTURE. NO FILTERS.`;
 
             const requestBody = {
                 instances: [
@@ -53,12 +116,6 @@ class GoogleImageService {
                                 referenceId: 1,
                                 referenceImage: { bytesBase64Encoded: imageData, mimeType: mimeType },
                                 subjectImageConfig: { subjectType: "SUBJECT_TYPE_PERSON", subjectDescription: atomicWipeInstruction }
-                            },
-                            {
-                                referenceType: "REFERENCE_TYPE_CONTROL",
-                                referenceId: 2,
-                                referenceImage: { bytesBase64Encoded: imageData, mimeType: mimeType },
-                                controlImageConfig: { controlType: "CONTROL_TYPE_FACE_MESH" }
                             }
                         ]
                     }
@@ -75,7 +132,7 @@ class GoogleImageService {
             });
 
             const responseJson = await response.json();
-            if (!response.ok) throw new Error(`Google Error: ${JSON.stringify(responseJson)}`);
+            if (!response.ok) throw new Error(`Google API Error: ${JSON.stringify(responseJson)}`);
 
             const imageBase64 = responseJson?.predictions?.[0]?.bytesBase64Encoded;
             return {
@@ -85,7 +142,7 @@ class GoogleImageService {
             };
 
         } catch (error) {
-            console.error('[Google-AI V36] FALHA:', error.message);
+            console.error('[Google-AI V37] FALHA:', error.message);
             throw error;
         }
     }
