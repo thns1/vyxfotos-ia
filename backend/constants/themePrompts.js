@@ -1,46 +1,42 @@
 /**
- * VYXFOTOS.IA - PROMPTS V31.0
- *
- * BASE: V22.0 aprovada (motor intacto).
- * ÚNICA MUDANÇA: Adicionado "WIDE ANGLE SHOT, camera pulled far back, show full body head to knees"
- * para forçar o afastamento da lente sem remover o Face Mesh.
- *
- * NÃO ALTERAR SEM APROVAÇÃO DO USUÁRIO.
+ * VYXFOTOS.IA - PROMPTS V32.0 (ELITE SEATED FINAL)
+ * Foco: Destruir o espelhamento da foto original.
+ * Regra: Câmera afastada a 5 metros para mostrar corpo inteiro sentado.
  */
 
 const themePrompts = {
   // 01 - EXECUTIVO
-  'executivo': "WIDE ANGLE SHOT, camera pulled far back. Full body photo of [1] seated in a luxury leather executive armchair, showing head, torso, legs and feet. [1] DRESSED IN a navy blue executive suit. AUTHENTIC STUDIO LIGHTING. Visible skin pores, natural unretouched skin texture. NO SKIN SMOOTHING. The entire original background and clothing of [1] is DELETED and replaced by a luxury office. 8k RAW photography.",
+  'executivo': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT, camera 5 meters from subject. Full body photo showing [1] from head to toe, seated comfortably in a luxury leather executive armchair. [1] DRESSED IN a premium navy blue corporate suit. THE ENTIRE SELFIE BACKGROUND AND CHAIR IS ERASED AND REPLACED BY A MINIMALIST LUXURY OFFICE. Soft natural light. 8k resolution, unretouched skin.",
 
   // 02 - MODERNO
-  'moderno': "WIDE ANGLE SHOT, camera pulled far back. Full body photo of [1] seated in a contemporary luxury chair, showing head to knees. [1] DRESSED IN a gray blazer and crisp white shirt. AUTHENTIC RAW RELIGHTING. Visible skin textures, unretouched. NO BEAUTY FILTERS. REMOVE all elements of [1]'s original background and clothes. Realistic DSLR style.",
+  'moderno': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT, camera far away. Full body photo of [1] seated in a modern designer chair. [1] DRESSED IN a sharp gray blazer. COMPLETELY DISCARD THE ORIGINAL SELFIE BACKGROUND AND CLOTHES. Professional office at sunset. High-fidelity skin texture, 8k.",
 
   // 03 - PREMIUM
-  'premium': "WIDE ANGLE SHOT, camera pulled far back. Full body photo of [1] seated in a luxury office armchair, showing head to feet. AUTHENTIC STUDIO LIGHTING. Cinematic contrast, deep bokeh background. NO AIRBRUSHING on face. DISCARD original gaming chair, clothes, and curtains. [1] DRESSED IN a black executive suit and tie.",
+  'premium': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT, full body head to knees. [1] seated in a prestigiou office sofa. [1] DRESSED IN a black executive suit and tie. IGNORE ALL PIXELS OF THE ORIGINAL GAMING CHAIR AND BACKGROUND. Luxury penthouse setting. Cinematic depth of field.",
 
   // 04 - INTERNACIONAL
-  'internacional': "WIDE ANGLE SHOT, camera pulled far back. Full body photo of [1] seated in a designer chair, showing head to knees. COMPLETELY NEW urban architectural background. AUTHENTIC professional lighting. NO SKIN FILTER. REMOVE original selfie context and clothes. [1] DRESSED IN a professional dark suit, RAW photography.",
+  'internacional': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT, head to toe. [1] seated in a designer urban chair. COMPLETELY NEW architectural background. [1] DRESSED IN a professional dark suit. DELETE original home environment context from [1]. Natural light.",
 
   // 05 - FEMININO
-  'feminino': "WIDE ANGLE SHOT, camera pulled far back. Full body photo of [1] seated elegantly in a luxury chair, showing head to feet. AUTHENTIC soft lighting. NO BEAUTY RETOUCHING. REMOVE all original background objects and clothes from [1]. [1] DRESSED IN a tailored blazer, natural skin character.",
+  'feminino': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT, full length. [1] seated elegantly in a luxury office chair. [1] DRESSED IN a tailored designer blazer. REMOVE all elements of the original selfie background. Luxury minimalist studio.",
 
   // 06 - SMART CASUAL
-  'smart_casual': "WIDE ANGLE SHOT, camera pulled far back. Full body photo of [1] seated casually in a modern office chair, showing head to knees. AUTHENTIC lighting. NO SKIN SMOOTHING. DELETE original home background and clothes of [1]. [1] DRESSED IN a structured blazer and white shirt, RAW texture.",
+  'smart_casual': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT. [1] seated casually in a contemporary office armchair. [1] DRESSED IN a structured blazer and shirt. DELETE home-office background from [1]. Real skin character, visible pores.",
 
   // 07 - LUXO
-  'luxo': "WIDE ANGLE SHOT, camera pulled far back. Full body photo of [1] seated in a velvet luxury sofa, showing head to feet. [1] DRESSED IN a black suit and tie. AUTHENTIC dramatic professional lighting, high contrast. NO FACE ALTERATIONS. DISCARD [1]'s original context and clothes. Realistic commercial photography.",
+  'luxo': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT, camera far back. [1] seated in a velvet luxury sofa. [1] DRESSED IN a black tailored suit. DISCARD original context and chair of [1]. Prestigious moody lighting. High contrast RAW photography.",
 
   // 08 - FINANCEIRO
-  'financeiro': "WIDE ANGLE SHOT, camera pulled far back. Full body photo of [1] seated in a luxury executive chair, showing head to knees. [1] DRESSED IN a navy pinstripe suit and tie. AUTHENTIC studio illumination. NO BEAUTY FILTERS. DELETE [1]'s original lighting, clothes, and background objects. Natural skin.",
+  'financeiro': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT, head to knees. [1] seated in an executive chair. [1] DRESSED IN a pinstripe suit. DELETE original lighting and clothes from [1]. Professional financial district background.",
 
   // 09 - LINKEDIN
-  'linkedin': "WIDE ANGLE SHOT, camera pulled far back. Full body photo of [1] seated in a professional office armchair, showing head to feet. [1] DRESSED IN a business suit and tie. AUTHENTIC natural skin texture, visible pores. NO SKIN SMOOTHING. REMOVE [1]'s original selfie background, clothes, and gaming chair.",
+  'linkedin': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT. [1] seated in a professional office armchair. [1] DRESSED IN a business suit. REMOVE [1]'s original background and gaming chair completely. High-fidelity identity, natural skin.",
 
   // 10 - URBANO
-  'urbano': "WIDE ANGLE SHOT, camera pulled far back. Full body photo of [1] seated in a stylish urban lounge chair, showing head to knees. [1] DRESSED IN a navy suit and white shirt. AUTHENTIC cinematic lighting. NO BEAUTY RETOUCHING. DELETE [1]'s original home environment and clothes.",
+  'urbano': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT. [1] seated in a stylish urban lounge armchair. [1] DRESSED IN a navy suit and white shirt. DELETE original home-office furniture and clothes. Natural cinematic photo.",
 
-  'sonhos': "WIDE ANGLE SHOT, camera pulled far back. Full body photo of [1] seated in an elegant chair, showing head to feet. Authentic lighting, natural skin.",
-  'custom': "WIDE ANGLE SHOT, camera pulled far back. Full body photo of [1] seated in a luxury armchair, showing head to feet. Authentic lighting, natural skin."
+  'sonhos': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT. [1] seated in an elegant scenario, head to toe. NEW clothes, NEW background, authentic identity.",
+  'custom': "AUTHENTIC RAW PHOTOGRAPHY, WIDE ANGLE SHOT. [1] seated in a luxury armchair, full body head to toe. NEW scenario, NEW clothes, high fidelity face."
 };
 
 module.exports = themePrompts;

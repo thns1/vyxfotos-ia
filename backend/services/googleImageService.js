@@ -1,16 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 const { GoogleAuth } = require('google-auth-library');
-const themePrompts = require('../constants/themePrompts');
+const fetch = require('node-fetch');
 
 /**
- * SERVIÇO DE GERAÇÃO DE IMAGENS - GOOGLE IMAGEN 3 ELITE (V22.0 RESTAURADO)
- *
- * ESTA É A VERSÃO EXATA QUE GEROU O RETRATO APROVADO PELO USUÁRIO.
- * Única mudança: O enquadramento nos themePrompts foi trocado de
- * portrait/headshot → full body seated in a luxury armchair.
- *
- * NÃO ALTERAR ESTE ARQUIVO SEM APROVAÇÃO DO USUÁRIO.
+ * SERVIÇO GOOGLE VERTEX AI - V32.0 (THE PIXEL ERADICATOR)
+ * Foco: Destruição total do cenário original + Enquadramento Seated forçado.
+ * Objetivo: Parar o "espelhamento" da selfie original com cadeira gamer.
  */
 class GoogleImageService {
     constructor() {
@@ -18,51 +14,28 @@ class GoogleImageService {
         this.location = 'us-central1';
         this.apiUrl = `https://${this.location}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${this.location}/publishers/google/models/imagen-3.0-capability-001:predict`;
 
-        // Autenticação Híbrida (Local JSON + Render ENV)
-        const authConfig = { scopes: ['https://www.googleapis.com/auth/cloud-platform'] };
+        let authOptions = { scopes: 'https://www.googleapis.com/auth/cloud-platform' };
         if (process.env.GOOGLE_CREDS_JSON) {
-            authConfig.credentials = JSON.parse(process.env.GOOGLE_CREDS_JSON);
+            try { authOptions.credentials = JSON.parse(process.env.GOOGLE_CREDS_JSON); } catch (e) {}
         } else {
             const keyPath = path.join(__dirname, '../../vyxfotos-493415-3d24a459e5c7.json');
-            if (fs.existsSync(keyPath)) authConfig.keyFilename = keyPath;
+            if (fs.existsSync(keyPath)) authOptions.keyFilename = keyPath;
         }
-        this.auth = new GoogleAuth(authConfig);
-    }
-
-    _applyGender(prompt, gender) {
-        if (gender === 'feminino') {
-            return prompt
-                .replace(/\b(man|men|male|gentleman|businessman)\b/gi, 'woman')
-                .replace(/\b(his)\b/gi, 'her')
-                .replace(/\b(he)\b/gi, 'she')
-                .replace(/tailored mens executive suit/gi, "women's tailored blazer or executive suit")
-                .replace(/mens executive/gi, "women's executive")
-                .replace(/a man's/gi, "a woman's");
-        }
-        return prompt;
+        this.auth = new GoogleAuth(authOptions);
     }
 
     async generateWithFaceID(imageFile, theme, customText, gender = 'masculino') {
         try {
-            console.log(`[Google-AI V22-RESTORED] Tema: "${theme}" | Gênero: "${gender}"`);
+            console.log(`[Google-AI V32] MODO EXTERMINADOR DE PIXELS: ${theme}`);
+            const themePrompts = require('../constants/themePrompts');
+            let promptFinal = themePrompts[theme] || themePrompts['executivo'];
 
-            // 1. Seleciona o prompt do tema
-            let promptBase;
-            if (customText && customText.trim().length > 3) {
-                promptBase = `${themePrompts['executivo']} The scene setting is: ${customText.trim()}.`;
-            } else {
-                promptBase = themePrompts[theme] || themePrompts['executivo'];
-            }
-
-            const promptFinal = this._applyGender(promptBase, gender);
-
-            // 2. Converte selfie para Base64
             const imageData = fs.readFileSync(imageFile.path).toString('base64');
             const mimeType = imageFile.mimetype || 'image/jpeg';
 
-            // 3. PROTOCOLO V22.0 INTACTO: Anti-Filtro + Fidelidade Biométrica
-            // Esta é a string EXATA que gerou o resultado aprovado pelo usuário.
-            const atomicWipeInstruction = "Strictly preserve the authentic facial identity of [1]. DO NOT smooth the skin. DO NOT use beauty filters or airbrushing. Keep natural skin textures, visible pores, and unique characteristics of [1]. RELIGHT the subject with professional studio lighting but maintain the raw, unretouched character of the person.";
+            // PROTOCOLO V32: Erradicação do Background
+            // Esta instrução diz para a IA: "Só sobra o rosto da pessoa. O resto deve ser deletado."
+            const atomicWipeInstruction = "STRICTLY PRESERVE THE FACIAL IDENTITY OF [1]. ENTIRELY ERASE, IGNORE, AND DELETE ALL PIXELS OF THE ORIGINAL BACKGROUND, CLOTHING, AND FURNITURE FROM [1]. NO GAMING CHAIR. NO RED CURTAINS. Relight the person's face to match a high-end luxury office. Focus on a wide shot seated posture.";
 
             const requestBody = {
                 instances: [
@@ -73,10 +46,7 @@ class GoogleImageService {
                                 referenceType: "REFERENCE_TYPE_SUBJECT",
                                 referenceId: 1,
                                 referenceImage: { bytesBase64Encoded: imageData, mimeType: mimeType },
-                                subjectImageConfig: {
-                                    subjectType: "SUBJECT_TYPE_PERSON",
-                                    subjectDescription: atomicWipeInstruction
-                                }
+                                subjectImageConfig: { subjectType: "SUBJECT_TYPE_PERSON", subjectDescription: atomicWipeInstruction }
                             },
                             {
                                 referenceType: "REFERENCE_TYPE_CONTROL",
@@ -90,27 +60,20 @@ class GoogleImageService {
                 parameters: { sampleCount: 1, aspectRatio: "3:4" }
             };
 
-            // 4. Autenticação e chamada
             const client = await this.auth.getClient();
             const tokenResponse = await client.getAccessToken();
             const response = await fetch(this.apiUrl, {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${tokenResponse.token}`,
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Authorization': `Bearer ${tokenResponse.token}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody)
             });
 
             const responseJson = await response.json();
-            if (!response.ok) {
-                throw new Error(`Google API Error ${response.status}: ${JSON.stringify(responseJson.error || responseJson)}`);
-            }
+            if (!response.ok) throw new Error(`Google Error: ${JSON.stringify(responseJson)}`);
 
             const imageBase64 = responseJson?.predictions?.[0]?.bytesBase64Encoded;
-            if (!imageBase64) throw new Error(`Sem imagem na resposta: ${JSON.stringify(responseJson).substring(0, 200)}`);
+            if (!imageBase64) throw new Error("IA falhou.");
 
-            console.log('[Google-AI V22-RESTORED] SUCESSO!');
             return {
                 status: "success",
                 output_url: `data:image/png;base64,${imageBase64}`,
@@ -118,10 +81,9 @@ class GoogleImageService {
             };
 
         } catch (error) {
-            console.error('[Google-AI V22-RESTORED] FALHA:', error.message);
+            console.error('[Google-AI V32] FALHA:', error.message);
             throw error;
         }
     }
 }
-
 module.exports = new GoogleImageService();
