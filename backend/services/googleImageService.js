@@ -95,7 +95,6 @@ class GoogleImageService {
                                     controlType: "CONTROL_TYPE_FACE_MESH"
                                 }
                             }
-                            }
                         ]
                     }
                 ],
