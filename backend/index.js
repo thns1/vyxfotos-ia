@@ -108,50 +108,105 @@ async function saveLead({ uid, email, name, photoURL }) {
   }
 
     // Google Sheets — só adiciona se for a primeira vez (verifica flag no Firestore)
-  if (leadsRegistrados.has(uid)) return;
+  if (leadsRegistrados.has(uid)) {
+    console.log(`[Sheets] UID já registrado nesta sessão: ${uid}`);
+    return;
+  }
 
   try {
     const sheets = getSheetsClient();
-    if (!sheets) return;
+    if (!sheets) {
+      console.warn('[Sheets] getSheetsClient() retornou null — credenciais inválidas?');
+      return;
+    }
 
     // Verifica se já foi adicionado ao Sheets em sessões anteriores
     if (firestoreDb) {
       const ref = firestoreDb.collection('leads').doc(uid);
       const snap = await ref.get();
-      if (snap.exists && snap.data().addedToSheets) return;
+      if (snap.exists && snap.data().addedToSheets) {
+        console.log(`[Sheets] Lead já registrado anteriormente: ${email}`);
+        leadsRegistrados.add(uid);
+        return;
+      }
     }
 
     leadsRegistrados.add(uid);
 
     const dataBR = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
 
-    // Garante cabeçalho na primeira linha
-    const header = await sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'A1' });
-    if (!header.data.values?.length) {
+    // Verifica se é a primeira linha (precisa criar o cabeçalho profissional)
+    const headerCheck = await sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'A1' });
+    const isFirstTime = !headerCheck.data.values?.length;
+
+    if (isFirstTime) {
+      // Cabeçalho com dados
       await sheets.spreadsheets.values.update({
-        spreadsheetId: SHEET_ID,
-        range: 'A1:E1',
-        valueInputOption: 'RAW',
-        requestBody: { values: [['Email', 'Nome', 'Data de Cadastro', 'UID']] },
+        spreadsheetId: SHEET_ID, range: 'A1:F1', valueInputOption: 'RAW',
+        requestBody: { values: [['📧 Email', '👤 Nome', '📅 Data & Hora', '🔖 Status', '🌐 Origem', '🆔 UID']] },
       });
+
+      // Formatação profissional via batchUpdate
+      const sheetId = 0;
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: SHEET_ID,
+        requestBody: { requests: [
+          // Cor verde escuro no cabeçalho
+          { repeatCell: { range: { sheetId, startRowIndex: 0, endRowIndex: 1 },
+            cell: { userEnteredFormat: {
+              backgroundColor: { red: 0.11, green: 0.37, blue: 0.22 },
+              textFormat: { foregroundColor: { red: 1, green: 1, blue: 1 }, bold: true, fontSize: 11 },
+              horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE',
+            }}, fields: 'userEnteredFormat' }},
+          // Congela a linha do cabeçalho
+          { updateSheetProperties: { properties: { sheetId, gridProperties: { frozenRowCount: 1 } }, fields: 'gridProperties.frozenRowCount' }},
+          // Larguras das colunas
+          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 0, endIndex: 1 }, properties: { pixelSize: 260 }, fields: 'pixelSize' }},
+          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 1, endIndex: 2 }, properties: { pixelSize: 180 }, fields: 'pixelSize' }},
+          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 2, endIndex: 3 }, properties: { pixelSize: 175 }, fields: 'pixelSize' }},
+          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 3, endIndex: 4 }, properties: { pixelSize: 120 }, fields: 'pixelSize' }},
+          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 4, endIndex: 5 }, properties: { pixelSize: 100 }, fields: 'pixelSize' }},
+          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 5, endIndex: 6 }, properties: { pixelSize: 260 }, fields: 'pixelSize' }},
+          // Altura do cabeçalho
+          { updateDimensionProperties: { range: { sheetId, dimension: 'ROWS', startIndex: 0, endIndex: 1 }, properties: { pixelSize: 40 }, fields: 'pixelSize' }},
+          // Renomeia a aba
+          { updateSheetProperties: { properties: { sheetId, title: '🟢 Leads Vyxfotos' }, fields: 'title' }},
+        ]},
+      });
+      console.log('[Sheets] Cabeçalho profissional criado.');
     }
 
+    // Cor alternada nas linhas (verde claro para linhas pares)
+    const nextRow = (headerCheck.data.values?.length || 0) + 2;
+    const isEvenRow = nextRow % 2 === 0;
+
     await sheets.spreadsheets.values.append({
-      spreadsheetId: SHEET_ID,
-      range: 'A:D',
-      valueInputOption: 'RAW',
-      insertDataOption: 'INSERT_ROWS',
-      requestBody: { values: [[email, name || '', dataBR, uid]] },
+      spreadsheetId: SHEET_ID, range: 'A:F',
+      valueInputOption: 'USER_ENTERED', insertDataOption: 'INSERT_ROWS',
+      requestBody: { values: [[email, name || '—', dataBR, '🟢 Novo Lead', 'Google', uid]] },
     });
+
+    // Aplica cor de fundo alternada na nova linha
+    if (isEvenRow) {
+      const rowIndex = nextRow - 1;
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: SHEET_ID,
+        requestBody: { requests: [{ repeatCell: {
+          range: { sheetId: 0, startRowIndex: rowIndex, endRowIndex: rowIndex + 1 },
+          cell: { userEnteredFormat: { backgroundColor: { red: 0.88, green: 0.96, blue: 0.90 } } },
+          fields: 'userEnteredFormat.backgroundColor',
+        }}]},
+      });
+    }
 
     // Marca no Firestore que já foi adicionado ao Sheets
     if (firestoreDb) {
       await firestoreDb.collection('leads').doc(uid).set({ addedToSheets: true }, { merge: true });
     }
 
-    console.log(`[Sheets] Lead adicionado: ${email}`);
+    console.log(`[Sheets] ✅ Lead adicionado com sucesso: ${email}`);
   } catch (e) {
-    console.warn('[Sheets] Erro ao salvar lead:', e.message);
+    console.warn('[Sheets] Erro ao salvar lead:', e.message, e.stack?.split('\n')[1]);
   }
 }
 
@@ -781,6 +836,7 @@ app.post('/api/webhooks/instagram', async (req, res) => {
 // ─────────────────────────────────────────────
 app.post('/api/register-lead', async (req, res) => {
   const { uid, email, name, photoURL } = req.body;
+  console.log(`[Lead] Recebido: ${email} | uid: ${uid}`);
   if (!uid || !email) return res.status(400).json({ success: false });
   await saveLead({ uid, email, name, photoURL });
   res.json({ success: true });
