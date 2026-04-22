@@ -65,8 +65,21 @@ export default function Landing() {
   }, [isGenerating, countdown, hasImageArrival, generatedImage, orderId, navigate]);
 
   useEffect(() => {
+    const BASE_API_URL = import.meta.env.VITE_API_URL || 'https://vyxfotos-backend.onrender.com';
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
       setUser(currentUser);
+      if (currentUser) {
+        fetch(`${BASE_API_URL}/api/register-lead`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            uid: currentUser.uid,
+            email: currentUser.email,
+            name: currentUser.displayName || '',
+            photoURL: currentUser.photoURL || '',
+          }),
+        }).catch(() => {});
+      }
     });
     return () => unsubscribe();
   }, []);
