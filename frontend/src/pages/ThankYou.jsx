@@ -54,7 +54,7 @@ export default function ThankYou() {
                    <span className="font-black text-xs uppercase tracking-[0.2em]">Entrega Instantânea</span>
                 </div>
                 <p className="text-sm text-ivory/60 leading-relaxed overflow-hidden italic">
-                  Suas fotos em 4K e os arquivos originais limpos já estão sendo salvos automaticamente na sua <b>Área do Cliente</b>.
+                  Suas fotos em Alta Qualidade e os arquivos originais limpos já estão sendo salvos automaticamente na sua <b>Área do Cliente</b>.
                 </p>
              </div>
              <div className="bg-white/5 p-8 rounded-[2.5rem] border border-white/5 space-y-4 hover:border-champagne/20 transition-colors group">
@@ -77,7 +77,7 @@ export default function ThankYou() {
                 <ArrowRight className="group-hover:translate-x-2 transition-transform" />
              </button>
              <p className="mt-8 text-[11px] md:text-xs text-ivory/20 uppercase tracking-[0.3em] font-mono font-bold">
-                Vyxfotos.IA — Renderização de Alto Luxo 4K
+                Vyxfotos.IA — Renderização de Alto Luxo Alta Qualidade
              </p>
           </div>
 

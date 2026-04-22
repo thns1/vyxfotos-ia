@@ -1,91 +1,88 @@
 const fs = require('fs');
-const path = require('path');
-const { GoogleAuth } = require('google-auth-library');
-const fetch = require('node-fetch');
+const { fal } = require('@fal-ai/client');
+require('dotenv').config();
 
-/**
- * SERVIÇO GOOGLE VERTEX AI - V39.1 (GEMINI WEB PROTOCOL - FIX)
- * - Correção da estrutura de bytes para o modelo 'generate-001'.
- */
-class GoogleImageService {
-    constructor() {
-        this.projectId = process.env.GOOGLE_PROJECT_ID || 'vyxfotos-493415';
-        this.location = 'us-central1';
-        this.apiUrl = `https://${this.location}-aiplatform.googleapis.com/v1/projects/${this.projectId}/locations/${this.location}/publishers/google/models/imagen-3.0-generate-001:predict`;
+fal.config({ credentials: process.env.FAL_KEY });
 
-        let authOptions = { scopes: 'https://www.googleapis.com/auth/cloud-platform' };
-        if (process.env.GOOGLE_CREDS_JSON) {
-            try { authOptions.credentials = JSON.parse(process.env.GOOGLE_CREDS_JSON); } catch (e) {}
-        } else {
-            const keyPath = path.join(__dirname, '../../vyxfotos-493415-3d24a459e5c7.json');
-            if (fs.existsSync(keyPath)) authOptions.keyFilename = keyPath;
-        }
-        this.auth = new GoogleAuth(authOptions);
-    }
-
+class ImageGenerationService {
     async generateWithFaceID(imageFile, theme, customText, gender = 'masculino') {
-        try {
-            console.log(`[Google-AI V39.1] CORRIGINDO PAYLOAD GENERATE-001: ${theme}`);
-            const themePrompts = require('../constants/themePrompts');
-            let promptBase = themePrompts[theme] || themePrompts['executivo'];
+        console.log(`[VYX] Pipeline iniciado | tema: ${theme} | gênero: ${gender}`);
 
-            const imageData = fs.readFileSync(imageFile.path).toString('base64');
-            const mimeType = imageFile.mimetype || 'image/jpeg';
+        const themePrompts = require('../constants/themePrompts');
+        const themePrompt = themePrompts[theme] || themePrompts['executivo'];
 
-            // Ajuste de Prompt para Plano Médio (DNA Gemini Web)
-            const promptFinal = promptBase
-                .replace(/portrait photograph/gi, "medium-wide shot photograph, waist up")
-                .replace(/85mm portrait lens/gi, "50mm wide lens");
+        // Upload da selfie para o storage do FAL
+        const imageBuffer = fs.readFileSync(imageFile.path);
+        const selfieUrl = await fal.storage.upload(imageBuffer);
+        console.log('[VYX] Selfie enviada ao storage.');
 
-            const requestBody = {
-                instances: [
-                    {
-                        prompt: promptFinal,
-                        referenceImages: [
-                            {
-                                referenceId: 1,
-                                referenceType: "REFERENCE_TYPE_SUBJECT",
-                                // Correção V39.2: Campo correto para o motor Generate-001 é 'image'
-                                image: { 
-                                    bytesBase64Encoded: imageData
-                                },
-                                subjectImageConfig: { 
-                                    subjectType: "SUBJECT_TYPE_PERSON", 
-                                    subjectDescription: "The exact individual from [1]. RAW organic skin texture. High-fidelity identity. Professional scenario." 
-                                }
-                            }
-                        ]
-                    }
-                ],
-                parameters: { 
-                    sampleCount: 1, 
-                    aspectRatio: "1:1",
-                    negativePrompt: "gaming chair, red curtains, artificial skin, plastic, cartoon, generic man"
-                }
-            };
+        // ─── PASSO 1: FLUX Realism gera cena profissional ───────────────────
+        console.log('[VYX] 1/2 — Gerando cena com FLUX Realism...');
 
-            const client = await this.auth.getClient();
-            const tokenResponse = await client.getAccessToken();
-            const response = await fetch(this.apiUrl, {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${tokenResponse.token}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify(requestBody)
-            });
+        const genderLabel = gender === 'feminino' ? 'woman' : 'man';
+        const prompt = `RAW photo of a ${genderLabel}, ${themePrompt}${customText ? ', ' + customText : ''}, photorealistic, 8k, sharp focus, natural skin texture, professional photography`;
 
-            const responseJson = await response.json();
-            if (!response.ok) throw new Error(`Google API Error: ${JSON.stringify(responseJson)}`);
+        const fluxResult = await fal.subscribe('fal-ai/flux-realism', {
+            input: {
+                prompt: prompt,
+                negative_prompt: 'cartoon, painting, illustration, blurry, deformed, ugly, low quality, watermark, text, fake skin',
+                num_inference_steps: 28,
+                guidance_scale: 3.5,
+                width: 1024,
+                height: 1024
+            },
+            logs: false,
+            onQueueUpdate: (update) => {
+                if (update.status === 'IN_PROGRESS') process.stdout.write('.');
+            }
+        });
 
-            const imageBase64 = responseJson?.predictions?.[0]?.bytesBase64Encoded;
-            return {
-                status: "success",
-                output_url: `data:image/png;base64,${imageBase64}`,
-                orderId: `PEDIDO_G_${Date.now()}`
-            };
+        const sceneUrl =
+            fluxResult?.data?.images?.[0]?.url ||
+            fluxResult?.images?.[0]?.url;
 
-        } catch (error) {
-            console.error('[Google-AI V39.1] FALHA:', error.message);
-            throw error;
+        if (!sceneUrl) {
+            console.error('\n[VYX] Resposta FLUX:', JSON.stringify(fluxResult, null, 2));
+            throw new Error('FLUX Realism não retornou imagem.');
         }
+        console.log('\n[VYX] Cena gerada.');
+
+        // ─── PASSO 2: Face swap — rosto real da selfie na cena ──────────────
+        console.log('[VYX] 2/2 — Aplicando rosto real (face swap)...');
+
+        const swapResult = await fal.subscribe('fal-ai/face-swap', {
+            input: {
+                base_image_url: sceneUrl,  // cena gerada pelo FLUX
+                swap_image_url: selfieUrl  // selfie com o rosto real
+            },
+            logs: false,
+            onQueueUpdate: (update) => {
+                if (update.status === 'IN_PROGRESS') process.stdout.write('.');
+            }
+        });
+
+        const finalUrl =
+            swapResult?.data?.image?.url ||
+            swapResult?.data?.images?.[0]?.url ||
+            swapResult?.image?.url;
+
+        if (!finalUrl) {
+            console.error('\n[VYX] Resposta face-swap:', JSON.stringify(swapResult, null, 2));
+            throw new Error('Face swap não retornou imagem.');
+        }
+
+        // Download da imagem final
+        const response = await fetch(finalUrl);
+        const buffer = Buffer.from(await response.arrayBuffer());
+        const base64 = buffer.toString('base64');
+
+        console.log('\n[VYX] Pipeline concluído com sucesso.');
+        return {
+            status: 'success',
+            output_url: `data:image/jpeg;base64,${base64}`,
+            orderId: `PEDIDO_F_${Date.now()}`
+        };
     }
 }
-module.exports = new GoogleImageService();
+
+module.exports = new ImageGenerationService();

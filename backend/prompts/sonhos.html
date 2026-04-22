@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vyxfotos.IA — Prompts: Tema Sonhos & Fantasia</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #050508;
+    color: #f0ede6;
+    padding: 40px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .header {
+    border-bottom: 1px solid rgba(201,168,76,0.4);
+    padding-bottom: 30px;
+    margin-bottom: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .brand { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
+  .brand span { color: #c9a84c; }
+  .doc-type { font-size: 11px; color: rgba(240,237,230,0.4); letter-spacing: 3px; text-transform: uppercase; font-weight: 600; }
+
+  .theme-title {
+    font-size: 52px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    margin-bottom: 8px;
+    line-height: 1;
+  }
+
+  .theme-subtitle {
+    color: #c9a84c;
+    font-size: 13px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 50px;
+  }
+
+  .info-block {
+    background: rgba(201,168,76,0.05);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 50px;
+  }
+
+  .info-block h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #c9a84c;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .info-block p {
+    font-size: 13px;
+    color: rgba(240,237,230,0.65);
+    line-height: 1.8;
+    font-weight: 300;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f0ede6;
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+
+  .section-label {
+    font-size: 10px;
+    color: #c9a84c;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .template-block {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-left: 3px solid rgba(201,168,76,0.3);
+    border-radius: 10px;
+    padding: 22px 24px;
+    margin-bottom: 16px;
+    page-break-inside: avoid;
+  }
+
+  .template-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+
+  .template-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #f0ede6;
+  }
+
+  .template-tag {
+    font-size: 9px;
+    background: rgba(201,168,76,0.1);
+    color: #c9a84c;
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 100px;
+    padding: 2px 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .client-input {
+    font-size: 11px;
+    color: rgba(240,237,230,0.4);
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .client-text {
+    font-size: 13px;
+    color: #c9a84c;
+    font-style: italic;
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    background: rgba(201,168,76,0.05);
+    border-radius: 6px;
+  }
+
+  .generated-label {
+    font-size: 11px;
+    color: rgba(240,237,230,0.4);
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .generated-prompt {
+    font-size: 12.5px;
+    color: rgba(240,237,230,0.75);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+
+  .template-formula {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 22px 24px;
+    margin-bottom: 16px;
+  }
+
+  .formula-label {
+    font-size: 9px;
+    color: rgba(240,237,230,0.4);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+
+  .formula-text {
+    font-size: 13px;
+    color: rgba(240,237,230,0.8);
+    line-height: 1.8;
+    font-weight: 300;
+    font-family: 'Courier New', monospace;
+  }
+
+  .formula-text em {
+    color: #c9a84c;
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    margin: 50px 0;
+  }
+
+  .footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-brand { font-size: 10px; color: rgba(240,237,230,0.25); letter-spacing: 2px; text-transform: uppercase; }
+  .footer-info { font-size: 10px; color: rgba(240,237,230,0.25); text-align: right; }
+
+  .badge {
+    display: inline-block;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.3);
+    color: #c9a84c;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+
+  @media print {
+    body { background: #050508; padding: 30px; }
+    .template-block { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="brand">Vyxfotos<span>.</span>IA</div>
+    <div class="doc-type">Documento Interno de Prompts</div>
+  </div>
+  <div class="doc-type">Confidencial · 2025</div>
+</div>
+
+<div class="badge">Tema 04 — Sonhos & Fantasia</div>
+<h1 class="theme-title">Sonhos</h1>
+<p class="theme-subtitle">Sistema de Prompt Dinâmico · Texto Livre do Cliente</p>
+
+<!-- INFO BLOCK -->
+<div class="info-block">
+  <h3>Como funciona este tema</h3>
+  <p>
+    O tema <strong>Sonhos & Fantasia</strong> funciona diferente dos outros. O cliente escreve em texto livre qual é o seu sonho ou fantasia — por exemplo, <em>"quero ser astronauta"</em>, <em>"quero parecer uma sereia"</em> ou <em>"quero aparecer como samurai japonês"</em>.<br><br>
+    O backend recebe esse texto e o injeta dentro de um <strong>template de prompt dinâmico</strong>, transformando a ideia simples do cliente em um prompt profissional e detalhado para o Gemini API.<br><br>
+    Abaixo estão: a fórmula do template + 10 exemplos completos de entrada e saída.
+  </p>
+</div>
+
+<!-- FÓRMULA DO TEMPLATE -->
+<span class="section-label">Fórmula do Template</span>
+<div class="template-formula">
+  <div class="formula-label">Prompt Base (Backend insere texto do cliente em [SONHO DO CLIENTE])</div>
+  <div class="formula-text">
+    Ultra-high quality cinematic fantasy portrait photograph. The subject is depicted as: <em>[SONHO DO CLIENTE]</em>. The scene is rendered with meticulous cinematic detail — the wardrobe, accessories, setting, lighting, and atmosphere are all precisely crafted to bring this fantasy to life with absolute photorealism. The subject's face from the reference photo is preserved with complete fidelity. Professional portrait photography combined with world-class cinematic art direction. Photorealistic, 8K resolution, visually spectacular.
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- EXEMPLOS -->
+<span class="section-label">Exemplos de Entrada → Saída</span>
+<p class="section-title" style="margin-bottom: 24px;">10 Cenários de Fantasia Documentados</p>
+
+<div class="template-block">
+  <div class="template-header">
+    <div class="template-name">01 — Astronauta</div>
+    <div class="template-tag">Profissão / Aventura</div>
+  </div>
+  <div class="client-input">Texto do cliente:</div>
+  <div class="client-text">"quero ser astronauta"</div>
+  <div class="generated-label">Prompt gerado pelo backend:</div>
+  <div class="generated-prompt">Ultra-high quality cinematic fantasy portrait photograph. The subject is depicted as a NASA or ESA elite astronaut, wearing a cutting-edge pressurized spacesuit with personalized mission patches and a reflective visor helmet. The background is either deep outer space with Earth visible in the distance, or a dramatic launch pad at Cape Canaveral moments before liftoff, with cinematic atmospheric lighting. The scene is rendered with meticulous cinematic detail — every technical element of the suit, every star in the background is precise and photorealistic. The subject's face is clearly visible through the open or removed helmet, preserved with complete fidelity. 8K, photorealistic, visually spectacular.</div>
+</div>
+
+<div class="template-block">
+  <div class="template-header">
+    <div class="template-name">02 — Sereia</div>
+    <div class="template-tag">Fantasia / Mitologia</div>
+  </div>
+  <div class="client-input">Texto do cliente:</div>
+  <div class="client-text">"quero parecer uma sereia"</div>
+  <div class="generated-label">Prompt gerado pelo backend:</div>
+  <div class="generated-prompt">Ultra-high quality cinematic fantasy portrait photograph. The subject is depicted as an ethereal mermaid queen of the deep ocean, with an iridescent shimmering tail in hues of teal, sapphire, and violet, elegant flowing hair adorned with pearls, coral, and sea glass. Intricate scaled bodice with aquatic jewelry. The background is a breathtaking underwater kingdom: bioluminescent sea creatures, coral palaces, shafts of filtered sunlight through clear blue water. Dreamy, magical underwater lighting creating an otherworldly atmosphere. The subject's face is preserved with complete fidelity from the reference photo. 8K, photorealistic fantasy with spectacular visual effects.</div>
+</div>
+
+<div class="template-block">
+  <div class="template-header">
+    <div class="template-name">03 — Samurai</div>
+    <div class="template-tag">Histórico / Cultural</div>
+  </div>
+  <div class="client-input">Texto do cliente:</div>
+  <div class="client-text">"quero aparecer como samurai japonês"</div>
+  <div class="generated-label">Prompt gerado pelo backend:</div>
+  <div class="generated-prompt">Ultra-high quality cinematic historical fantasy portrait photograph. The subject is depicted as an elite feudal Japanese samurai warrior, wearing an ornate traditional yoroi armor with lacquered plates in deep crimson and black with gold accents, a distinctive kabuto helmet with crests, and traditional fabrics. A katana with an elegant tsuba is visible. The background is a dramatic feudal Japanese setting: cherry blossom trees in bloom with petals drifting, Mount Fuji in misty distance, or a shoji paper screen with golden candlelight. Cinematic dramatic lighting evoking ancient honor and discipline. 8K, photorealistic, museum-quality historical accuracy.</div>
+</div>
+
+<div class="template-block">
+  <div class="template-header">
+    <div class="template-name">04 — Super-Herói</div>
+    <div class="template-tag">Fantasia / Ficção Científica</div>
+  </div>
+  <div class="client-input">Texto do cliente:</div>
+  <div class="client-text">"quero ser um super-herói"</div>
+  <div class="generated-label">Prompt gerado pelo backend:</div>
+  <div class="generated-prompt">Ultra-high quality cinematic superhero portrait photograph in the style of a Marvel or DC blockbuster film. The subject wears a custom-designed high-tech superhero suit with sleek composite armor plating, luminous power-core elements, a dramatic cape, and personal emblem. The background is a dramatic urban cityscape at night with lightning, or a heroic rooftop scene with the city below, rendered with cinematic visual effects and spectacular lighting. Dramatic hero lighting — rim light, volumetric clouds, epic atmosphere. The subject's face is clearly visible, preserved with complete fidelity. 8K, photorealistic, Hollywood blockbuster quality.</div>
+</div>
+
+<div class="template-block">
+  <div class="template-header">
+    <div class="template-name">05 — Rainha / Rei Medieval</div>
+    <div class="template-tag">Histórico / Fantasia</div>
+  </div>
+  <div class="client-input">Texto do cliente:</div>
+  <div class="client-text">"quero ser um rei ou rainha medieval"</div>
+  <div class="generated-label">Prompt gerado pelo backend:</div>
+  <div class="generated-prompt">Ultra-high quality cinematic historical fantasy portrait photograph. The subject is depicted as a powerful medieval monarch — a king in royal robes of velvet and ermine with a golden crown set with precious jewels, or a queen in an elaborate medieval gown with intricate brocade fabric, regal jewelry, and a ornate crown. The background is a magnificent castle throne room or great hall: stone arches, tapestries, golden candlelight, stained glass, all rendered with historical splendor. Regal, majestic portrait lighting worthy of a royal court. 8K, photorealistic, spectacular cinematic quality.</div>
+</div>
+
+<div class="template-block">
+  <div class="template-header">
+    <div class="template-name">06 — Vilã / Feiticeira</div>
+    <div class="template-tag">Fantasia Dark / Drama</div>
+  </div>
+  <div class="client-input">Texto do cliente:</div>
+  <div class="client-text">"quero parecer uma feiticeira poderosa"</div>
+  <div class="generated-label">Prompt gerado pelo backend:</div>
+  <div class="generated-prompt">Ultra-high quality cinematic dark fantasy portrait photograph. The subject is depicted as an extraordinarily powerful sorceress — wearing dramatic dark robes in deep purple, midnight black, or blood red with arcane symbols, flowing like shadows, adorned with mystical jewelry and a staff or magical artifact glowing with arcane energy. The background is a dramatic mystical realm: a dark tower with swirling magical energies, floating runes, or a dark enchanted forest at midnight with eldritch lights. Dramatic, moody lighting with magical practical effects — glowing eyes, emanating power. Cinematic, spectacular, 8K photorealistic fantasy.</div>
+</div>
+
+<div class="template-block">
+  <div class="template-header">
+    <div class="template-name">07 — Piloto de Fórmula 1</div>
+    <div class="template-tag">Esporte / Adrenalina</div>
+  </div>
+  <div class="client-input">Texto do cliente:</div>
+  <div class="client-text">"quero ser piloto de Fórmula 1"</div>
+  <div class="generated-label">Prompt gerado pelo backend:</div>
+  <div class="generated-prompt">Ultra-high quality cinematic sports portrait photograph. The subject is depicted as an elite Formula 1 racing champion, wearing a personalized fire-resistant racing suit with colorful sponsor livery and emblems, matching gloves, and either holding or wearing their custom racing helmet. The background shows a dramatic pit lane or race track environment — motion-blurred racing cars passing, dramatic stadium lighting, or post-victory champagne celebration. Cinematic sports photography with dynamic lighting and energy. The subject's face is clearly visible, preserved with complete fidelity. 8K, photorealistic, sports magazine cover quality.</div>
+</div>
+
+<div class="template-block">
+  <div class="template-header">
+    <div class="template-name">08 — Artista / Rockstar</div>
+    <div class="template-tag">Música / Arte</div>
+  </div>
+  <div class="client-input">Texto do cliente:</div>
+  <div class="client-text">"quero parecer um rockstar famoso"</div>
+  <div class="generated-label">Prompt gerado pelo backend:</div>
+  <div class="generated-prompt">Ultra-high quality cinematic music portrait photograph. The subject is depicted as a legendary rock superstar — styled in iconic rock fashion with leather jacket, premium accessories, dramatic hair, and rock attitude. They hold or stand beside a custom guitar or are captured mid-performance. The background is an epic concert arena with a sea of audience lights, dramatic stage lighting with lens flares, spotlights and smoke machines, or a moody backstage portrait with gold platinum record plaques. Cinematic rock editorial photography lighting with dramatic atmosphere. 8K, photorealistic, album cover quality.</div>
+</div>
+
+<div class="template-block">
+  <div class="template-header">
+    <div class="template-name">09 — Empresário Bilionário</div>
+    <div class="template-tag">Sucesso / Poder</div>
+  </div>
+  <div class="client-input">Texto do cliente:</div>
+  <div class="client-text">"quero parecer um bilionário da tecnologia"</div>
+  <div class="generated-label">Prompt gerado pelo backend:</div>
+  <div class="generated-prompt">Ultra-high quality cinematic business power portrait photograph. The subject is depicted as a visionary tech billionaire — wearing a slim-cut premium dark suit or signature casual look of the world's most powerful tech leaders, with understated luxury accessories and an air of quiet, absolute confidence. Background is either a private jet interior with luxury fixtures, the observation deck of a supertall skyscraper with a panoramic city view, or a minimalist ultra-modern office of a global tech company. Cinematic dramatic lighting with depth and prestige. 8K, photorealistic, magazine profile quality.</div>
+</div>
+
+<div class="template-block">
+  <div class="template-header">
+    <div class="template-name">10 — Modelo Internacional</div>
+    <div class="template-tag">Moda / Glamour</div>
+  </div>
+  <div class="client-input">Texto do cliente:</div>
+  <div class="client-text">"quero parecer modelo de capa de revista"</div>
+  <div class="generated-label">Prompt gerado pelo backend:</div>
+  <div class="generated-prompt">Ultra-high quality high fashion editorial portrait photograph in the style of Vogue or Harper's Bazaar. The subject is styled as a world-class fashion model — wearing a stunning haute couture designer ensemble with impeccable styling, dramatic makeup, and flawless presentation. The background is either a luxury Parisian atelier, a dramatic minimalist studio, or a fashion editorial setting in an exotic glamorous location. Extraordinary fashion photography lighting — large beauty dish, dramatic shadows, and perfect skin tones. The subject's face is preserved with absolute fidelity from the reference photo. 8K, photorealistic, international fashion magazine cover quality.</div>
+</div>
+
+<div class="footer">
+  <div class="footer-brand">Vyxfotos.IA — Documento Confidencial</div>
+  <div class="footer-info">Tema: Sonhos & Fantasia · Sistema Dinâmico · Para uso exclusivo com Gemini API</div>
+</div>
+
+</body>
+</html>

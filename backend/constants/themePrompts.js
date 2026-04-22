@@ -1,25 +1,623 @@
 /**
- * VYXFOTOS.IA - PROMPTS V34.0 (ULTRA-FIDELITY STUDIO RESTORATION)
- * 
- * BASE: O Prompt de Elite fornecido pelo usuário.
- * FOCO: Retrato executivo de altíssimo padrão, 85mm, RAW, sem filtros.
+ * VYXFOTOS.IA — CATÁLOGO DE PROMPTS PARA GEMINI API
+ * Cada subtema possui exatamente 30 variações únicas.
+ * Garante que pacotes de até 30 fotos em um único subtema nunca repitam.
  */
 
-const studioPromptBase = "Ultra-realistic professional executive portrait photograph of a Brazilian person with warm skin tone and dark features. CRITICAL: this person must be EXACTLY the same individual as in the reference photo [1] — identical facial structure, same hair texture, color and length, same eye shape and color, same nose bridge width and tip shape, same lip contour and thickness, same eyebrow arch, density and spacing, same ear shape and placement, same jawline, same cheekbones, same skin tone and visible pores, same facial symmetry. Every single facial feature must be a perfect match to the reference [1]. Same person, same face, same features as reference photo [1]. Subject wearing a tailored men executive suit in deep navy/charcoal, crisp white dress shirt, premium silk tie. Confident, composed expression with natural micro-expressions preserved. Posture: straight, authoritative, shoulders slightly back. Studio lighting setup: three-point professional lighting (key light at 45° angle, soft fill light eliminating harsh shadows, subtle rim light separating subject from background). Lighting renders skin texture with photographic realism — visible pores, natural skin imperfections, realistic subsurface scattering. Background: clean seamless studio gradient in neutral light gray (#E8E8E8), shallow depth of field with subject in razor-sharp focus, bokeh on background. Camera: 85mm portrait lens, f/2.2 aperture, ISO 100, studio strobe. Shot at eye level. Full sharpness on face, eyes in critical focus with natural catchlights. Output: 4K resolution, RAW-quality finish, zero artificial smoothing or skin retouching, no AI artifacts, no blurring of facial features, no duplicate elements in background. Professional headshot quality equivalent to top-tier corporate photography studio.";
-
 const themePrompts = {
-  'executivo': studioPromptBase,
-  'moderno': studioPromptBase.replace("neutral light gray (#E8E8E8)", "modern luxury office blurred background"),
-  'premium': studioPromptBase.replace("neutral light gray (#E8E8E8)", "high-end luxury penthouse blurred background"),
-  'internacional': studioPromptBase.replace("neutral light gray (#E8E8E8)", "premium urban architectural background"),
-  'feminino': studioPromptBase.replace("men executive suit", "women tailored blazer").replace("Brazilian person", "Brazilian woman"),
-  'smart_casual': studioPromptBase.replace("men executive suit", "modern casual blazer").replace("neutral light gray (#E8E8E8)", "modern tech office"),
-  'luxo': studioPromptBase.replace("neutral light gray (#E8E8E8)", "prestigious library background"),
-  'financeiro': studioPromptBase,
-  'linkedin': studioPromptBase,
-  'urbano': studioPromptBase.replace("neutral light gray (#E8E8E8)", "cinematic urban background"),
-  'sonhos': studioPromptBase,
-  'custom': studioPromptBase
+
+  // ═══════════════════════════════════════════════════════════════
+  // EXECUTIVO CLÁSSICO — 30 variações
+  // ═══════════════════════════════════════════════════════════════
+  executivo_classico: [
+    `Professional executive portrait. Navy blue classic suit, white dress shirt, deep burgundy silk tie. Neutral warm gray studio backdrop. Classic three-point studio lighting. Sharp face detail. Photorealistic, 8K.`,
+    `Corporate executive headshot. Charcoal gray two-button suit, white poplin shirt, dark navy tie. Clean light gray seamless background. Large octabox softbox lighting. Confident expression. Photorealistic, 8K.`,
+    `Executive portrait. Dark navy pinstripe suit, white shirt, deep red silk tie. Smooth charcoal-to-gray gradient background. Rembrandt lighting pattern with warm shadows. Photorealistic, 8K.`,
+    `Distinguished corporate portrait. Charcoal classic suit, white French-cuff shirt with gold cufflinks, silver-striped conservative tie. Cool neutral studio backdrop. Large diffused key light, right side. Photorealistic, 8K.`,
+    `Classic executive headshot. Midnight blue suit, crisp white dress shirt, dark slate blue silk tie. Textured neutral studio backdrop. Broad loop lighting, flattering and even. Photorealistic, 8K.`,
+    `Professional portrait. Dark charcoal herringbone suit, pale blue shirt, burgundy knit tie. Soft off-white studio background. Butterfly lighting creating elegant shadow under nose. Photorealistic, 8K.`,
+    `Executive corporate portrait. Navy blue chalk-stripe suit, white shirt, forest green tie. Dark gray gradient studio background. Split lighting for dramatic authority. Photorealistic, 8K.`,
+    `Classic headshot. Slate gray suit, white shirt with subtle texture, deep plum tie. Light taupe seamless backdrop. Clamshell lighting for smooth, even skin tones. Photorealistic, 8K.`,
+    `Business executive portrait. Dark indigo suit, light blue dress shirt, black silk tie. Medium gray studio background. Side loop lighting with warm fill creating depth. Photorealistic, 8K.`,
+    `Corporate portrait. Anthracite suit with fine pick-stitch detail, white shirt, dark chocolate brown tie. Cool white studio background. High-key even lighting with subtle shadow. Photorealistic, 8K.`,
+    `Executive headshot. Classic black suit, crisp white shirt, thin silver tie. Pure white seamless studio background. Soft even lighting for maximum professional impact. Photorealistic, 8K.`,
+    `Professional business portrait. Dark teal-gray suit, white shirt, deep navy tie with white dots. Neutral medium gray backdrop. Rembrandt lighting, warm and authoritative. Photorealistic, 8K.`,
+    `Corporate executive portrait. Charcoal double-breasted suit, white shirt, gold tie. Gradient gray-to-dark background. Dramatic single key light from left. Photorealistic, 8K.`,
+    `Executive portrait. Dark blue birdseye weave suit, pale cream shirt, dark burgundy tie. Warm stone gray backdrop. Loop lighting with soft reflector fill. Photorealistic, 8K.`,
+    `Classic professional portrait. Black pinstripe suit, white dress shirt, dark gray tie. Light silver-gray seamless background. Even soft box lighting from both sides. Photorealistic, 8K.`,
+    `Business headshot. Charcoal flannel suit, crisp white shirt, deep olive green tie. Neutral gray studio backdrop. Split Rembrandt lighting for strong presence. Photorealistic, 8K.`,
+    `Executive portrait. Dark navy three-piece suit, white shirt, burgundy pocket square, no tie. Warm mid-gray studio background. Three-point lighting, warm key. Photorealistic, 8K.`,
+    `Professional corporate portrait. Medium gray suit, white shirt, navy-and-silver striped tie. Off-white seamless backdrop. Large soft octabox from above, slight Paramount angle. Photorealistic, 8K.`,
+    `Classic executive headshot. Midnight navy suit, light blue shirt, deep wine tie with subtle pattern. Textured gray background. Soft dramatic Rembrandt, confident direct gaze. Photorealistic, 8K.`,
+    `Distinguished executive portrait. Charcoal suit, white shirt, burgundy pocket square and matching tie. Warm neutral studio backdrop. Three-point studio setup, soft and authoritative. Photorealistic, 8K.`,
+    `Classic three-piece executive portrait. Dark navy three-piece suit with waistcoat, white shirt, silver tie. Warm charcoal studio gradient. Dramatic Rembrandt lighting emphasizing the vest detail. Photorealistic, 8K.`,
+    `British-cut executive portrait. Deep chocolate brown classic suit, pale cream shirt, dark cognac tie. Textured warm tan studio backdrop. Soft even loop lighting. Photorealistic, 8K.`,
+    `Executive windowpane portrait. Classic charcoal windowpane plaid suit, white shirt, dark navy tie. Clean medium gray seamless background. Butterfly lighting for sophisticated even tones. Photorealistic, 8K.`,
+    `Executive pocket watch portrait. Classic black suit, white shirt, dark tie, vintage gold pocket watch chain across waistcoat. Warm dark gradient background. Classical portrait lighting. Photorealistic, 8K.`,
+    `Olive executive portrait. Dark olive or forest green classic suit, white shirt, dark knit tie. Neutral warm studio backdrop. Side loop lighting with warm fill. Photorealistic, 8K.`,
+    `Classic summer executive portrait. Lightweight medium gray suit, white shirt, pale blue tie — lighter fabric suggesting premium summer suiting. Bright clean white background. High-key soft lighting. Photorealistic, 8K.`,
+    `Executive overcoat portrait. Dark charcoal classic suit visible beneath an open luxury wool overcoat in deep navy, white shirt. Very dark gradient background. Dramatic key light from above. Photorealistic, 8K.`,
+    `Herringbone executive portrait. Classic dark brown herringbone suit, crisp white shirt, rust-orange silk tie. Warm neutral studio backdrop. Classic three-point warm lighting. Photorealistic, 8K.`,
+    `Classic burgundy executive portrait. Deep wine or burgundy classic suit, white shirt, dark tie. Medium gray seamless background. Rembrandt lighting adding depth and gravitas. Photorealistic, 8K.`,
+  ],
+
+  // ═══════════════════════════════════════════════════════════════
+  // EXECUTIVO MODERNO — 30 variações
+  // ═══════════════════════════════════════════════════════════════
+  executivo_moderno: [
+    `Modern executive portrait. Slim charcoal suit, light blue shirt open collar, no tie. Blurred contemporary corporate office background, glass walls. Natural window light from left. Cinematic depth of field. Photorealistic, 8K.`,
+    `Contemporary CEO portrait. Dark slim suit jacket, fitted black turtleneck, no tie. Blurred modern office with floor-to-ceiling windows, city view. Clean natural daylight. Photorealistic, 8K.`,
+    `Modern professional headshot. Navy slim-fit suit, white shirt, no tie, top button open. Blurred contemporary co-working space. Moody natural light with blue-gray window tone. Photorealistic, 8K.`,
+    `Startup leader portrait. Medium gray slim suit, white oxford shirt, no tie. Blurred minimalist modern office or exposed-brick creative space. Side window editorial light. Photorealistic, 8K.`,
+    `Digital professional portrait. Fitted dark blazer, navy premium crew-neck, no tie. Blurred modern lobby or open-plan office in neutral tones. Soft natural lighting, warm fill. Photorealistic, 8K.`,
+    `Contemporary business portrait. Slim black suit, fitted gray mock-neck shirt, no tie. Blurred glass boardroom with city skyline behind. Moody corporate atmosphere. Photorealistic, 8K.`,
+    `Modern executive headshot. Slim dark teal suit jacket, white shirt open collar. Blurred modern tech campus or innovation center. Clean, bright, diffused natural light. Photorealistic, 8K.`,
+    `Tech executive portrait. Fitted charcoal blazer over dark slim trousers, fitted white t-shirt, no tie. Blurred Silicon Valley-style open office. Natural overhead light, clean and modern. Photorealistic, 8K.`,
+    `Contemporary professional portrait. Slim indigo suit, pale blue shirt no tie. Blurred modern hotel lobby or conference center. Warm ambient ceiling light mixed with daylight. Photorealistic, 8K.`,
+    `Modern business leader portrait. Dark olive green slim suit, white shirt open collar. Blurred urban co-working loft with industrial details. Moody natural side light. Photorealistic, 8K.`,
+    `Innovative executive headshot. Black slim suit, fitted light gray shirt, no tie. Blurred cutting-edge modern architecture or sleek reception area. Clean cool-toned lighting. Photorealistic, 8K.`,
+    `Contemporary CEO headshot. Dark blue-gray slim suit, white shirt, no tie. Blurred modern boardroom with city views at dusk, ambient warm light. Cinematic quality. Photorealistic, 8K.`,
+    `Modern professional portrait. Navy slim suit, fitted light lavender-gray shirt, no tie. Blurred modern open-plan office, warm neutral tones. Soft diffused window light. Photorealistic, 8K.`,
+    `Executive modern portrait. Charcoal slim double-breasted suit, black turtleneck. Blurred prestigious modern building lobby with marble and steel. Dramatic architectural light. Photorealistic, 8K.`,
+    `Creative director portrait. Dark slim blazer, fitted white linen shirt open two buttons. Blurred creative studio with mood boards or art. Soft warm editorial lighting. Photorealistic, 8K.`,
+    `Modern leader headshot. Slim dark burgundy suit jacket, gray fitted shirt, no tie. Blurred modern transparent glass office. Fresh, bright natural afternoon light. Photorealistic, 8K.`,
+    `Digital era executive. Fitted black blazer, premium dark navy henley, no tie. Blurred tech company campus, outdoor terrace or modern cafeteria. Casual natural light. Photorealistic, 8K.`,
+    `Contemporary headshot. Slim slate gray suit, white shirt unbuttoned one, no tie. Blurred modern corporate lobby with warm wood accents. Balanced soft window and fill light. Photorealistic, 8K.`,
+    `Modern business portrait. Dark slim suit, fitted white shirt, no tie, rolled sleeves on jacket off-shoulder casual pose. Blurred urban office. Editorial natural light. Photorealistic, 8K.`,
+    `Fintech executive portrait. Slim charcoal suit, dark gray premium fitted shirt, no tie. Blurred futuristic modern office with screens and glass. Cool blue-tinted ambient light. Photorealistic, 8K.`,
+    `Monochrome modern portrait. All-black slim suit, black shirt, no tie, black accessories. Blurred sleek black and gray minimalist office. Low-key moody modern lighting. Photorealistic, 8K.`,
+    `Modern summer executive portrait. Slim light beige or sand linen suit, white shirt open collar, no tie. Blurred rooftop terrace or outdoor meeting space. Warm bright natural summer light. Photorealistic, 8K.`,
+    `Modern creative director portrait. Dark slim blazer, fitted white shirt, no tie, creative accessory such as modern watch or artistic jewelry. Blurred design agency or creative studio. Warm editorial side light. Photorealistic, 8K.`,
+    `Smart casual elevated portrait. Premium dark chinos, fitted white shirt, structured sport coat, no tie. Blurred boutique hotel lobby or upscale casual setting. Natural warm diffused light. Photorealistic, 8K.`,
+    `Modern international portrait. Slim dark suit, clean white shirt, no tie — global-ready modern look. Blurred international business lounge or airport terminal. Clean even modern lighting. Photorealistic, 8K.`,
+    `Olive modern executive portrait. Slim olive or dark khaki suit jacket, white shirt, no tie. Blurred modern outdoor terrace or garden meeting space. Natural dappled afternoon light. Photorealistic, 8K.`,
+    `Streetwear boardroom portrait. Premium bomber jacket over slim dark trousers and white shirt, no tie. Blurred modern luxury loft or urban premium space. Cool editorial street-meets-corporate lighting. Photorealistic, 8K.`,
+    `Modern evening executive portrait. Slim dark midnight blue suit, black shirt, no tie. Blurred modern restaurant or rooftop bar at dusk. Warm ambient evening lighting mixed with neon. Photorealistic, 8K.`,
+    `Minimalist modern portrait. Slim light gray suit, fitted light gray shirt, no tie — near-tonal monochrome. Blurred minimalist modern space with white and gray. Clean soft overhead lighting. Photorealistic, 8K.`,
+  ],
+
+  // ═══════════════════════════════════════════════════════════════
+  // EXECUTIVO PREMIUM — 30 variações
+  // ═══════════════════════════════════════════════════════════════
+  executivo_premium: [
+    `Luxury executive portrait. Bespoke midnight blue suit, ivory silk pocket square, jewel-tone tie, luxury watch. Blurred dark wood library with leather books. Dramatic Rembrandt lighting. Photorealistic, 8K.`,
+    `Premium CEO portrait. Bespoke charcoal glen-plaid suit, white shirt, deep teal silk tie, luxury watch and cufflinks. Blurred exclusive boardroom, panoramic city view. Cinematic warm-cool lighting. Photorealistic, 8K.`,
+    `Elite executive portrait. Perfect black luxury fashion-house suit, white shirt, premium silk tie sheen. Blurred opulent hotel lobby, marble and dark wood. Moody dramatic lighting. Photorealistic, 8K.`,
+    `Chairman-level portrait. Dark chalk-stripe bespoke suit, white dress shirt, handmade silk tie, luxury watch. Blurred corner office, twilight city beyond floor-to-ceiling glass. Warm window light, dramatic accent. Photorealistic, 8K.`,
+    `Forbes-cover executive portrait. Slim bespoke dark charcoal suit, exceptional fabric, crisp white shirt, refined tie. Blurred sophisticated private club lounge, warm golden light. Low-key dramatic lighting. Photorealistic, 8K.`,
+    `Prestige executive portrait. Deep navy bespoke suit, fine white shirt with monogram, dark silk tie, Patek Philippe watch visible. Blurred private members club interior, fine antiques. Classic Rembrandt lighting. Photorealistic, 8K.`,
+    `Luxury boardroom portrait. Custom-tailored black suit, white shirt, charcoal tie, onyx cufflinks. Blurred exclusive penthouse office at night, city lights below. Dramatic rim-light silhouette effect. Photorealistic, 8K.`,
+    `Premium executive headshot. Bespoke dark chocolate brown suit, ivory shirt, champagne pocket square. Blurred upscale hotel presidential suite. Warm amber key light, deep shadows. Photorealistic, 8K.`,
+    `Top-tier executive portrait. Tailored midnight navy double-breasted suit, white shirt, no tie but with luxury accessories. Blurred prestigious law firm or private equity interior. Dramatic side light. Photorealistic, 8K.`,
+    `Billionaire executive portrait. Hand-stitched black bespoke suit, white shirt, dark tie, discreet platinum accessories. Blurred private library with rare books and art. Candle-warm dramatic lighting. Photorealistic, 8K.`,
+    `CEO prestige portrait. Bespoke charcoal suit with subtle self-stripe, pale blue shirt, navy pocket square, premium watch. Blurred exclusive private club bar with dark wood. Warm moody lighting. Photorealistic, 8K.`,
+    `Executive luxury portrait. Deep slate bespoke suit, white French-cuff shirt, gold cufflinks, silk tie, luxury watch. Blurred luxury car showroom or private garage. Dramatic industrial-luxury lighting. Photorealistic, 8K.`,
+    `High-net-worth executive portrait. Custom black suit, white shirt, thin black tie, luxury accessories. Blurred modern art gallery with premium sculptures. Clean gallery lighting, cool and precise. Photorealistic, 8K.`,
+    `Ultra-premium executive portrait. Bespoke dark forest green suit, white shirt, dark tie, luxury watch. Blurred exclusive private dining room with crystal and silver. Warm candle-glow lighting. Photorealistic, 8K.`,
+    `Power executive portrait. Midnight black bespoke suit, white shirt, silk pocket square, Rolex visible. Blurred prestigious club or estate library. Dramatic key light from above, deep shadows. Photorealistic, 8K.`,
+    `Exclusive CEO portrait. Bespoke dark maroon-bordeaux suit, white shirt, pocket square. Blurred private jet interior with luxury leather seats. Dramatic cabin lighting, premium atmosphere. Photorealistic, 8K.`,
+    `Top executive prestige portrait. Tailored charcoal herringbone bespoke suit, cream shirt, silver tie, luxury accessories. Blurred Mayfair-style luxury apartment interior. Warm, refined portrait lighting. Photorealistic, 8K.`,
+    `Elite leader portrait. Custom black three-piece suit, white shirt, pocket watch chain visible, luxury watch. Blurred prestigious institution or parliament-style interior. Classic dignified lighting. Photorealistic, 8K.`,
+    `Premium corporate portrait. Hand-tailored dark navy suit, pale shirt, luxury tie pin, fine watch. Blurred exclusive rooftop terrace at golden hour, city skyline. Warm golden-hour key light. Photorealistic, 8K.`,
+    `Exceptional executive portrait. Bespoke anthracite suit, crisp white shirt, fine silk tie with geometric pattern, understated luxury watch. Blurred exclusive private lounge. Deep, authoritative Rembrandt lighting. Photorealistic, 8K.`,
+    `Velvet premium portrait. Bespoke midnight blue suit with subtle velvet lapel detail, white shirt, black tie, luxury watch. Blurred exclusive private theater or opera box. Warm dramatic velvet-toned lighting. Photorealistic, 8K.`,
+    `Premium terracotta portrait. Bespoke rich terracotta or burnt sienna suit of finest fabric, white shirt, dark tie, gold watch. Blurred exclusive Mediterranean or Italian luxury villa interior. Warm golden ambient light. Photorealistic, 8K.`,
+    `Ultra-luxury winter portrait. Bespoke charcoal suit under open luxury cashmere overcoat, white shirt, silk scarf. Blurred exclusive Swiss or Austrian mountain luxury chalet interior. Warm fireplace glow. Photorealistic, 8K.`,
+    `Premium tuxedo portrait. Perfect white dinner jacket tuxedo with black trousers, white shirt, black bow tie, luxury accessories. Blurred exclusive Monaco gala or luxury yacht. Warm prestigious event lighting. Photorealistic, 8K.`,
+    `Bespoke green premium portrait. Bespoke deep bottle green suit, white shirt, burgundy tie, luxury pocket square. Blurred exclusive English country estate or private club. Warm English-country-house portrait lighting. Photorealistic, 8K.`,
+    `Premium dusk portrait. Bespoke dark navy suit, white shirt, luxury tie pin, fine accessories. Blurred exclusive penthouse terrace at blue hour — the sky deep blue, city lights just starting. Cinematic blue-hour light. Photorealistic, 8K.`,
+    `Luxury heritage portrait. Bespoke charcoal suit, white shirt, dark tie, generational luxury watch. Blurred private ancestral estate drawing room with family portraits and fine art on walls. Classic warm portrait lighting. Photorealistic, 8K.`,
+    `Premium sport coat portrait. Bespoke sport coat in dark herringbone over premium dark trousers, open collar luxury shirt — country-house weekend style. Blurred exclusive estate gardens or private grounds. Warm outdoor natural light. Photorealistic, 8K.`,
+    `Luxury all-black premium portrait. Bespoke all-black suit, black shirt, black silk tie, platinum or white gold accessories — extreme monochrome luxury. Blurred ultra-minimalist luxury penthouse or gallery. Precise single key light. Photorealistic, 8K.`,
+  ],
+
+  // ═══════════════════════════════════════════════════════════════
+  // PADRÃO INTERNACIONAL — 30 variações
+  // ═══════════════════════════════════════════════════════════════
+  executivo_internacional: [
+    `International business portrait. Classic dark navy suit, white shirt, muted tie, universally respected business look. Blurred world-class hotel lobby or international conference center. Even professional lighting. Photorealistic, 8K.`,
+    `Global executive portrait. Dark charcoal suit, white shirt, conservative silk tie in deep blue. Blurred premium international hotel corridor or lobby. Even professional studio lighting. Photorealistic, 8K.`,
+    `World-class executive portrait. Timeless dark suit, white shirt, classic tie, culture-neutral international styling. Blurred Davos-style forum venue or executive airport lounge. Photorealistic, 8K.`,
+    `International keynote portrait. Distinguished dark suit, premium white shirt, sophisticated tie with subtle pattern. Blurred TED-style stage or world summit setting. Confident, expert lighting. Photorealistic, 8K.`,
+    `Diplomatic executive portrait. Impeccable classic dark suit, white shirt, tasteful tie. Blurred embassy-style interior or luxury meeting room. Classic trustworthy portrait lighting. Photorealistic, 8K.`,
+    `Global CEO portrait. Dark navy suit, light blue shirt, dark burgundy tie. Blurred international airport business class lounge. Clean, bright, professional ambient lighting. Photorealistic, 8K.`,
+    `United Nations-grade executive portrait. Classic dark charcoal suit, crisp white shirt, blue silk tie. Blurred prestigious international institution interior. Authoritative balanced lighting. Photorealistic, 8K.`,
+    `International finance portrait. Dark suit, white shirt, muted green tie, understated accessories. Blurred luxury financial district office with city view. Professional window light. Photorealistic, 8K.`,
+    `Cross-cultural executive portrait. Charcoal suit, white shirt, silver-gray tie — universally neutral styling. Blurred premium conference room of global firm. Soft even studio-quality lighting. Photorealistic, 8K.`,
+    `Davos executive portrait. High-quality dark navy suit, white shirt, conservative tie. Blurred mountain luxury resort or summit venue interior. Clean, prestigious lighting. Photorealistic, 8K.`,
+    `G20-level executive portrait. Classic black suit, white shirt, dark tie. Blurred formal state room or grand institution interior. Classic diplomatic portrait lighting. Photorealistic, 8K.`,
+    `International board portrait. Dark charcoal suit, pale blue shirt, dark tie. Blurred luxury boardroom with international flags or skyline. Even professional corporate lighting. Photorealistic, 8K.`,
+    `Global thought leader portrait. Medium charcoal suit, white shirt, teal tie. Blurred prestigious university or institution hall. Warm authoritative portrait lighting. Photorealistic, 8K.`,
+    `International press portrait. Dark navy suit, white shirt, red power tie. Blurred press conference room or official governmental venue. Even bright professional lighting. Photorealistic, 8K.`,
+    `World business portrait. Classic dark suit, crisp white shirt, navy tie with fine pattern. Blurred luxury hotel presidential suite. Warm controlled portrait lighting. Photorealistic, 8K.`,
+    `Embassy-class executive portrait. Dark suit, white shirt, conservative silk tie in deep charcoal. Blurred formal diplomatic reception room. Classic old-world dignified lighting. Photorealistic, 8K.`,
+    `International luxury hotel portrait. Dark navy suit, white shirt, dark tie, understated accessories. Blurred five-star hotel business center or lobby. Warm ambient hotel lighting. Photorealistic, 8K.`,
+    `Global summit portrait. Classic charcoal suit, white shirt, blue silk tie. Blurred prestigious summit or forum stage with global design. Clean balanced professional lighting. Photorealistic, 8K.`,
+    `World economic portrait. Dark suit, white shirt, gold tie — understated global confidence. Blurred luxury financial venue or private bank interior. Warm precise portrait lighting. Photorealistic, 8K.`,
+    `International statesman portrait. Classic black suit, white shirt, dark tie. Blurred grand neoclassical hall, marble columns, world-class architecture. Dignified formal portrait lighting. Photorealistic, 8K.`,
+    `International autumn portrait. Classic dark suit, white shirt, warm amber tie. Blurred prestigious European institution or autumn-toned international venue. Warm European autumn light. Photorealistic, 8K.`,
+    `International NGO portrait. Classic charcoal suit, light blue UN-blue tie, white shirt. Blurred international humanitarian or non-profit summit venue. Clean bright trustworthy lighting. Photorealistic, 8K.`,
+    `International tech summit portrait. Classic dark suit, white shirt, tech-industry understated tie. Blurred international tech conference or innovation forum. Clean modern precise lighting. Photorealistic, 8K.`,
+    `International luxury brand portrait. Classic dark suit, white shirt, subtle luxury brand accessory. Blurred international fashion week or luxury brand event venue. Sophisticated warm lighting. Photorealistic, 8K.`,
+    `International media portrait. Classic charcoal suit, white shirt, media-ready neutral tie. Blurred professional TV studio or international press room. Even professional broadcast lighting. Photorealistic, 8K.`,
+    `International winter summit portrait. Classic dark suit under open premium overcoat, white shirt, conservative tie. Blurred snowy international summit venue or Davos-style mountain resort. Crisp cold prestigious lighting. Photorealistic, 8K.`,
+    `International trade portrait. Dark navy suit, white shirt, commerce-green tie. Blurred trade fair or international expo venue with global branding. Even professional expo lighting. Photorealistic, 8K.`,
+    `International energy portrait. Classic charcoal suit, white shirt, dark tie. Blurred international energy summit or petroleum industry conference venue. Authoritative balanced lighting. Photorealistic, 8K.`,
+    `International cultural portrait. Classic dark suit, white shirt, culturally-neutral tie. Blurred UNESCO-style heritage site, cultural institution, or world museum interior. Refined warm cultural lighting. Photorealistic, 8K.`,
+  ],
+
+  // ═══════════════════════════════════════════════════════════════
+  // LUXO CLÁSSICO — 30 variações
+  // ═══════════════════════════════════════════════════════════════
+  luxo_classico: [
+    `Luxury prestige portrait. Black bespoke suit, silk charcoal tie, luxury watch, gold cufflinks. Blurred private library, floor-to-ceiling leather books, mahogany shelving, candlelight. Moody dramatic lighting. Photorealistic, 8K.`,
+    `Old-money prestige portrait. Perfectly tailored charcoal suit, white shirt with monogram, conservative luxury tie. Blurred private club with oil paintings, fine antiques, warm wood. Old masters portrait lighting. Photorealistic, 8K.`,
+    `Heritage luxury portrait. Black tuxedo or smoking jacket, white shirt, understated accessories. Blurred grand estate interior, marble staircase or crystal chandeliers. Cinematic rich shadows. Photorealistic, 8K.`,
+    `Collector prestige portrait. Dark suit with velvet or silk texture detail, refined accessories. Blurred private art gallery or distinguished interior with curated objects. Gallery-style lighting. Photorealistic, 8K.`,
+    `Grand gala luxury portrait. Perfect black tuxedo, satin lapels, white dress shirt, black bow tie, luxury accessories. Blurred grand gala ballroom, golden chandeliers, opulent drapery. Elegant warm lighting. Photorealistic, 8K.`,
+    `Ultra-luxury executive portrait. Midnight black bespoke suit, finest fabric, white shirt, silk pocket square, Patek Philippe. Blurred exclusive Mayfair private members club. Deep dramatic lighting. Photorealistic, 8K.`,
+    `Noble prestige portrait. Dark charcoal bespoke suit, crisp white shirt, dark silk tie, generational wealth accessories. Blurred heritage estate great hall with fireplace. Warm firelight portrait. Photorealistic, 8K.`,
+    `Aristocratic prestige portrait. Classic black suit, white shirt, conservative tie, understated platinum accessories. Blurred palace or château interior with fine tapestries. Regal dignified lighting. Photorealistic, 8K.`,
+    `Billionaire luxury portrait. Hand-tailored midnight navy suit, white shirt, black silk tie, multi-million dollar watch. Blurred private club bar with mahogany and leather. Moody amber lighting. Photorealistic, 8K.`,
+    `Private equity prestige portrait. Dark bespoke suit, finest Italian fabric, white shirt, luxury accessories. Blurred exclusive boardroom or club room with city view at night. Dramatic modern luxury lighting. Photorealistic, 8K.`,
+    `Generational wealth portrait. Black double-breasted suit, white shirt, charcoal pocket square. Blurred ancestral estate or private manor library. Warm, controlled dramatic lighting. Photorealistic, 8K.`,
+    `Ultra-prestige luxury portrait. Custom charcoal suit, white French-cuff shirt, gold cufflinks, luxury tie, fine watch. Blurred private museum or exclusive gallery interior. Clean gallery-quality lighting. Photorealistic, 8K.`,
+    `Exclusive club portrait. Dark navy suit of finest quality, pale shirt, conservative tie, Rolex. Blurred English private club reading room with leather chairs. Warm lamp-light portrait. Photorealistic, 8K.`,
+    `Dynasty prestige portrait. Bespoke black suit, white shirt, dark silk tie, heavy signet ring. Blurred grand neoclassical interior with marble and gold. Dramatic Rembrandt lighting. Photorealistic, 8K.`,
+    `Connoisseur luxury portrait. Dark charcoal suit, white shirt, pocket watch chain, fine accessories. Blurred exclusive wine cellar or tasting room. Atmospheric warm cellar lighting. Photorealistic, 8K.`,
+    `Patron of arts portrait. Custom dark suit with fine detail, silk accessories, luxury watch. Blurred private art salon with museum-quality paintings. Gallery portrait lighting. Photorealistic, 8K.`,
+    `Exclusive society portrait. Midnight blue suit of finest quality, white shirt, silver pocket square, Audemars Piguet. Blurred exclusive charity gala venue with premium decor. Warm prestigious lighting. Photorealistic, 8K.`,
+    `Old world luxury portrait. Classic black suit, white shirt, gold tie, luxury accessories. Blurred private château dining room with candlelight and crystal. Warm candlelit portrait. Photorealistic, 8K.`,
+    `Private jet owner portrait. Bespoke charcoal suit, white shirt, luxury tie, fine watch. Blurred private jet cabin with luxurious leather interior. Dramatic cabin lighting. Photorealistic, 8K.`,
+    `Ultra-elite prestige portrait. Black bespoke suit of supreme fabric, white shirt, silk tie, understated but extravagant accessories. Blurred exclusive private club with old masters paintings. Deep moody Rembrandt lighting. Photorealistic, 8K.`,
+    `Luxury velvet prestige portrait. Midnight navy suit with velvet lapels, white shirt, dark tie, fine accessories. Blurred exclusive private theater box or opera house interior. Warm theatrical dramatic lighting. Photorealistic, 8K.`,
+    `Luxury cigar lounge portrait. Dark bespoke suit, white shirt, loosened tie, luxury watch — cultivated relaxed prestige. Blurred exclusive cigar lounge with dark leather and warm amber light. Warm intimate portrait. Photorealistic, 8K.`,
+    `Luxury motorsport patron portrait. Bespoke dark suit, white shirt, fine accessories — the look of a racing team owner. Blurred exclusive paddock club or Formula 1 hospitality suite. Warm dramatic club lighting. Photorealistic, 8K.`,
+    `Luxury midnight portrait. Perfect black bespoke suit, white shirt, no tie, single platinum accessory. Blurred rooftop at absolute midnight, only city glow and moonlight visible. Cool silver moonlight mixed with warm city glow. Photorealistic, 8K.`,
+    `Old world banking luxury portrait. Classic charcoal bespoke suit, white shirt, dark tie, heavy signet ring, fine watch. Blurred private Swiss banking hall or historic financial institution interior. Warm dignified traditional lighting. Photorealistic, 8K.`,
+    `Luxury gallery opening portrait. Bespoke dark suit, white shirt, creative luxury accessory. Blurred exclusive private gallery opening with precision white gallery lighting and warm social ambient. Photorealistic, 8K.`,
+    `Luxury cognac estate portrait. Bespoke dark suit, white shirt, amber tie, luxury watch. Blurred exclusive cognac or whiskey estate cellar — dark aged wood, amber bottles, warm candlelight. Photorealistic, 8K.`,
+    `Aristocratic garden party luxury portrait. Cream or ivory linen bespoke suit, white shirt, pocket square — luxury garden party attire. Blurred exclusive estate garden party at golden hour. Warm golden outdoor luxury lighting. Photorealistic, 8K.`,
+    `Luxury winter estate portrait. Dark bespoke suit under open luxury fur-trim overcoat, white shirt, fine scarf. Blurred snow-covered private estate exterior or heated greenhouse interior. Warm winter luxury portrait lighting. Photorealistic, 8K.`,
+  ],
+
+  // ═══════════════════════════════════════════════════════════════
+  // LUXO DOURADO / LUZ QUENTE — 30 variações
+  // ═══════════════════════════════════════════════════════════════
+  luxo_dourado: [
+    `Warm golden luxury portrait. Elegant champagne or gold-tone attire, warm metal accessories. Blurred terrace with rich golden hour light and exclusive landscape. Honey and amber color palette. Photorealistic, 8K.`,
+    `Golden hour penthouse portrait. Sophisticated cream or ivory attire, fine gold jewelry. Blurred penthouse terrace at dusk, city glowing in golden twilight. Warm amber soft light. Photorealistic, 8K.`,
+    `Warm prestige portrait. Rich caramel or bronze luxury attire, gold jewelry and accessories. Blurred exclusive champagne lounge, warm festive light. Soft candlelike golden tones. Photorealistic, 8K.`,
+    `Amber elegance luxury portrait. Evening attire with gold accessories, dark navy or black with gold elements. Blurred private dinner, warm amber candle lighting, crystal glassware. Warm intimate lighting. Photorealistic, 8K.`,
+    `Gilded prestige portrait. Warm metallic attire — gold blazer, or luxury wear with gold accessories. Blurred opulent interior, golden decorative elements, fine art. Painterly warm Rembrandt lighting. Photorealistic, 8K.`,
+    `Sunset luxury portrait. Rich warm-toned luxury outfit in ochre or gold. Blurred rooftop pool at sunset, orange-pink sky, warm golden reflections. Dramatic golden-hour backlight. Photorealistic, 8K.`,
+    `Champagne gala portrait. Elegant champagne or ivory formal attire, fine jewelry in gold. Blurred exclusive gala ballroom with warm golden chandeliers. Warm flattering portrait light. Photorealistic, 8K.`,
+    `Golden palazzo portrait. Premium warm-toned attire, gold accessories, luxury watch. Blurred palatial Italian interior with frescoes and golden ornate details. Warm Mediterranean ambient light. Photorealistic, 8K.`,
+    `Amber luxury resort portrait. Warm luxury resort attire in cream or sand tones. Blurred exclusive beach resort at golden hour with infinity pool. Warm golden tropical light. Photorealistic, 8K.`,
+    `Golden anniversary portrait. Sophisticated gold-accent formal attire, luxury accessories. Blurred exclusive private villa terrace, golden sunset light streaming in. Warm cinematic lighting. Photorealistic, 8K.`,
+    `Warm luxury lounge portrait. Rich warm-toned suit or attire in caramel or dark honey. Blurred exclusive whiskey or cigar lounge with amber lighting and warm wood. Moody warm portrait light. Photorealistic, 8K.`,
+    `Golden penthouse party portrait. Elegant formal attire in warm champagne tones. Blurred luxury penthouse party with Manhattan-style view at night, warm indoor light. Soft warm glamour lighting. Photorealistic, 8K.`,
+    `Sunlit luxury villa portrait. Premium resort wear or casual luxury attire in warm tones. Blurred Tuscan or Amalfi villa exterior at golden hour. Warm natural sunlight key light. Photorealistic, 8K.`,
+    `Warm yacht luxury portrait. Elegant nautical luxury attire in warm neutrals or navy with gold. Blurred luxury superyacht deck at sunset, golden sea and sky. Warm golden maritime light. Photorealistic, 8K.`,
+    `Monaco luxury portrait. Premium attire in warm or neutral luxury tones. Blurred Monaco casino entrance, Hotel de Paris, or Formula 1 paddock club. Warm European evening light. Photorealistic, 8K.`,
+    `Dubai golden portrait. Luxury attire in warm gold or cream tones with fine accessories. Blurred Dubai skyline or Burj Al Arab interior with golden warm light. Rich warm ambiance. Photorealistic, 8K.`,
+    `Luxury spa resort portrait. Elegant warm-tone luxury attire or resort wear. Blurred exclusive spa or thermal pool interior with warm amber stone lighting. Serene warm portrait light. Photorealistic, 8K.`,
+    `Warm estate portrait. Luxury warm-toned attire, gold jewelry, premium watch. Blurred ancestral estate drawing room at evening with fireplace glow. Warm firelight and lamp mix. Photorealistic, 8K.`,
+    `Golden award gala portrait. Formal attire with gold detail, fine jewelry, luxury accessories. Blurred prestigious awards ceremony with warm spotlights and golden décor. Warm dramatic stage light. Photorealistic, 8K.`,
+    `Warm private club portrait. Rich warm-toned luxury outfit, fine accessories. Blurred exclusive private club or distinguished hotel bar with warm amber and mahogany. Warm moody portrait light. Photorealistic, 8K.`,
+    `Golden Tuscany luxury portrait. Warm luxury attire in terracotta, amber, or warm earthy tones. Blurred Tuscan vineyard estate at golden hour — rolling hills, cypress trees, warm Italian light. Warm Mediterranean golden light. Photorealistic, 8K.`,
+    `Warm luxury ballroom portrait. Formal attire in warm champagne or ivory with fine gold accessories. Blurred grand ballroom at gala with warm golden chandeliers and cream-and-gold decor. Warm ballroom portrait lighting. Photorealistic, 8K.`,
+    `Golden library luxury portrait. Warm luxury attire in amber or caramel tones, fine accessories. Blurred private library lit entirely by warm lamp light — golden leather books, mahogany, warm amber everywhere. Warm bookish luxury light. Photorealistic, 8K.`,
+    `Warm luxury Marrakech portrait. Rich warm-toned luxury outfit with gold accessories. Blurred exclusive Riad interior or Moroccan luxury palace — warm tiles, arches, lanterns, gold and terracotta. Warm exotic golden light. Photorealistic, 8K.`,
+    `Golden award portrait. Elegant warm-toned attire holding or near award or trophy. Blurred exclusive awards stage with warm golden spotlights and luxury décor. Warm triumphant portrait lighting. Photorealistic, 8K.`,
+    `Warm vintage luxury portrait. Warm-toned luxury vintage-inspired attire — caramel leather accessories, warm fabric. Blurred exclusive vintage luxury car interior or private garage with warm amber light. Photorealistic, 8K.`,
+    `Golden jungle luxury portrait. Warm luxury safari or expedition attire in khaki, tan, and gold. Blurred exclusive luxury safari lodge or tropical terrace at golden hour. Warm tropical golden light. Photorealistic, 8K.`,
+    `Warm boudoir luxury portrait. Rich warm-toned luxury attire in silk or velvet, gold accessories. Blurred exclusive boudoir or dressing room with warm vanity lighting and gold mirror. Warm intimate glamour lighting. Photorealistic, 8K.`,
+    `Golden harvest luxury portrait. Warm luxury attire in deep amber, burnt orange, or harvest gold. Blurred exclusive autumn estate at golden hour — fallen leaves, warm harvest light on a grand exterior. Warm autumn golden-hour light. Photorealistic, 8K.`,
+  ],
+
+  // ═══════════════════════════════════════════════════════════════
+  // ANIVERSÁRIO VIP — 30 variações
+  // ═══════════════════════════════════════════════════════════════
+  aniversario_vip: [
+    `VIP birthday portrait. CLOTHING: floor-length gold sequined gown with plunging neckline, diamond drop earrings, delicate gold bracelet. Blurred exclusive penthouse rooftop celebration, champagne flutes and bokeh warm lights in background. Glamorous key light from above. Photorealistic, 8K.`,
+    `Milestone VIP portrait. CLOTHING: sleeveless emerald green silk floor-length gown, pearl necklace, elegant updo with gold hair pin. Blurred exclusive luxury hotel ballroom with chandeliers and flowers softly blurred in background. Warm flattering portrait light. Photorealistic, 8K.`,
+    `Prestige birthday portrait. CLOTHING: fitted deep burgundy velvet midi cocktail dress, diamond tennis bracelet, silver strappy heels. Blurred luxury event space with tasteful candle décor and warm bokeh. Three-point warm studio lighting. Photorealistic, 8K.`,
+    `VIP gala birthday portrait. CLOTHING: strapless champagne-colored ball gown with full skirt and subtle sparkle, teardrop pearl earrings, delicate tiara. Blurred grand hotel ballroom with golden chandeliers and formal gala elements. Warm elegant lighting. Photorealistic, 8K.`,
+    `Champagne luxury birthday portrait. CLOTHING: off-shoulder rose gold sequined mini dress, layered fine gold chains, crystal clutch bag in hand. Blurred exclusive private villa terrace with champagne bottles and warm bokeh fairy lights. Warm golden glow from above. Photorealistic, 8K.`,
+    `Exclusive birthday soirée portrait. CLOTHING: deep navy blue halter-neck silk gown, diamond stud earrings, sleek low bun hairstyle. Blurred exclusive rooftop party with warm city lights and elegant bokeh below. Sophisticated warm rim light. Photorealistic, 8K.`,
+    `Private island birthday portrait. CLOTHING: flowing white silk maxi dress with gold embroidery at neckline, gold sandals, tropical floral accessories in hair. Blurred exclusive private island beachfront venue, warm tropical evening sunset light. Photorealistic, 8K.`,
+    `Luxury yacht birthday portrait. CLOTHING: elegant fitted cobalt blue one-shoulder midi dress, pearl drop earrings, silver bracelet. Blurred luxury superyacht deck at twilight, warm sea horizon in background. Warm golden maritime light. Photorealistic, 8K.`,
+    `VIP red carpet birthday portrait. CLOTHING: dramatic full-length red silk gown with structured bodice and flowing skirt, ruby and gold statement earrings, matching clutch. Blurred exclusive celebrity red carpet event with photographers in background. Glamorous warm spotlight. Photorealistic, 8K.`,
+    `Milestone diamond birthday portrait. CLOTHING: silver and crystal fully-beaded column gown, chandelier diamond earrings, diamond tennis necklace. Blurred luxurious event space with crystal chandeliers and jewel-toned floral arrangements. Dramatic elegant top light. Photorealistic, 8K.`,
+    `Exclusive spa birthday portrait. CLOTHING: luxurious cream silk robe tied with a satin sash, delicate gold chain with gemstone pendant, fresh white flowers in hair. Blurred exclusive wellness retreat garden with soft greenery. Soft natural warm daylight. Photorealistic, 8K.`,
+    `Grand hotel birthday portrait. CLOTHING: structured royal blue satin strapless gown, sapphire and gold cluster earrings, satin elbow gloves. Blurred legendary grand hotel ballroom with gilded décor. Warm prestigious ambient lighting. Photorealistic, 8K.`,
+    `VIP champagne toast portrait. CLOTHING: fitted metallic silver mini dress, crystal drop earrings, a champagne flute held elegantly in hand. Blurred exclusive celebration lounge with warm bokeh and golden bottle service setup in background. Glamorous front-key light. Photorealistic, 8K.`,
+    `Destination birthday portrait. CLOTHING: flowing dusty rose silk wrap dress with thin gold belt, gold hoop earrings, open-toe heeled sandals. Blurred Santorini terrace with white architecture and Aegean Sea at golden hour. Warm Mediterranean light. Photorealistic, 8K.`,
+    `Black tie birthday portrait. CLOTHING: classic black floor-length fitted crepe gown with high slit, understated diamond stud earrings, sleek polished low ponytail. Blurred exclusive black tie gala with golden chandeliers. Cinematic elegant lighting. Photorealistic, 8K.`,
+    `Garden party VIP portrait. CLOTHING: pastel lavender floral chiffon midi dress with flutter sleeves, pearl stud earrings, woven flower crown. Blurred exclusive private garden with luxury white peony arrangements. Soft warm outdoor afternoon light. Photorealistic, 8K.`,
+    `Signature birthday portrait. CLOTHING: deep plum satin slip dress with thin straps, amethyst drop earrings, thin diamond anklet. Blurred luxury restaurant private dining room with candles and flowers. Warm intimate candlelight portrait. Photorealistic, 8K.`,
+    `Luxury mansion birthday portrait. CLOTHING: structured deep teal ball gown with ruched bodice and full skirt, emerald and gold drop earrings, white gloves. Blurred opulent French-style mansion great room with marble and gilded furnishings. Warm dramatic key light. Photorealistic, 8K.`,
+    `Art gallery birthday portrait. CLOTHING: bold sculptural off-white avant-garde midi dress, oversized art-deco gold earrings, strappy heeled mules. Blurred exclusive private art gallery opening with curated lighting and artwork walls. Clean gallery lighting. Photorealistic, 8K.`,
+    `Monaco birthday portrait. CLOTHING: fitted sapphire blue crepe spaghetti-strap midi dress, gold and sapphire drop earrings, delicate gold ankle bracelet. Blurred Monaco grand terrasse at night with Principality lights and port view. European warm celebration light. Photorealistic, 8K.`,
+    `Tropical VIP birthday portrait. CLOTHING: vibrant coral-orange one-shoulder silk maxi gown, tropical flower tucked behind ear, gold shell jewelry set. Blurred exclusive Caribbean luxury resort beachfront at sunset. Warm tropical golden-hour light. Photorealistic, 8K.`,
+    `VIP spa birthday retreat portrait. CLOTHING: pristine white structured fitted dress with subtle embroidery, diamond hair clip, minimalist fine jewelry. Blurred exclusive mountain luxury spa interior with warm wood tones and natural stone. Serene soft natural light. Photorealistic, 8K.`,
+    `VIP winter birthday portrait. CLOTHING: rich ruby red velvet floor-length gown with long sleeves, jeweled brooch at neckline, fur-trimmed stole over shoulders. Blurred exclusive winter gala venue with warm Christmas seasonal décor and golden candelabras. Festive warm portrait light. Photorealistic, 8K.`,
+    `VIP winery birthday portrait. CLOTHING: deep grape-purple silk midi dress with draped neckline, antique gold cameo earrings, holding a crystal wine glass. Blurred exclusive private winery cellar with candles and oak barrels. Warm candlelit cellar portrait lighting. Photorealistic, 8K.`,
+    `VIP art collector birthday portrait. CLOTHING: striking emerald green structured blazer-dress with wide lapels, sculptural modern gold earrings, dark strappy heels. Blurred exclusive private art collector home with gallery walls and curated sculptures. Gallery ambient lighting. Photorealistic, 8K.`,
+    `VIP casino royale birthday portrait. CLOTHING: sleek full-length black sequined gown with high thigh slit, bold red lip, classic diamond pendant necklace. Blurred exclusive private casino evening with green felt tables and golden lamps in background. Dramatic glamorous spotlight. Photorealistic, 8K.`,
+    `VIP sunset cliff portrait. CLOTHING: elegant flowing tangerine and gold ombre chiffon maxi gown, gold chandelier earrings, barefoot or gold sandals. Blurred exclusive clifftop terrace in Positano at sunset with dramatic Mediterranean scenery. Spectacular warm sunset backlight. Photorealistic, 8K.`,
+    `VIP birthday boat portrait. CLOTHING: nautical-chic white linen fitted blazer over navy slip dress, gold anchor-charm earrings, fine gold chain. Blurred exclusive superyacht deck with open sea and warm horizon. Warm golden-hour maritime light. Photorealistic, 8K.`,
+    `VIP midnight celebration portrait. CLOTHING: deep midnight blue fully beaded strapless gown, sapphire and silver statement earrings, silver clutch. Blurred exclusive midnight birthday venue with fireworks glow through panoramic floor-to-ceiling windows. Cool blue midnight with warm champagne sparkle. Photorealistic, 8K.`,
+    `VIP penthouse birthday portrait. CLOTHING: champagne gold off-shoulder fitted satin gown with thigh slit, layered diamond necklaces, crystal-encrusted heels. Blurred luxury penthouse suite with floor-to-ceiling city skyline view and warm ambient LED lighting. Cinematic warm portrait light. Photorealistic, 8K.`,
+  ],
+
+  // ═══════════════════════════════════════════════════════════════
+  // ANIVERSÁRIO PRINCESA MÁGICA — 30 variações
+  // ═══════════════════════════════════════════════════════════════
+  aniversario_princesa: [
+    `Magical princess portrait. Elaborate ball gown, blush pink tulle with silver beading, delicate tiara. Blurred enchanted fairy garden, magical flowers, sparkle bokeh. Dreamy soft portrait light with sparkle effects. Photorealistic, 8K.`,
+    `Royal ballroom princess portrait. Magnificent ball gown in pearl white or ice blue, intricate lace and beading, sparkling tiara. Blurred grand royal ballroom, crystal chandeliers, gilded architecture. Warm chandelier lighting. Photorealistic, 8K.`,
+    `Fairy tale forest princess portrait. Romantic gown in lavender or rose pink, floral appliqués, flower crown. Blurred magical enchanted forest, filtered light, fireflies, misty dreamlike atmosphere. Dreamy soft lighting. Photorealistic, 8K.`,
+    `Cinderella princess portrait. Iconic floor-length gown in soft blue, silver, or ivory, organza or satin, sparkling accessories. Blurred magical palace staircase or ballroom entrance. Warm golden magical glow. Photorealistic, 8K.`,
+    `Mystic castle princess portrait. Dramatic gown in deep amethyst or midnight blue, velvet detail, jeweled crown. Blurred mystical castle courtyard at twilight, climbing roses, atmospheric light. Cinematic magical lighting. Photorealistic, 8K.`,
+    `Snow queen princess portrait. Stunning ice-blue or silver gown with frost-crystal details, diamond tiara. Blurred magical winter wonderland, snowflakes, frozen palace. Cold crisp magical light with sparkle. Photorealistic, 8K.`,
+    `Garden princess portrait. Flowing garden gown in soft mint green or pale yellow, floral crown. Blurred magical secret garden in bloom, soft afternoon light and bokeh. Warm botanical portrait light. Photorealistic, 8K.`,
+    `Aurora princess portrait. Stunning gown in Aurora pink or rose gold with layers of silk, golden tiara. Blurred magical castle at sunrise with aurora borealis colors in sky. Magical warm-pink light. Photorealistic, 8K.`,
+    `Mermaid princess portrait. Elegant ocean princess attire — flowing sea-green gown or iridescent fabric, pearl crown. Blurred magical underwater palace or lagoon. Ethereal blue-green underwater light. Photorealistic, 8K.`,
+    `Midnight ball princess portrait. Dramatic floor-length dark navy or midnight blue gown with star details, silver tiara. Blurred magical moonlit garden or terrace with lanterns. Cool silver moonlight and warm lantern glow. Photorealistic, 8K.`,
+    `Enchanted rose princess portrait. Romantic gown in deep red or crimson with rose-gold details, elegant crown. Blurred enchanted castle interior with rose motifs and warm candlelight. Deep romantic warm lighting. Photorealistic, 8K.`,
+    `Spring fairy princess portrait. Light flowing dress in pastel spring colors — soft pink, peach, or white — with butterfly-wing detail. Blurred magical meadow in full spring bloom. Soft warm golden spring light. Photorealistic, 8K.`,
+    `Starlight princess portrait. Silver-white ethereal gown with star-pattern embroidery, crystal tiara. Blurred magical starlit sky landscape or observatory tower. Deep blue starlight and silver magical glow. Photorealistic, 8K.`,
+    `Dragon princess portrait. Dramatic gown in deep emerald or dragon-scale iridescent fabric, majestic crown. Blurred fantasy kingdom with mountains and dragon silhouette at dusk. Dramatic fantasy lighting. Photorealistic, 8K.`,
+    `Crystal palace princess portrait. Stunning crystalline or transparent overlay gown, diamond tiara, elegant jewelry. Blurred magical crystal palace with prismatic light effects. Rainbow prismatic magical lighting. Photorealistic, 8K.`,
+    `Desert princess portrait. Flowing gown in gold, amber, and terracotta with ornate arabian jewelry and headdress. Blurred magical palace garden at sunset in an enchanted desert kingdom. Warm golden-hour Arabian light. Photorealistic, 8K.`,
+    `Underwater realm princess portrait. Oceanic blue-green gown with pearl and coral embellishments, sea-glass crown. Blurred magical coral reef kingdom with glowing sea life. Ethereal bioluminescent underwater lighting. Photorealistic, 8K.`,
+    `Celestial princess portrait. Flowing gown in cosmic blue-purple with galaxy print and moon-phase details, stellar tiara. Blurred magical space observatory or celestial garden. Deep purple-blue cosmic atmospheric light. Photorealistic, 8K.`,
+    `Autumn fairy-tale princess portrait. Elegant gown in warm autumn tones — burnt orange, gold, deep red — with leaf-crown. Blurred enchanted autumn forest, falling leaves, golden evening light. Warm golden-autumn portrait light. Photorealistic, 8K.`,
+    `Unicorn princess portrait. Dreamy pastel rainbow gown with iridescent shimmer, silver unicorn-horn tiara. Blurred magical rainbow meadow with unicorn and bokeh sparkles. Dreamy pastel rainbow magical lighting. Photorealistic, 8K.`,
+    `Victorian princess portrait. Elaborate Victorian-inspired princess gown in deep jewel tones with lace, corset detail, pearl buttons, cameo jewelry. Blurred Victorian manor drawing room. Warm antique portrait lighting. Photorealistic, 8K.`,
+    `Tropical paradise princess portrait. Flowing tropical-inspired princess dress in bright parrot-greens and turquoise with exotic floral crown. Blurred magical tropical paradise waterfall. Bright warm tropical natural light. Photorealistic, 8K.`,
+    `Warrior princess portrait. Elegant but fierce gown with armor-inspired metallic elements, braided crown, sword or shield prop. Blurred dramatic battlefield or fortress. Cinematic dramatic warrior lighting. Photorealistic, 8K.`,
+    `Egyptian princess portrait. Elaborate ancient Egyptian-inspired gown in gold and white linen, golden crown with scarab jewels, kohl eyes referenced. Blurred magical ancient Egyptian palace. Warm golden ancient torchlight atmosphere. Photorealistic, 8K.`,
+    `Ballet princess portrait. Romantic ballet tutu in soft pink or ivory, pointe shoes, delicate flower headpiece. Blurred grand ballet theater stage or practice studio with mirrors. Warm stage footlight and spotlight. Photorealistic, 8K.`,
+    `Sci-fi princess portrait. Futuristic princess attire — sleek silver or holographic gown with technological crown and glowing accessories. Blurred futuristic space palace or starship throne room. Cool blue-white futuristic lighting. Photorealistic, 8K.`,
+    `Renaissance princess portrait. Elaborate Renaissance-era gown in deep velvet with pearl and gold embroidery, jeweled headdress. Blurred Italian Renaissance palace or courtyard. Warm Renaissance portrait lighting, old masters style. Photorealistic, 8K.`,
+    `Candy princess portrait. Whimsical gown in cotton-candy pinks and mint greens with candy-inspired accessories, sweet confection crown. Blurred magical candy land kingdom. Bright playful sweet pastel magical lighting. Photorealistic, 8K.`,
+    `Moonlight princess portrait. Shimmering silver-white gown with crescent moon crown, moonstone jewelry. Blurred magical moonlit garden or forest at full moon. Cool silver moonlight creating ethereal magic. Photorealistic, 8K.`,
+  ],
+
+  // ═══════════════════════════════════════════════════════════════
+  // ANIVERSÁRIO DEBUTANTE / 15 ANOS — 30 variações
+  // ═══════════════════════════════════════════════════════════════
+  aniversario_debutante: [
+    `Debutante 15 anos portrait. Romantic floor-length ball gown in soft blush pink with layers of tulle, elegant pearl jewelry, delicate floral crown. Blurred grand ballroom with crystal chandeliers and warm golden light. Soft romantic portrait lighting. Photorealistic, 8K.`,
+    `Debutante portrait. Stunning white ball gown with intricate lace bodice and full skirt, pearl tiara, white gloves. Blurred elegant salon with classical décor and warm chandeliers. Classic romantic portrait lighting. Photorealistic, 8K.`,
+    `15 anos celebration portrait. Gorgeous blush-rose gown with floral 3D appliqués, sparkling accessories. Blurred luxury venue staircase with floral arch. Warm elegant portrait lighting. Photorealistic, 8K.`,
+    `Debutante ball portrait. Ice-blue or powder-blue ball gown with silver embroidery and jeweled accessories. Blurred grand ballroom with blue and silver decor. Elegant balanced portrait lighting. Photorealistic, 8K.`,
+    `Quinze anos portrait. Lavender or soft purple romantic gown, flower crown, pearl necklace. Blurred enchanted garden party setting with soft warm lanterns. Soft dreamy portrait lighting. Photorealistic, 8K.`,
+    `Debutante portrait. Champagne and gold full-length gown with beaded detail and structured bodice, jeweled crown. Blurred exclusive ballroom with gold décor. Warm golden elegant lighting. Photorealistic, 8K.`,
+    `15 anos debutante portrait. Romantic rose-red gown with flowing skirt and rose-gold accessories. Blurred luxury venue with red rose floral arrangements and candlelight. Warm romantic portrait lighting. Photorealistic, 8K.`,
+    `Debutante garden portrait. Flowing white gown with floral embroidery, butterfly-inspired accessories, flower crown. Blurred manicured garden with soft warm natural light and bokeh flowers. Soft natural portrait lighting. Photorealistic, 8K.`,
+    `15 anos portrait. Ivory satin ball gown with cathedral train and sparkling tiara, long white gloves. Blurred historic palace ballroom interior. Classic formal portrait lighting. Photorealistic, 8K.`,
+    `Romantic debutante portrait. Soft mint green or sage gown with delicate embroidery, pearl accessories. Blurred luxurious event space with floral arches and warm bokeh lights. Dreamy romantic lighting. Photorealistic, 8K.`,
+    `Debutante princess portrait. Deep coral or peach ball gown with glitter tulle skirt, sparkling hair accessories. Blurred fairy-tale ballroom with warm evening light. Warm flattering portrait lighting. Photorealistic, 8K.`,
+    `15 anos portrait. Fitted and flared silver-white dress with crystal beading all over, diamond tiara. Blurred exclusive celebration venue with silver and white decor. Clean elegant portrait lighting. Photorealistic, 8K.`,
+    `Classic debutante portrait. Floor-length lilac or soft violet gown with lace overlay, pearl headband and gloves. Blurred traditional ballroom or society hall. Warm dignified portrait lighting. Photorealistic, 8K.`,
+    `Debutante fairy-tale portrait. Dramatic sky-blue princess gown with sequin starry detail and silver tiara. Blurred fairy-tale ballroom at night with magical bokeh lights. Cinematic dreamy lighting. Photorealistic, 8K.`,
+    `Modern debutante portrait. Contemporary ball gown in warm blush with architectural structure and fine jewelry. Blurred modern luxury event venue with warm ambient light. Modern elegant portrait lighting. Photorealistic, 8K.`,
+    `Debutante garden soirée portrait. Flowing tulle gown in soft yellow or butter cream, flower crown, natural accessories. Blurred exclusive garden party at golden hour. Warm golden afternoon portrait light. Photorealistic, 8K.`,
+    `15 anos glamour portrait. Dramatic deep fuchsia or hot pink ball gown with glitter and sparkle, elegant accessories. Blurred glamorous celebration venue with pink and gold decor. Warm glamour portrait lighting. Photorealistic, 8K.`,
+    `Debutante ethereal portrait. Soft white chiffon gown with flowing layers and wings, angel-like accessories. Blurred heavenly white floral setting with soft ethereal bokeh. Soft angelic portrait lighting. Photorealistic, 8K.`,
+    `Debutante waltz portrait. Romantic ball gown in deep wine or mauve with elegant gloves and jeweled accessories. Blurred grand ballroom with golden chandeliers, formal atmosphere. Classic warm portrait lighting. Photorealistic, 8K.`,
+    `15 anos vintage portrait. Classic vintage-inspired gown in dusty rose or antique white with retro accessories and gloves. Blurred elegant vintage salon or grand hotel interior. Warm nostalgic portrait lighting. Photorealistic, 8K.`,
+    `Debutante jewel portrait. Stunning gown in deep sapphire blue with diamond jewelry and elegant sapphire tiara. Blurred exclusive luxury venue with blue and silver decor. Cool sapphire-toned elegant lighting. Photorealistic, 8K.`,
+    `Debutante emerald portrait. Dramatic floor-length emerald green gown with gold embroidery and emerald jewelry. Blurred grand estate or exclusive green-and-gold themed celebration. Warm gold-emerald portrait lighting. Photorealistic, 8K.`,
+    `Debutante poetry portrait. Flowing romantic white or cream gown with delicate hand-painted floral details, ribbon accessories. Blurred outdoor garden with literary or artistic setting. Soft natural golden artistic light. Photorealistic, 8K.`,
+    `Debutante carnival portrait. Luxurious Carnaval-inspired gown in vibrant tropical colors with elaborate feathered and jeweled crown. Blurred spectacular theatrical carnival stage or backdrop. Theatrical colorful warm spotlight. Photorealistic, 8K.`,
+    `Debutante pearl portrait. Elegant ivory gown with intricate pearl embroidery all over, pearl tiara and matching jewelry set. Blurred prestigious grand salon or pearl-toned luxury venue. Soft warm pearl-white portrait lighting. Photorealistic, 8K.`,
+    `Debutante Versailles portrait. Elaborate 18th-century inspired debutante gown in powder pink with lace and silk ribbons, powdered-style hair with miniature roses. Blurred Palace of Versailles-inspired hall of mirrors. Spectacular gilded warm light. Photorealistic, 8K.`,
+    `Debutante starlight portrait. Gown in midnight black with thousands of tiny crystal stars, constellation tiara. Blurred magical planetarium or open night sky terrace. Dramatic deep blue starlight with warm face illumination. Photorealistic, 8K.`,
+    `Debutante tropical portrait. Vibrant tropical-inspired ball gown in warm coral, mango, and turquoise with tropical flower crown. Blurred exclusive tropical garden party venue. Bright warm tropical golden portrait light. Photorealistic, 8K.`,
+    `Debutante royalty portrait. Dramatic full-length gown in deep royal purple or violet with gold embroidery and royal crown. Blurred palace throne room or grand state room. Regal dignified formal portrait lighting. Photorealistic, 8K.`,
+  ],
+
+  // ═══════════════════════════════════════════════════════════════
+  // ANIVERSÁRIO FESTA MODERNA — 30 variações
+  // ═══════════════════════════════════════════════════════════════
+  aniversario_moderno: [
+    `Modern birthday portrait. CLOTHING: fitted black sequined short dress with thin straps, gold drop earrings, black strappy heeled sandals. Blurred modern rooftop party with city skyline and warm bokeh lights. Cool editorial spotlight from above. Photorealistic, 8K.`,
+    `Influencer birthday portrait. CLOTHING: bold cobalt blue structured one-shoulder mini dress, oversized gold hoop earrings, barely-there heeled mule. Blurred modern aesthetic loft interior with neon sign and floral wall. Bright clean editorial key light. Photorealistic, 8K.`,
+    `Contemporary birthday portrait. CLOTHING: sleek emerald green satin midi slip dress, thin gold chain necklace, minimalist pointed-toe heels. Blurred upscale modern restaurant lounge with warm amber globe lights. Warm modern portrait light. Photorealistic, 8K.`,
+    `Urban birthday portrait. CLOTHING: fitted metallic bronze mini skirt with matching crop top, chunky gold chain necklace, platform boots. Blurred urban rooftop with neon lights and city skyline at night. Cool urban neon editorial light. Photorealistic, 8K.`,
+    `Modern party portrait. CLOTHING: hot pink all-over sequined mini dress with plunging neckline, rose gold crystal drop earrings, pointed pink heels. Blurred exclusive modern nightclub private event with warm pink lighting. Glamorous warm party spotlight. Photorealistic, 8K.`,
+    `Social media birthday portrait. CLOTHING: trendy white fitted corset-style top with wide-leg cream trousers, gold statement layered necklaces, gold strappy sandals. Blurred aesthetic pastel modern interior with neon "happy birthday" sign. Clean bright editorial light. Photorealistic, 8K.`,
+    `Chic birthday portrait. CLOTHING: fitted deep wine red midi dress with square neckline and puff sleeves, pearl drop earrings, nude pointed heels. Blurred upscale modern restaurant with warm candle amber light. Warm sophisticated portrait light. Photorealistic, 8K.`,
+    `Pool party birthday portrait. CLOTHING: vibrant fuchsia printed satin wrap mini dress, large gold hoop earrings, gold flat sandals. Blurred exclusive luxury pool party with warm golden sun and tropical greenery. Bright warm tropical light. Photorealistic, 8K.`,
+    `Modern gala birthday portrait. CLOTHING: dramatic silver holographic floor-length gown with high slit, architectural crystal collar necklace, silver heels. Blurred modern gala venue with dramatic architectural uplighting. Dramatic cool-silver portrait light. Photorealistic, 8K.`,
+    `Birthday brunch portrait. CLOTHING: fresh white linen wide-leg trousers with matching blazer over a minimal nude bodysuit, delicate gold jewelry, tan heeled mules. Blurred upscale rooftop brunch venue in daylight with lush plants. Bright clean natural morning light. Photorealistic, 8K.`,
+    `Neon birthday portrait. CLOTHING: vibrant lime green latex-look fitted mini dress, oversized chrome statement earrings, neon green pointed heels. Blurred neon-lit modern party space with colorful LED walls. Dramatic neon-tinted editorial lighting. Photorealistic, 8K.`,
+    `Luxury birthday party portrait. CLOTHING: floor-length champagne beaded gown with side slit, layered diamond-style necklace, metallic strappy heels. Blurred exclusive modern penthouse party with panoramic skyline. Warm golden ambient party light. Photorealistic, 8K.`,
+    `Garden birthday party portrait. CLOTHING: floral print midi wrap dress in soft pink and ivory, dainty floral hair clip, espadrille wedge heels. Blurred exclusive garden party with white floral installations and bokeh lights. Soft golden outdoor afternoon light. Photorealistic, 8K.`,
+    `Modern vintage birthday portrait. CLOTHING: retro-style fitted red polka-dot midi dress with sweetheart neckline, pearl stud earrings, red kitten heels. Blurred aesthetic modern interior with vintage-inspired warm decor and warm Edison bulbs. Warm nostalgic portrait light. Photorealistic, 8K.`,
+    `Sophisticated birthday portrait. CLOTHING: sleek geometric black and white structured color-block midi dress, bold sculptural gold cuff bracelet, pointed black heels. Blurred modern upscale art gallery opening. Cool precise gallery portrait light. Photorealistic, 8K.`,
+    `Music birthday portrait. CLOTHING: edgy fitted black leather-look mini dress with silver zipper details, chunky silver earrings and rings, ankle boots. Blurred exclusive concert or music event venue with stage lighting. Dramatic warm-cool stage lighting. Photorealistic, 8K.`,
+    `Modern tropical birthday portrait. CLOTHING: bright tropical printed ruffle midi dress in orange, green and yellow, large gold hoop earrings, platform espadrilles. Blurred exclusive tropical resort birthday dinner at sunset. Warm tropical golden-hour light. Photorealistic, 8K.`,
+    `Birthday glow portrait. CLOTHING: golden bronze shimmer fitted midi dress with cutout waist detail, layered gold chains, champagne metallic heels. Blurred modern party with warm bokeh candle lights and golden confetti. Warm glowing ambient key light. Photorealistic, 8K.`,
+    `Chic beach birthday portrait. CLOTHING: breezy coral linen wide-leg trouser set with matching crop top, gold anklet and shell earrings, tan flat sandals. Blurred exclusive beach club at golden hour with gentle ocean in background. Warm coastal sunset light. Photorealistic, 8K.`,
+    `Metropolitan birthday portrait. CLOTHING: sharp fitted modern blazer dress in deep burgundy, bold modern geometric earrings, pointed ankle boots. Blurred trendy metropolitan rooftop with panoramic city view at night. Urban modern blue-toned night light. Photorealistic, 8K.`,
+    `Modern birthday glow-up portrait. CLOTHING: fitted emerald velvet midi dress with plunging V-neck, emerald and gold teardrop earrings, gold strappy heels. Blurred modern luxury beauty studio or glamorous backstage. Warm flattering beauty key light. Photorealistic, 8K.`,
+    `Modern birthday escape portrait. CLOTHING: chic cream cashmere turtleneck tucked into camel wide-leg trousers, oversized gold sunglasses held in hand, white sneakers. Blurred exclusive airport lounge or luxury train interior. Clean warm premium ambient light. Photorealistic, 8K.`,
+    `Modern birthday brunch glow portrait. CLOTHING: fresh white broderie anglaise midi dress, delicate gold initial necklace, strappy gold flat sandals. Blurred glass greenhouse restaurant with lush plants and bright morning light. Fresh natural morning light. Photorealistic, 8K.`,
+    `Modern birthday yacht portrait. CLOTHING: crisp white fitted linen blazer dress with gold anchor-button details, gold anchor earrings, white leather sneakers. Blurred modern luxury yacht at sea on a sunny day. Bright clear maritime natural light. Photorealistic, 8K.`,
+    `Modern birthday concert portrait. CLOTHING: bold all-over leopard print fitted long-sleeve mini dress, black chunky platform boots, gold stacked rings. Blurred exclusive VIP concert arena with colorful stage lighting. Dynamic warm-pink stage portrait light. Photorealistic, 8K.`,
+    `Modern birthday confetti portrait. CLOTHING: fun and vibrant rainbow sequined mini dress with spaghetti straps, multicolor crystal earrings, platform heels. Blurred exclusive party space with confetti and bokeh lights mid-air. Warm fun celebratory spotlight. Photorealistic, 8K.`,
+    `Modern birthday art portrait. CLOTHING: artistic printed oversized button-down shirt-dress in abstract print, sculptural modern earrings, chunky leather belt, ankle boots. Blurred contemporary art gallery or street art mural backdrop. Cool artistic mixed lighting. Photorealistic, 8K.`,
+    `Modern birthday night pool portrait. CLOTHING: sleek one-piece black luxury swimsuit with gold hardware, oversized luxury beach towel draped, gold anklet. Blurred luxury rooftop pool at night with glowing pool lights and warm city skyline. Warm dramatic pool reflection light. Photorealistic, 8K.`,
+    `Modern birthday toast portrait. CLOTHING: fitted dusty rose satin midi slip dress, thin rose gold chain necklace, champagne flute held elegantly in hand. Blurred modern luxury restaurant lounge with warm candle bokeh. Warm intimate celebration portrait light. Photorealistic, 8K.`,
+    `Modern birthday outdoor party portrait. CLOTHING: bright yellow structured off-shoulder mini dress, large geometric orange earrings, white block-heel sandals. Blurred exclusive outdoor birthday party with festive lights and greenery. Warm vibrant outdoor golden light. Photorealistic, 8K.`,
+  ],
+
+  // ═══════════════════════════════════════════════════════════════
+  // LUXO NOIR — 30 variações
+  // ═══════════════════════════════════════════════════════════════
+  luxo_noir: [
+    `Dark luxury noir portrait. All-black bespoke suit, black silk tie, no accessories visible. Pure black seamless background. Single dramatic key light from above creating deep shadows. Cinematic, high-contrast noir. Photorealistic, 8K.`,
+    `Film noir luxury portrait. Black suit, black shirt, thin black tie. Dark moody background with subtle smoke or mist. Low-key dramatic side lighting. Deep shadows. Photorealistic, 8K.`,
+    `Dark prestige portrait. Midnight black suit with subtle texture, dark tie, minimal platinum accessories. Blurred dark interior with deep shadows and single light source. Dramatic Rembrandt noir lighting. Photorealistic, 8K.`,
+    `Noir executive portrait. Charcoal-black suit, black shirt, no tie. Very dark gradient background, nearly black. Dramatic split lighting — half face illuminated, half in shadow. Photorealistic, 8K.`,
+    `Dark cinematic portrait. Black tuxedo, white shirt contrast, black bow tie. Almost entirely dark background with cinematic rim lighting only. High-contrast black and white adjacent. Photorealistic, 8K.`,
+    `Luxury noir villain portrait. Perfectly tailored all-black suit, black gloves, minimal cold silver accessories. Blurred dark library or private room. Harsh dramatic overhead lighting. Photorealistic, 8K.`,
+    `Dark moody prestige portrait. Black bespoke suit, dark gray tie, watch barely visible in shadow. Very dark blurred exclusive club background. Dramatic eye lighting only, deep shadows below. Photorealistic, 8K.`,
+    `Noir power portrait. Black double-breasted suit, black shirt, standing in shadow. Blurred dark urban backdrop, rain-slicked street reflected glow. Dramatic cold rim light. Photorealistic, 8K.`,
+    `Shadow luxury portrait. Black slim suit, dark turtle neck, no accessories. Completely dark background, near silhouette. Precise single key light on face only. Ultra-dramatic. Photorealistic, 8K.`,
+    `Dark opera luxury portrait. Perfect black tie tuxedo, white shirt, black bow tie. Blurred dark opera house or exclusive theater interior. Dramatic footlight-style portrait lighting. Photorealistic, 8K.`,
+    `Noir billionaire portrait. Bespoke black suit, black shirt, single cold platinum watch. Blurred penthouse at night, city lights as only background glow. Dark cinematic portrait. Photorealistic, 8K.`,
+    `Dark artisan luxury portrait. Black linen or textured suit, black shirt, no tie. Very dark blurred artisan workshop or underground exclusive space. Single warm candle-style key light. Photorealistic, 8K.`,
+    `Noir private detective portrait. Dark charcoal suit, white shirt, black tie — classic noir aesthetic. Blurred dark rainy urban street or office at night, venetian blind shadow patterns. Classic film noir lighting. Photorealistic, 8K.`,
+    `Dark throne portrait. All-black luxury suit, standing or seated in dark throne-like setting. Blurred opulent dark interior with single overhead dramatic light. Extreme power portrait. Photorealistic, 8K.`,
+    `Luxury shadow portrait. Black three-piece suit, dark accessories. Profile or three-quarter angle with face half in deep shadow. Black background. Dramatic cross-lighting. Photorealistic, 8K.`,
+    `Noir architect portrait. Black suit, black turtleneck, architectural rimlight. Blurred modern dark minimalist architectural space. Cold precise architectural lighting. Photorealistic, 8K.`,
+    `Dark luxury car portrait. Black bespoke suit, standing beside implied dark luxury vehicle. Very dark background with single precise key light. Cinematic automotive noir lighting. Photorealistic, 8K.`,
+    `Noir casino portrait. Black tuxedo, white shirt, black bow tie, playing card or chip detail. Blurred dark exclusive casino environment. Dramatic focused casino spotlight. Photorealistic, 8K.`,
+    `Dark alchemist portrait. Black suit with subtle dark pattern, near-black background. Extreme low-key lighting — only eyes and lips lit, deep shadows everywhere. Mysterious and powerful. Photorealistic, 8K.`,
+    `Pure noir portrait. Black suit, black shirt, black background — monochromatic near-silhouette. Ultra-precise single slit of hard light across face. Maximum cinematic drama. Photorealistic, 8K.`,
+    `Noir rainy city portrait. Black trench coat over black suit, black shirt. Blurred dark rainy city street at night — wet pavement, blurred headlights and neon reflections. Dramatic cold rain-light. Photorealistic, 8K.`,
+    `Noir penthouse predator portrait. Black bespoke suit, black shirt, single platinum detail. Blurred floor-to-ceiling penthouse windows at night showing only city lights below. Only city glow as backlight, face in near-darkness. Photorealistic, 8K.`,
+    `Noir masquerade portrait. Black tuxedo, black half-mask in hand. Blurred dark exclusive masquerade event, venetian masks and candles barely visible. Single dramatic candle-key light. Photorealistic, 8K.`,
+    `Noir motorcycle portrait. Black leather jacket, black clothing, dark accessories — rebel luxury. Blurred dark underground garage or industrial space with single shaft of light. Harsh industrial key light. Photorealistic, 8K.`,
+    `Noir architect portrait. Black slim suit, black roll-neck, architectural minimal accessories. Blurred unlit brutal concrete architecture or dark modernist building interior. Cold architectural single light source. Photorealistic, 8K.`,
+    `Noir underground portrait. All-black outfit, dark background, barely visible surroundings. Subject lit only by a single bare bulb above or a narrow window sliver. Extreme low-key underground atmosphere. Photorealistic, 8K.`,
+    `Noir assassin portrait. Perfect black suit, black gloves partially visible, cold platinum watch. Completely black background. Ultra-hard single key light creating razor-precise shadows. Cinematic thriller quality. Photorealistic, 8K.`,
+    `Noir jazz portrait. Black tuxedo, white shirt, black bow tie loosened, jazz club atmosphere. Blurred dark underground jazz club with single warm spotlight on stage visible behind. Dramatic spotlight key light. Photorealistic, 8K.`,
+    `Noir chess master portrait. Dark suit, white shirt, dark tie, chess piece in hand. Blurred dark intellectual club interior — dark wood, quiet menace. Precise low-key Rembrandt lighting. Photorealistic, 8K.`,
+  ],
+
+  // ═══════════════════════════════════════════════════════════════
+  // LUXO BRANCO — 30 variações
+  // ═══════════════════════════════════════════════════════════════
+  luxo_branco: [
+    `White luxury portrait. All-white bespoke suit, white shirt, no tie, minimal platinum accessories. Pure white seamless background. Clean, precise, high-key even lighting. Photorealistic, 8K.`,
+    `All-white prestige portrait. White slim-fit suit, white shirt open collar, white accessories. Blurred white luxury yacht interior or white-on-white minimal luxury space. Bright diffused lighting. Photorealistic, 8K.`,
+    `White luxury resort portrait. White linen suit, white shirt, minimal accessories. Blurred white-sand beach or Maldives overwater villa. Bright warm tropical natural light. Photorealistic, 8K.`,
+    `Pristine white luxury portrait. White double-breasted suit, white shirt, single gold accessory. White gradient seamless studio background. Precisely even high-key studio lighting. Photorealistic, 8K.`,
+    `White Santorini portrait. White luxury resort wear, white suit or casual luxury white attire. Blurred iconic white Santorini architecture, blue domes, Aegean Sea. Bright Mediterranean light. Photorealistic, 8K.`,
+    `White minimalist luxury portrait. White suit, white shirt, white background — zen minimal luxury. Pure white environment with precise side-shadow for depth. Photorealistic, 8K.`,
+    `White penthouse portrait. Elegant white suit or white attire with fine accessories. Blurred all-white luxury penthouse interior with city views. Bright clean modern interior lighting. Photorealistic, 8K.`,
+    `White spa luxury portrait. Clean white luxury spa attire or white linen suit. Blurred exclusive spa interior — marble, white towels, serene atmosphere. Soft clean diffused light. Photorealistic, 8K.`,
+    `Bridal luxury portrait. White formal suit or ivory luxury attire with subtle white accessories. Blurred white floral luxury venue. Clean elegant bright portrait lighting. Photorealistic, 8K.`,
+    `White Ibiza luxury portrait. White resort attire, white linen, gold accessories. Blurred Ibiza whitewashed luxury villa or rooftop pool at sunset. Warm Mediterranean golden light. Photorealistic, 8K.`,
+    `White gala portrait. White tuxedo or white formal suit, white shirt, black bow tie — elegant reverse tuxedo. Blurred exclusive gala with white and gold decor. Clean elegant portrait lighting. Photorealistic, 8K.`,
+    `White Monaco portrait. Pristine white luxury suit, fine accessories. Blurred Monaco seafront terrace or luxury hotel terrace. Bright Côte d'Azur natural light. Photorealistic, 8K.`,
+    `White Amalfi luxury portrait. White linen suit or Italian summer luxury attire. Blurred Amalfi Coast terrace with sea view and lemon trees. Warm Italian golden sunlight. Photorealistic, 8K.`,
+    `All-white studio luxury portrait. White bespoke suit, white shirt, white pocket square — all white. Bright white high-key studio. Ultra-clean luxury fashion editorial lighting. Photorealistic, 8K.`,
+    `White Dubai luxury portrait. Pristine white suit with subtle gold accessory, luxury watch. Blurred Dubai luxury hotel pool or beach club. Bright warm Middle Eastern sunlight. Photorealistic, 8K.`,
+    `White gallery luxury portrait. White suit or white luxury outfit. Blurred premium art gallery or white museum interior. Clean precise gallery lighting. Photorealistic, 8K.`,
+    `White winter luxury portrait. White fur-trim coat or white cashmere luxury attire. Blurred snow-covered Swiss Alps luxury resort. Bright crisp winter mountain light. Photorealistic, 8K.`,
+    `White luxury boat portrait. White nautical luxury suit, gold accessories. Blurred luxury sailboat or catamaran deck on clear blue water. Bright natural maritime light. Photorealistic, 8K.`,
+    `Ivory luxury portrait. Ivory or off-white bespoke suit, champagne pocket square, minimal accessories. Blurred upscale venue in ivory and cream tones. Warm soft editorial portrait lighting. Photorealistic, 8K.`,
+    `Pure white power portrait. White suit, white shirt, white background — supreme confidence. Single precise soft key light creating subtle shadow for dimension. Photorealistic, 8K.`,
+    `White luxury ski resort portrait. White premium ski wear or après-ski luxury white attire, white fur accessories. Blurred exclusive alpine ski resort or snowy luxury chalet exterior. Bright crisp snow light. Photorealistic, 8K.`,
+    `White luxury spa portrait. White robe or white linen luxury attire in a premium wellness context. Blurred exclusive thermal spa or infinity pool with white stone and water. Soft clean diffused spa lighting. Photorealistic, 8K.`,
+    `White luxury editorial portrait. White tailored blazer, white trousers, minimal white accessories — high-fashion editorial. Pure white seamless background. Fashion editorial high-key lighting with precise shadows. Photorealistic, 8K.`,
+    `White Mediterranean luxury portrait. White linen suit, gold accessories. Blurred iconic whitewashed Mykonos or Capri luxury villa terrace. Bright warm Mediterranean noon light. Photorealistic, 8K.`,
+    `White luxury beach club portrait. Crisp white resort wear or white swimwear-cover attire. Blurred exclusive white-sand beach club at midday. Bright beautiful natural beach light. Photorealistic, 8K.`,
+    `White luxury art portrait. White suit or all-white artistic luxury outfit. Blurred exclusive all-white art installation or white gallery. Clean gallery lighting with subtle shadows. Photorealistic, 8K.`,
+    `White luxury night portrait. White tuxedo or white formal suit at night. Blurred exclusive luxury garden party or evening event with white fairy lights and white lanterns. Warm white-light evening portrait. Photorealistic, 8K.`,
+    `White luxury honeymoon portrait. Elegant white or ivory luxury attire with delicate accessories. Blurred exclusive honeymoon suite or overwater bungalow in Maldives. Warm romantic tropical light. Photorealistic, 8K.`,
+    `White luxury film set portrait. White suit, minimal accessories — cinematic white luxury aesthetic. Blurred pure white infinity cove studio with dramatic single directional light. Studio cinematic white-on-white lighting. Photorealistic, 8K.`,
+  ],
+
+  // ═══════════════════════════════════════════════════════════════
+  // SONHOS / FANTASIA — dinâmico (texto do cliente)
+  // ═══════════════════════════════════════════════════════════════
+  sonhos_fantasia: [
+    `Ultra-high quality cinematic fantasy portrait photograph. The subject is depicted in their chosen fantasy scenario with cinematic quality, perfect lighting, and photorealistic detail. The wardrobe, setting, and atmosphere are all precisely crafted. Photorealistic, 8K resolution.`,
+  ],
+
 };
 
-module.exports = themePrompts;
+// ═══════════════════════════════════════════════════════════════
+// ANIVERSÁRIO VIP — MASCULINO (30 variações)
+// ═══════════════════════════════════════════════════════════════
+themePrompts.aniversario_vip_masculino = [
+  `VIP birthday portrait. CLOTHING: classic black tuxedo with satin lapels, white dress shirt, black bow tie, champagne flute held elegantly in hand. Blurred exclusive penthouse rooftop celebration, bokeh warm lights and city skyline. Glamorous key light from above. Photorealistic, 8K.`,
+  `Milestone VIP portrait. CLOTHING: deep midnight navy velvet blazer, white dress shirt open collar, fitted dark trousers, vintage gold pocket watch chain. Blurred exclusive luxury hotel ballroom with chandeliers. Warm flattering portrait light. Photorealistic, 8K.`,
+  `Prestige birthday portrait. CLOTHING: white dinner jacket, black dress trousers, white shirt, black bow tie, platinum cufflinks. Blurred luxury event space with warm bokeh candles. Three-point warm studio lighting. Photorealistic, 8K.`,
+  `VIP gala birthday portrait. CLOTHING: perfect black peak-lapel tuxedo, white marcella shirt, black bow tie, Rolex on wrist, boutonnière in lapel. Blurred grand hotel ballroom with golden chandeliers. Warm elegant lighting. Photorealistic, 8K.`,
+  `Champagne birthday portrait. CLOTHING: fitted champagne ivory linen blazer, white dress shirt open two buttons, dark slim trousers, gold accessories, champagne flute in hand. Blurred exclusive villa terrace with bokeh fairy lights. Warm golden glow. Photorealistic, 8K.`,
+  `Exclusive soirée portrait. CLOTHING: slim-fit deep burgundy velvet blazer, black fitted dress shirt, slim dark trousers, no tie, gold watch at wrist. Blurred exclusive rooftop party, warm city bokeh below. Sophisticated warm rim light. Photorealistic, 8K.`,
+  `Private island birthday portrait. CLOTHING: crisp white linen resort shirt open chest, cream slim trousers, leather sandals, fine gold bracelet. Blurred private island beachfront venue at evening. Warm tropical light. Photorealistic, 8K.`,
+  `Luxury yacht birthday portrait. CLOTHING: elegant navy captain-style blazer with gold buttons, white dress shirt, cream slim trousers, leather boat shoes. Blurred luxury superyacht deck at twilight. Warm maritime light. Photorealistic, 8K.`,
+  `VIP red carpet birthday portrait. CLOTHING: sharp bespoke all-black suit, white dress shirt, one button open — confident celebrity style. Blurred celebrity red carpet with photographers. Glamorous warm spotlight. Photorealistic, 8K.`,
+  `Milestone diamond birthday portrait. CLOTHING: classic black tuxedo, white dress shirt, silver cummerbund, diamond-set cufflinks, black patent shoes. Blurred luxurious event with crystal chandeliers. Dramatic top light. Photorealistic, 8K.`,
+  `Exclusive birthday portrait. CLOTHING: stone-gray slim blazer, white open-collar dress shirt, dark slim trousers, minimalist luxury watch. Blurred exclusive resort garden. Soft natural warm daylight. Photorealistic, 8K.`,
+  `Grand hotel birthday portrait. CLOTHING: fitted midnight blue double-breasted suit, white dress shirt, no tie, luxury watch, navy pocket square. Blurred legendary grand hotel ballroom with gilded décor. Warm prestigious lighting. Photorealistic, 8K.`,
+  `VIP champagne toast portrait. CLOTHING: fitted charcoal bespoke suit, white shirt, top button undone, luxury watch, champagne flute held confidently. Blurred exclusive celebration lounge with warm bokeh. Glamorous front-key light. Photorealistic, 8K.`,
+  `Destination birthday portrait. CLOTHING: relaxed Italian linen suit in ecru, white dress shirt open two buttons, leather loafers, no tie. Blurred Santorini terrace with white architecture at golden hour. Warm Mediterranean light. Photorealistic, 8K.`,
+  `Black tie birthday portrait. CLOTHING: impeccable black peak-lapel tuxedo, white marcella shirt, black bow tie, black patent shoes, gold watch. Blurred exclusive black-tie gala with golden chandeliers. Cinematic elegant lighting. Photorealistic, 8K.`,
+  `Garden party VIP portrait. CLOTHING: light sky-blue linen blazer, white dress shirt, fitted ivory chinos, no tie, brown leather loafers. Blurred exclusive private garden with white peony arrangements. Soft warm outdoor afternoon light. Photorealistic, 8K.`,
+  `Signature birthday portrait. CLOTHING: deep forest-green velvet blazer, black turtleneck underneath, fitted black trousers, bold gold watch. Blurred luxury restaurant private dining room with candles. Warm intimate candlelight portrait. Photorealistic, 8K.`,
+  `Luxury mansion birthday portrait. CLOTHING: structured dark navy double-breasted suit, white French-cuff shirt, silver cufflinks, no tie. Blurred opulent mansion with marble and gilded furnishings. Warm dramatic key light. Photorealistic, 8K.`,
+  `Art gallery birthday portrait. CLOTHING: sleek all-black outfit — slim black blazer, black turtleneck, black trousers — minimalist avant-garde. Blurred exclusive private gallery opening. Clean gallery lighting. Photorealistic, 8K.`,
+  `Monaco birthday portrait. CLOTHING: fitted dark slim European suit, white dress shirt, no tie, fine watch — understated Old World luxury. Blurred Monaco grand terrace at night with port view. European warm celebration light. Photorealistic, 8K.`,
+  `Tropical VIP birthday portrait. CLOTHING: linen resort blazer in warm camel, white guayabera shirt open collar, white slim trousers, leather sandals, gold bracelet. Blurred exclusive Caribbean resort at sunset. Warm tropical golden-hour light. Photorealistic, 8K.`,
+  `VIP spa birthday portrait. CLOTHING: pristine white terrycloth robe open at chest, white linen trousers, barefoot, minimal gold chain necklace. Blurred exclusive mountain luxury spa retreat. Serene soft natural light. Photorealistic, 8K.`,
+  `VIP winter birthday portrait. CLOTHING: rich charcoal cashmere overcoat over black tuxedo, white dress shirt, black bow tie, cashmere scarf. Blurred exclusive winter gala with golden candelabras. Festive warm portrait light. Photorealistic, 8K.`,
+  `VIP winery birthday portrait. CLOTHING: dark olive velvet blazer, white dress shirt open collar, fitted dark trousers, holding a crystal wine glass. Blurred exclusive winery cellar with candles and aged oak barrels. Warm candlelit portrait. Photorealistic, 8K.`,
+  `VIP art collector birthday portrait. CLOTHING: slim black suit, black turtleneck underneath, sculptural modern ring, minimalist luxury watch. Blurred exclusive private art home gallery. Gallery ambient lighting. Photorealistic, 8K.`,
+  `VIP casino royale birthday portrait. CLOTHING: perfect black tuxedo, white dress shirt, black bow tie loosened slightly, gold watch — Bond style. Blurred exclusive private casino with green felt tables and golden lamps. Dramatic glamorous spotlight. Photorealistic, 8K.`,
+  `VIP sunset cliff portrait. CLOTHING: open white linen shirt over slim sand-colored trousers, brown leather belt, barefoot — relaxed luxury. Blurred clifftop terrace in Positano at sunset. Spectacular sunset backlight. Photorealistic, 8K.`,
+  `VIP birthday boat portrait. CLOTHING: navy captain blazer, white dress shirt, white slim chinos, leather boat shoes, gold anchor cufflinks. Blurred exclusive superyacht deck with open sea. Warm golden-hour maritime light. Photorealistic, 8K.`,
+  `VIP midnight celebration portrait. CLOTHING: deep midnight-blue three-piece suit, white shirt, silver tie, luxury watch. Blurred exclusive midnight birthday venue with fireworks through panoramic windows. Cool blue midnight with warm sparkle. Photorealistic, 8K.`,
+  `VIP penthouse birthday portrait. CLOTHING: slim champagne-toned suit jacket, white dress shirt, no tie, luxury watch, champagne coupe in hand. Blurred luxury penthouse with floor-to-ceiling city skyline. Cinematic warm portrait light. Photorealistic, 8K.`,
+];
+
+// ═══════════════════════════════════════════════════════════════
+// ANIVERSÁRIO FESTA MODERNA — MASCULINO (30 variações)
+// ═══════════════════════════════════════════════════════════════
+themePrompts.aniversario_moderno_masculino = [
+  `Modern birthday portrait. CLOTHING: fitted all-black slim suit, black fitted shirt, no tie — sleek modern party look. Blurred modern rooftop party with city skyline and warm bokeh. Cool editorial spotlight. Photorealistic, 8K.`,
+  `Influencer birthday portrait. CLOTHING: cobalt blue slim blazer over white fitted t-shirt, dark slim jeans, white sneakers, bold gold chain. Blurred modern loft interior with neon sign. Bright clean editorial key light. Photorealistic, 8K.`,
+  `Contemporary birthday portrait. CLOTHING: emerald green slim-fit suit jacket, white dress shirt open collar, dark slim trousers, minimalist watch. Blurred upscale modern restaurant lounge with amber lighting. Warm modern portrait light. Photorealistic, 8K.`,
+  `Urban birthday portrait. CLOTHING: metallic silver bomber jacket over black fitted t-shirt, slim dark jeans, black boots, silver chain. Blurred urban rooftop with neon lights and city skyline at night. Cool urban neon editorial light. Photorealistic, 8K.`,
+  `Modern party portrait. CLOTHING: bold fuchsia slim blazer, white fitted shirt, slim dark trousers — bold modern party statement. Blurred modern nightclub private event. Glamorous warm party spotlight. Photorealistic, 8K.`,
+  `Social media birthday portrait. CLOTHING: white oversized linen shirt tucked into wide-leg cream trousers, layered gold chains, white sneakers — clean editorial. Blurred aesthetic pastel modern interior with neon sign. Clean bright editorial light. Photorealistic, 8K.`,
+  `Chic birthday portrait. CLOTHING: fitted wine-red slim suit, white dress shirt, no tie. Blurred upscale modern restaurant with warm amber lighting. Warm sophisticated portrait light. Photorealistic, 8K.`,
+  `Pool party birthday portrait. CLOTHING: vibrant orange tropical-print short-sleeve resort shirt, white linen shorts, leather sandals, gold bracelet. Blurred exclusive luxury pool party. Bright warm tropical light. Photorealistic, 8K.`,
+  `Modern gala portrait. CLOTHING: dark silver holographic slim blazer, black turtleneck, fitted black trousers, silver ring. Blurred modern gala with dramatic architectural lighting. Dramatic cool-silver portrait light. Photorealistic, 8K.`,
+  `Birthday brunch portrait. CLOTHING: white linen wide-leg trousers, fitted tan polo, leather loafers, minimal gold watch. Blurred upscale rooftop brunch with lush plants. Bright clean natural morning light. Photorealistic, 8K.`,
+  `Neon birthday portrait. CLOTHING: electric lime-green bomber jacket, white fitted t-shirt, slim dark jeans, neon sneakers. Blurred neon-lit modern party space. Dramatic neon editorial lighting. Photorealistic, 8K.`,
+  `Luxury birthday portrait. CLOTHING: floor-length champagne blazer coat over black shirt and slim trousers — dramatic luxury entrance. Blurred modern penthouse party with panoramic skyline. Warm golden ambient light. Photorealistic, 8K.`,
+  `Garden birthday portrait. CLOTHING: floral earth-tone short-sleeve print shirt, cream chinos, leather sandals — relaxed modern garden party. Blurred exclusive garden party with white floral installations. Soft golden outdoor light. Photorealistic, 8K.`,
+  `Modern vintage birthday portrait. CLOTHING: slim-fit retro burgundy velvet suit, white shirt, no tie, chelsea boots. Blurred aesthetic interior with warm Edison bulbs. Warm nostalgic portrait light. Photorealistic, 8K.`,
+  `Sophisticated birthday portrait. CLOTHING: sleek black-and-white color-block sport coat, black fitted shirt, black slim trousers, white sneakers. Blurred modern art gallery opening. Cool gallery portrait light. Photorealistic, 8K.`,
+  `Music birthday portrait. CLOTHING: black leather biker jacket, white fitted t-shirt, slim dark jeans, ankle boots, silver chain — rock-luxury. Blurred exclusive concert venue with stage lighting. Dramatic warm-cool stage light. Photorealistic, 8K.`,
+  `Modern tropical birthday portrait. CLOTHING: vivid tropical-print short-sleeve shirt in orange and green, white linen shorts, woven loafers, gold bracelet. Blurred tropical resort birthday dinner at sunset. Warm tropical golden-hour light. Photorealistic, 8K.`,
+  `Birthday glow portrait. CLOTHING: golden bronze satin fitted shirt, open two buttons, slim dark trousers, gold chain, luxury watch. Blurred modern party with warm bokeh candle lights. Warm glowing ambient key light. Photorealistic, 8K.`,
+  `Chic beach birthday portrait. CLOTHING: open white linen shirt over tank top, linen shorts, leather sandals, gold anklet chain — coastal luxury. Blurred exclusive beach club at golden hour. Warm coastal sunset light. Photorealistic, 8K.`,
+  `Metropolitan birthday portrait. CLOTHING: sharp dark modern trench coat, black fitted shirt, slim dark trousers, minimalist watch. Blurred metropolitan rooftop at night with panoramic city view. Urban blue-toned night light. Photorealistic, 8K.`,
+  `Birthday glow-up portrait. CLOTHING: fitted deep teal slim blazer, white dress shirt, no tie — polished bold modern look. Blurred modern luxury backstage. Warm flattering beauty key light. Photorealistic, 8K.`,
+  `Birthday escape portrait. CLOTHING: camel slim trousers, cream cashmere turtleneck, structured blazer, white sneakers — luxury travel look. Blurred exclusive airport lounge or luxury train. Clean warm premium light. Photorealistic, 8K.`,
+  `Birthday brunch glow portrait. CLOTHING: white linen shirt tucked into white wide-leg trousers, sunglasses tucked in shirt — fresh morning luxury. Blurred glass greenhouse restaurant. Fresh natural morning light. Photorealistic, 8K.`,
+  `Birthday yacht portrait. CLOTHING: navy linen blazer, white fitted t-shirt, white slim jeans, boat shoes, anchor bracelet. Blurred modern luxury yacht at sea. Bright maritime natural light. Photorealistic, 8K.`,
+  `Birthday concert portrait. CLOTHING: bold all-over animal-print bomber jacket, black t-shirt, slim black jeans, black boots, silver rings. Blurred exclusive VIP concert with colorful stage lighting. Dynamic warm-pink stage light. Photorealistic, 8K.`,
+  `Birthday confetti portrait. CLOTHING: vibrant rainbow-striped tailored blazer, white fitted shirt, dark slim trousers — fun and bold party look. Blurred party space with confetti and warm bokeh. Fun celebratory spotlight. Photorealistic, 8K.`,
+  `Birthday art portrait. CLOTHING: oversized abstract-print shirt-jacket, fitted black turtleneck, wide-leg dark trousers, chunky boots. Blurred contemporary art gallery or mural backdrop. Cool artistic mixed light. Photorealistic, 8K.`,
+  `Birthday night pool portrait. CLOTHING: sleek black swim trunks, open white linen shirt unbuttoned, gold chain, designer slides. Blurred luxury rooftop pool at night. Warm dramatic pool reflection light. Photorealistic, 8K.`,
+  `Birthday toast portrait. CLOTHING: fitted dusty rose slim blazer, white dress shirt, dark slim trousers — fashion-forward gentleman, champagne flute in hand. Blurred modern luxury lounge. Warm intimate celebration portrait light. Photorealistic, 8K.`,
+  `Birthday outdoor party portrait. CLOTHING: bright yellow structured bomber jacket, white t-shirt, cream slim trousers, white sneakers. Blurred exclusive outdoor birthday party with festive lights. Warm vibrant outdoor golden light. Photorealistic, 8K.`,
+];
+
+// ═══════════════════════════════════════════════════════════════
+// ANIVERSÁRIO PRÍNCIPE / REI — MASCULINO (30 variações)
+// (Equivalente masculino do tema Princesa Mágica)
+// ═══════════════════════════════════════════════════════════════
+themePrompts.aniversario_princesa_masculino = [
+  `Royal prince birthday portrait. CLOTHING: magnificent royal navy velvet tailcoat with gold epaulettes and gold braid trim, white ruffled cravat, fitted white breeches, ceremonial sash and medals, gold crown. Blurred grand royal ballroom with crystal chandeliers. Warm regal chandelier lighting. Photorealistic, 8K.`,
+  `Fantasy king portrait. CLOTHING: dramatic medieval king's robe in deep crimson and gold, heavy gold crown with rubies, gold armor shoulder guards, royal scepter in hand. Blurred majestic castle throne room with candlelight. Dramatic regal lighting. Photorealistic, 8K.`,
+  `Fairy tale prince portrait. CLOTHING: classic storybook prince costume — white embroidered coat with gold buttons, royal blue sash, fitted white trousers, riding boots, small crown. Blurred enchanted palace staircase with magical bokeh. Warm magical golden glow. Photorealistic, 8K.`,
+  `Royal warlock prince portrait. CLOTHING: dramatic dark purple velvet royal coat with silver embroidery and jeweled buttons, black fitted trousers, amethyst jeweled crown. Blurred mystical castle courtyard at twilight. Cinematic magical lighting. Photorealistic, 8K.`,
+  `Ice king portrait. CLOTHING: stunning ice-blue and silver royal armor coat with frost-crystal details, ice-blue crown, white fur trim at shoulders. Blurred magical winter palace throne room. Cold magical sparkle light. Photorealistic, 8K.`,
+  `Forest prince portrait. CLOTHING: flowing emerald green royal coat with leaf-pattern embroidery, antler crown, forest-green cape. Blurred magical enchanted forest with fireflies. Warm botanical portrait light. Photorealistic, 8K.`,
+  `Dawn prince portrait. CLOTHING: spectacular rose-gold and ivory royal coat with aurora-pink embroidery, ornate gold crown with rose gems. Blurred magical castle at sunrise with aurora colors. Magical warm-pink light. Photorealistic, 8K.`,
+  `Ocean prince portrait. CLOTHING: flowing sea-blue royal coat with pearl and coral embellishments, trident prop, sea-glass crown with pearls. Blurred magical underwater palace or island lagoon. Ethereal blue-green light. Photorealistic, 8K.`,
+  `Midnight prince portrait. CLOTHING: dramatic full-length dark navy royal coat with silver star embroidery, midnight blue cape, silver starlight crown. Blurred moonlit castle garden with lanterns. Cool silver moonlight. Photorealistic, 8K.`,
+  `Blood prince portrait. CLOTHING: deep crimson royal military-style coat with black embroidery and gold buttons, black trousers, jeweled ruby crown. Blurred enchanted castle interior with rose motifs and candlelight. Deep romantic warm lighting. Photorealistic, 8K.`,
+  `Spring knight portrait. CLOTHING: light silver armor-inspired coat with pastel flower-pattern detail, white fitted trousers, floral garland crown. Blurred magical meadow in full spring bloom. Soft warm golden spring light. Photorealistic, 8K.`,
+  `Starlight prince portrait. CLOTHING: ethereal silver-white royal coat with constellation embroidery, crystal crown, silver gloves. Blurred magical starlit sky observatory. Deep blue starlight and silver glow. Photorealistic, 8K.`,
+  `Dragon lord portrait. CLOTHING: dramatic dark emerald royal coat with dragon-scale iridescent fabric, dragon-emblem crown, dark cape. Blurred fantasy kingdom with mountains at dusk. Dramatic fantasy lighting. Photorealistic, 8K.`,
+  `Crystal king portrait. CLOTHING: stunning crystalline royal coat with prismatic embellishments, diamond-encrusted crown, translucent jeweled accessories. Blurred magical crystal palace with prismatic light. Rainbow prismatic magical lighting. Photorealistic, 8K.`,
+  `Desert sultan portrait. CLOTHING: flowing golden royal robes with amber arabian embroidery, ornate gold sultan crown with jewels, gold accessories. Blurred magical palace garden at sunset. Warm golden-hour Arabian light. Photorealistic, 8K.`,
+  `Sea lord portrait. CLOTHING: rich oceanic blue-green royal admiral coat with pearl and coral trim, trident prop, ornate sea-crown with gems. Blurred magical coral kingdom with glowing sea life. Ethereal bioluminescent light. Photorealistic, 8K.`,
+  `Celestial prince portrait. CLOTHING: flowing midnight-blue royal coat with galaxy pattern and moon-phase embroidery, stellar crown. Blurred magical space observatory or celestial garden. Deep purple-blue cosmic light. Photorealistic, 8K.`,
+  `Autumn king portrait. CLOTHING: warm royal coat in burnt orange and gold with leaf-pattern embroidery, oak-and-acorn crown. Blurred enchanted autumn forest with falling leaves. Warm golden-autumn portrait light. Photorealistic, 8K.`,
+  `Enchanted prince portrait. CLOTHING: dreamy pastel rainbow royal coat with iridescent shimmer details, silver crown with rainbow gems. Blurred magical rainbow meadow with bokeh sparkles. Dreamy rainbow magical light. Photorealistic, 8K.`,
+  `Victorian king portrait. CLOTHING: elaborate Victorian royal coat in deep jewel tones with gold epaulettes and lace cravat, heavy gold crown, ceremonial medals. Blurred Victorian manor great hall. Warm antique portrait lighting. Photorealistic, 8K.`,
+  `Jungle prince portrait. CLOTHING: exotic jungle-inspired royal coat in deep parrot-greens with tropical embroidery, jeweled headdress with exotic feathers. Blurred magical tropical waterfall and lush jungle. Bright tropical natural light. Photorealistic, 8K.`,
+  `Warrior king portrait. CLOTHING: fierce royal battle armor in polished dark metal with gold trim, king's crown atop a battle helmet, sword or shield prop. Blurred dramatic fortress or battlefield at dawn. Cinematic warrior lighting. Photorealistic, 8K.`,
+  `Pharaoh portrait. CLOTHING: ancient Egyptian royal regalia — white and gold linen royal kilt with gold belt, pharaoh's nemes headdress with uraeus, gold pectoral jewelry, crook and flail. Blurred magical ancient Egyptian palace. Warm golden ancient torchlight. Photorealistic, 8K.`,
+  `Ballet prince portrait. CLOTHING: classic ballet prince costume — white fitted jacket with gold embroidery, fitted white tights, ballet slippers, small crown. Blurred grand ballet theater stage. Warm stage spotlight. Photorealistic, 8K.`,
+  `Sci-fi prince portrait. CLOTHING: futuristic royal suit — sleek silver-and-black royal armor with technological crown and glowing circuit accessories. Blurred futuristic space palace or starship throne room. Cool blue-white futuristic lighting. Photorealistic, 8K.`,
+  `Renaissance noble portrait. CLOTHING: elaborate Renaissance doublet in deep velvet with gold embroidery, pearl buttons, Renaissance cap with feather. Blurred Italian Renaissance palace courtyard. Warm Renaissance old-masters portrait lighting. Photorealistic, 8K.`,
+  `Candy king portrait. CLOTHING: whimsical king's robe in cotton-candy pink and mint with candy-stripe sash, lollipop crown, playful gold accessories. Blurred magical candy land kingdom. Bright playful sweet pastel magical light. Photorealistic, 8K.`,
+  `Moonlight prince portrait. CLOTHING: shimmering silver-white royal coat with crescent moon embroidery, moonstone crown, silver cape. Blurred magical moonlit garden at full moon. Cool silver moonlight creating ethereal magic. Photorealistic, 8K.`,
+  `Ice warrior prince portrait. CLOTHING: imposing ice-and-steel battle royal coat, full crown of ice crystals, armored gauntlets visible. Blurred frozen tundra castle exterior with aurora borealis. Icy cold dramatic backlight. Photorealistic, 8K.`,
+  `Shadow lord portrait. CLOTHING: dramatic all-dark royal coat in midnight black with smoky translucent cape overlay, obsidian crown with dark gems. Pure dark gradient background. Maximum cinematic noir royal drama. Photorealistic, 8K.`,
+];
+
+// ═══════════════════════════════════════════════════════════════
+// ANIVERSÁRIO BAILE GALA — MASCULINO (30 variações)
+// (Equivalente masculino do tema Debutante / 15 Anos)
+// ═══════════════════════════════════════════════════════════════
+themePrompts.aniversario_debutante_masculino = [
+  `Debutante ball male portrait. CLOTHING: impeccable white tie formal — white tailcoat, white waistcoat, white dress shirt, white bow tie, black trousers with satin stripe, white gloves in hand. Blurred grand ballroom with crystal chandeliers. Soft romantic portrait lighting. Photorealistic, 8K.`,
+  `Gala formal portrait. CLOTHING: classic black tuxedo, white shirt, black bow tie, white pocket square, black patent shoes, white gloves. Blurred elegant salon with classical décor and chandeliers. Classic romantic portrait lighting. Photorealistic, 8K.`,
+  `Baile de gala portrait. CLOTHING: formal white dinner jacket, white dress shirt, black bow tie, black dress trousers — elegant ball attire. Blurred luxury staircase venue with floral arch backdrop. Warm elegant portrait lighting. Photorealistic, 8K.`,
+  `Debutante male gala portrait. CLOTHING: formal black tailcoat, white piqué waistcoat, white dress shirt, white bow tie, pearl cufflinks. Blurred grand ballroom with blue and silver décor. Elegant balanced portrait lighting. Photorealistic, 8K.`,
+  `Quinze anos padrinho portrait. CLOTHING: lavender slim formal suit, white dress shirt, white boutonnière in lapel, pearl cufflinks. Blurred enchanted garden gala setting with soft lanterns. Soft dreamy portrait lighting. Photorealistic, 8K.`,
+  `Golden gala portrait. CLOTHING: champagne and gold slim tuxedo jacket, white dress shirt, black bow tie, gold cufflinks and watch. Blurred exclusive ballroom with gold décor. Warm golden elegant lighting. Photorealistic, 8K.`,
+  `Romantic gala portrait. CLOTHING: deep rose-red formal slim suit, white dress shirt, white rose boutonnière in lapel. Blurred luxury venue with rose floral arrangements and candlelight. Warm romantic portrait lighting. Photorealistic, 8K.`,
+  `Garden gala portrait. CLOTHING: white slim formal suit, white dress shirt open collar, pearl accessories, white boutonnière. Blurred manicured garden gala with natural light and bokeh flowers. Soft natural portrait lighting. Photorealistic, 8K.`,
+  `Imperial gala portrait. CLOTHING: ivory satin formal tailcoat, white shirt with ruffled front, pearl cufflinks, white boutonnière. Blurred historic palace ballroom interior. Classic formal portrait lighting. Photorealistic, 8K.`,
+  `Romantic sage gala portrait. CLOTHING: soft mint-green slim formal suit, white shirt, pearl accessories, small white boutonnière. Blurred luxurious event space with floral arches and warm bokeh. Dreamy romantic lighting. Photorealistic, 8K.`,
+  `Classic gala portrait. CLOTHING: deep coral slim formal suit, white dress shirt, matching pocket square, gold boutonnière pin. Blurred fairy-tale ballroom with warm evening light. Warm flattering portrait lighting. Photorealistic, 8K.`,
+  `Silver gala portrait. CLOTHING: slim silver-gray formal suit with metallic sheen, white dress shirt, white boutonnière, silver cufflinks. Blurred exclusive celebration venue with silver and white décor. Clean elegant portrait lighting. Photorealistic, 8K.`,
+  `Classic debutante ball male portrait. CLOTHING: formal black tailcoat, white shirt, pearl waistcoat, white bow tie, white gloves held in one hand. Blurred traditional ballroom or society hall. Warm dignified portrait lighting. Photorealistic, 8K.`,
+  `Formal evening portrait. CLOTHING: deep midnight-blue slim formal suit, silver-trimmed pocket square, formal dress shirt, elegant boutonnière. Blurred fairy-tale ballroom at night with magical bokeh. Cinematic dreamy lighting. Photorealistic, 8K.`,
+  `Modern debutante gala portrait. CLOTHING: contemporary slim white formal suit, white dress shirt, slim tie — modern gala attire. Blurred modern luxury event venue with warm ambient light. Modern elegant portrait lighting. Photorealistic, 8K.`,
+  `Garden soirée portrait. CLOTHING: linen formal suit in soft yellow or butter cream, white dress shirt open collar, white boutonnière. Blurred exclusive garden party at golden hour. Warm golden afternoon portrait light. Photorealistic, 8K.`,
+  `Glamour gala portrait. CLOTHING: dramatic deep fuchsia slim formal suit, white shirt, silver boutonnière — bold gala statement. Blurred glamorous ballroom with pink and gold décor. Warm glamour portrait lighting. Photorealistic, 8K.`,
+  `Ethereal gala portrait. CLOTHING: soft white formal suit with subtle shimmer, white shirt, white gloves in hand — angelic formal attire. Blurred heavenly white floral gala setting. Soft angelic portrait lighting. Photorealistic, 8K.`,
+  `Waltz portrait. CLOTHING: formal black tailcoat, white piqué waistcoat, white dress shirt, white bow tie — dance-ready gala attire. Blurred grand ballroom with golden chandeliers. Classic warm portrait lighting. Photorealistic, 8K.`,
+  `Vintage gala portrait. CLOTHING: classic vintage-inspired cream or ivory formal suit with retro accessories and pocket watch chain. Blurred elegant vintage salon interior. Warm nostalgic portrait lighting. Photorealistic, 8K.`,
+  `Sapphire gala portrait. CLOTHING: stunning sapphire-blue slim formal suit, white dress shirt, silver boutonnière, sapphire cufflinks. Blurred exclusive luxury venue with blue and silver décor. Cool sapphire-toned elegant lighting. Photorealistic, 8K.`,
+  `Emerald gala portrait. CLOTHING: dramatic emerald-green slim formal suit, white dress shirt, gold boutonnière pin, emerald cufflinks. Blurred grand estate gala with green and gold themed décor. Warm gold-emerald portrait lighting. Photorealistic, 8K.`,
+  `Poetic gala portrait. CLOTHING: flowing ivory formal suit with delicate floral-pattern lining at pocket, white dress shirt, ribbon boutonnière. Blurred garden artistic setting. Soft golden natural light. Photorealistic, 8K.`,
+  `Carnival gala portrait. CLOTHING: luxurious Carnaval-inspired formal suit in vibrant tropical colors with elaborate jeweled boutonnière and feathered lapel accessories. Blurred spectacular theatrical stage. Theatrical colorful warm spotlight. Photorealistic, 8K.`,
+  `Pearl gala portrait. CLOTHING: elegant ivory slim formal suit with pearl-button details, white shirt, pearl boutonnière, pearl cufflinks. Blurred prestigious grand salon in pearl-toned luxury venue. Soft warm pearl-white portrait lighting. Photorealistic, 8K.`,
+  `Versailles portrait. CLOTHING: elaborate 18th-century inspired formal coat in powder blue with lace cuffs and gold embroidery, tricorne hat held in hand. Blurred Palace of Versailles hall of mirrors. Spectacular gilded warm light. Photorealistic, 8K.`,
+  `Starlight gala portrait. CLOTHING: formal suit in midnight black with subtle crystal-star pin on lapel, constellation cufflinks. Blurred magical planetarium or night sky terrace. Dramatic starlight with warm face illumination. Photorealistic, 8K.`,
+  `Tropical gala portrait. CLOTHING: tropical-inspired formal suit in warm coral and ivory, tropical flower boutonnière, gold accessories. Blurred exclusive tropical garden gala venue. Bright warm tropical golden portrait light. Photorealistic, 8K.`,
+  `Royal gala portrait. CLOTHING: dramatic deep royal-purple slim formal suit with gold embroidery trim, regal boutonnière, gold accessories. Blurred palace state room or grand throne ballroom. Regal dignified formal portrait lighting. Photorealistic, 8K.`,
+  `Diamond gala portrait. CLOTHING: silver-white metallic slim formal suit, white dress shirt, diamond-set boutonnière, crystal cufflinks. Blurred exclusive luxury ballroom with crystal chandeliers and silver décor. Cool elegant diamond light. Photorealistic, 8K.`,
+];
+
+/**
+ * Retorna o prompt correto com base no tema, subtema, gênero e índice.
+ * @param {string} theme - Ex: 'executivo'
+ * @param {string} subtheme - Ex: 'classico'
+ * @param {string} [customText] - Texto livre para o tema 'sonhos'
+ * @param {number} [photoIndex] - Índice da foto no pedido (0, 1, 2...)
+ * @param {string} [gender] - 'feminino' ou 'masculino'
+ * @returns {string}
+ */
+function getPrompt(theme, subtheme, customText = '', photoIndex = 0, gender = 'feminino') {
+  // Para temas de aniversário com pessoa masculina, usa variante masculina
+  if (gender === 'masculino' && theme === 'aniversario') {
+    const genderedKey = `${theme}_${subtheme}_masculino`;
+    const genderedPrompts = themePrompts[genderedKey];
+    if (genderedPrompts && genderedPrompts.length > 0) {
+      return genderedPrompts[photoIndex % genderedPrompts.length];
+    }
+  }
+
+  const key = `${theme}_${subtheme}`;
+  let prompts = themePrompts[key];
+
+  if (!prompts || prompts.length === 0) {
+    // Fallback: usa o primeiro subtema disponível para o tema correto (ignora variantes _masculino)
+    const fallbackKey = Object.keys(themePrompts).find(k => k.startsWith(`${theme}_`) && !k.endsWith('_masculino'));
+    prompts = fallbackKey ? themePrompts[fallbackKey] : themePrompts['executivo_classico'];
+  }
+
+  // Sonhos/fantasia: usa o texto livre do cliente
+  if (key === 'sonhos_fantasia' && customText) {
+    return `Ultra-high quality cinematic fantasy portrait photograph. The subject is depicted as: ${customText}. The scene is rendered with cinematic quality, perfect lighting, and photorealistic detail. Wardrobe, setting, and atmosphere are all tailored to this fantasy. Photorealistic, 8K.`;
+  }
+
+  const index = photoIndex % prompts.length;
+  return prompts[index];
+}
+
+module.exports = { themePrompts, getPrompt };

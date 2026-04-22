@@ -25,9 +25,9 @@ const TESTIMONIALS = [
 ];
 
 const FAQS = [
-  { q: "Como o serviço da Vyxfotos funciona?", a: "O processo é simples e autônomo. Você seleciona o cenário exato que deseja para a estética da sua marca, envia uma selfie sua com o rosto iluminado, e nós renderizamos o retrato. Assim que você confirmar a compra da licença que mais se adequa a você, as fotos originais em 4K são liberadas imediatamente na sua Área do Cliente e também enviadas para o seu e-mail." },
+  { q: "Como o serviço da Vyxfotos funciona?", a: "O processo é simples e autônomo. Você seleciona o cenário exato que deseja para a estética da sua marca, envia uma selfie sua com o rosto iluminado, e nós renderizamos o retrato. Assim que você confirmar a compra da licença que mais se adequa a você, as fotos originais em Alta Qualidade são liberadas imediatamente na sua Área do Cliente e também enviadas para o seu e-mail." },
   { q: "Qual o prazo para as fotos ficarem prontas?", a: "Imediatamente. Nosso servidor de Inteligência Artificial renderiza e escala seu ensaio fotográfico na nuvem em cerca de 5 a 15 minutos, após a confirmação do evento de pagamento." },
-  { q: "Como eu recebo as fotos finais?", a: "As fotos 4K puras e brutas chegarão como anexo direto no seu e-mail logo após a compra. Como segurança extra, elas também ficam salvas automaticamente na sua 'Área do Cliente' aqui no site para download a qualquer momento, sem depender da sua caixa de entrada." },
+  { q: "Como eu recebo as fotos finais?", a: "As fotos Alta Qualidade puras e brutas chegarão como anexo direto no seu e-mail logo após a compra. Como segurança extra, elas também ficam salvas automaticamente na sua 'Área do Cliente' aqui no site para download a qualquer momento, sem depender da sua caixa de entrada." },
   { q: "Será que vai parecer comigo?", a: "Nossa tecnologia mapeia as micro-expressões únicas do seu rosto humano, absorvendo detalhes como formato, íris e traços estruturais. O resultado é assustadoramente idêntico a você, como se estivesse fisicamente no estúdio fotográfico de luxo." }
 ];
 
@@ -38,9 +38,9 @@ export default function Landing() {
   const [customTheme, setCustomTheme] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
-  const [orderId, setOrderId] = useState(null); // Guarantimos a comissão com parametro SRC
+  const [orderId, setOrderId] = useState(null); // Garantimos a comissão com parâmetro SRC
   const [isThankYouScreen, setIsThankYouScreen] = useState(false);
-  const [generatedImage, setGeneratedImage] = useState(null); // Imagem REAL cuspidada pela IA
+  const [generatedImage, setGeneratedImage] = useState(null); // Imagem REAL gerada pela IA
   const [user, setUser] = useState(null);
   const [countdown, setCountdown] = useState(30);
   const [gender, setGender] = useState('masculino'); // 'masculino' ou 'feminino'
@@ -143,7 +143,7 @@ export default function Landing() {
 
   const handleNextStep = async () => {
     if (!user) {
-      if(confirm("Para garantir a segurança da sua identidade e a entrega das fotos em 4K, você precisa se identificar rapidamente. Deseja entrar com o Google agora?")) {
+      if(confirm("Para garantir a segurança da sua identidade e a entrega das fotos em Alta Qualidade, você precisa se identificar rapidamente. Deseja entrar com o Google agora?")) {
         try {
           await signInWithPopup(auth, provider);
         } catch (error) {
@@ -183,7 +183,7 @@ export default function Landing() {
       const file = e.target.files[0];
       
       setIsGenerating(true);
-      setCountdown(30); // Cronômetro acelerado para 30s (Motor Google)
+      setCountdown(30); // Cronômetro de 30s solicitado pelo usuário
       setGeneratedImage(null); // Limpa gerações antigas
       setStep(3); // Mostra as telas rodando
       window.scrollTo(0, 0);
@@ -216,18 +216,27 @@ export default function Landing() {
            
            localStorage.setItem('vyx_generated_image', result.data.output_url);
            localStorage.setItem('vyx_order_id', result.data.orderId);
+           localStorage.setItem('vyx_theme', selectedTheme);
            
            setHasImageArrival(true); 
         } else {
            console.error("Backend Error:", result.error);
            setIsGenerating(false);
+           
+           if (response.status === 429) {
+             // Redirecionamento comercial para página dedicada de planos
+             setIsGenerating(false);
+             navigate('/planos');
+             return; 
+           }
+
            const errorMsg = result.detail || result.error || "Erro desconhecido";
            alert(`Erro no Motor de Imagens:\n${errorMsg}`);
         }
 
       } catch (error) {
         console.error("Erro ao chamar o servidor Backend (Ele pode estar desligado):", error);
-        // Desbloqueia pros testes continuarem caso o backend n esteja rodando direito
+        // Desbloqueia para os testes continuarem caso o backend n esteja rodando direito
         setIsGenerating(false);
       }
     }
@@ -252,9 +261,22 @@ export default function Landing() {
         <div className="text-xl md:text-2xl font-black tracking-tight text-ivory cursor-pointer flex items-center" onClick={() => setStep(1)}>
           Vyxfotos<span className="text-champagne ml-1">.</span>IA
         </div>
-        <button onClick={() => navigate('/cliente')} className="text-[10px] md:text-sm font-mono tracking-widest uppercase text-ivory/60 hover:text-champagne transition-colors relative z-10">
-          Area do Cliente
-        </button>
+        <div className="flex items-center gap-4 md:gap-6">
+          <a
+            href="https://www.instagram.com/vyxfotos.ia/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-[10px] md:text-sm font-mono tracking-widest uppercase text-ivory/60 hover:text-champagne transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+            Instagram
+          </a>
+          <button onClick={() => navigate('/cliente')} className="text-[10px] md:text-sm font-mono tracking-widest uppercase text-ivory/60 hover:text-champagne transition-colors relative z-10">
+            Área do Cliente
+          </button>
+        </div>
       </nav>
 
       <main className="w-full flex flex-col items-center relative z-10">
@@ -278,7 +300,7 @@ export default function Landing() {
                  </div>
                  <div className="flex gap-4 items-center">
                     <div className="w-8 h-8 rounded-full bg-champagne text-obsidian flex justify-center items-center font-bold">2</div>
-                    <p className="text-ivory/80 text-sm md:text-base">Pós-Processamento e Upscale para <span className="font-bold">Alta Definição (4K)</span>.</p>
+                    <p className="text-ivory/80 text-sm md:text-base">Pós-Processamento e Upscale para <span className="font-bold">Alta Definição (Alta Qualidade)</span>.</p>
                  </div>
                  <div className="flex gap-4 items-center">
                     <div className="w-8 h-8 rounded-full bg-champagne text-obsidian flex justify-center items-center font-bold">3</div>
@@ -317,7 +339,7 @@ export default function Landing() {
                 </div>
                 
                 <p className="text-xs md:text-base text-ivory/60 max-w-2xl mx-auto font-light leading-snug">
-                  Esqueça estúdios e fotógrafos. Renderize fotos corporativas, festas infantis ou artísticas com absoluta e perfeita resolução 4k em 3 minutos.
+                  Esqueça estúdios e fotógrafos. Renderize fotos corporativas, festas infantis ou artísticas com absoluta e perfeita resolução Alta Qualidade em 3 minutos.
                 </p>
               </div>
 
@@ -415,7 +437,7 @@ export default function Landing() {
                    A maioria dos estúdios foca em cenários caros, sessões de horas e a cobrança de milhares de reais por iluminação perfeita.
                  </h2>
                  <h3 className="phil-reveal mt-6 text-5xl md:text-7xl lg:text-8xl font-drama italic text-champagne drop-shadow-lg">
-                   Nós produzimos resultados de cinema por R$ 19,90.
+                   Nós produzimos resultados de cinema por R$ 34,90.
                  </h3>
                </div>
             </section>
@@ -481,7 +503,7 @@ export default function Landing() {
                   <div ref={el => cardsRef.current[2] = el} className="w-full max-w-4xl mx-auto h-[60vh] bg-[#121217] rounded-[3rem] p-12 md:p-20 shadow-2xl flex flex-col justify-center mb-8 border border-white/10 relative overflow-hidden">
                      <span className="absolute top-10 right-10 font-mono text-champagne text-xl">03</span>
                      <h3 className="text-4xl md:text-6xl font-black mb-6">Rapidez Implacável.</h3>
-                     <p className="text-lg md:text-xl text-ivory/70 max-w-xl">Sem semanas de espera para edição. Suas fotografias são pós-produzidas e entregues em alta resolução Ultra 4K quase instantaneamente.</p>
+                     <p className="text-lg md:text-xl text-ivory/70 max-w-xl">Sem semanas de espera para edição. Suas fotografias são pós-produzidas e entregues em alta resolução Ultra Alta Qualidade quase instantaneamente.</p>
                   </div>
                </div>
             </section>
@@ -528,10 +550,18 @@ export default function Landing() {
              </section>
 
             {/* FOOTER */}
-            <footer className="w-full py-12 text-center text-ivory/40 bg-transparent border-t border-white/5">
-               <p className="font-bold text-ivory text-xl mb-2 font-drama italic">Vyxfotos.IA</p>
-               <p className="text-sm font-mono uppercase tracking-widest">A Revolução Digital</p>
-            </footer>
+             <footer className="w-full py-16 text-center text-ivory/40 bg-transparent border-t border-white/5 space-y-4">
+                <p className="font-bold text-ivory text-xl mb-1 font-drama italic">Vyxfotos.IA</p>
+                <div className="flex flex-col items-center gap-6">
+                  <p className="text-[10px] font-mono uppercase tracking-[0.3em]">A Revolução Digital</p>
+                  <button 
+                    onClick={() => navigate('/contato')}
+                    className="px-6 py-2 rounded-full border border-white/10 text-[10px] font-mono uppercase tracking-widest hover:bg-white/5 hover:border-champagne/50 hover:text-champagne transition-all"
+                  >
+                    Fale Conosco
+                  </button>
+                </div>
+             </footer>
           </div>
         )}
 
