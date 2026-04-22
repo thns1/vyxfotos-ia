@@ -4,7 +4,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { ChevronDown, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { auth, provider, signInWithPopup } from '../firebase';
+import { auth, db, provider, signInWithPopup } from '../firebase';
+import { doc, setDoc, serverTimestamp, increment } from 'firebase/firestore';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -141,20 +142,45 @@ export default function Landing() {
     );
   }, { dependencies: [step], scope: containerRef });
 
+  // Salva lead no Firestore (cria ou incrementa tentativas)
+  const saveLeadToFirestore = async (currentUser) => {
+    if (!currentUser) return;
+    try {
+      const ref = doc(db, 'leads', currentUser.uid);
+      await setDoc(ref, {
+        uid: currentUser.uid,
+        email: currentUser.email,
+        name: currentUser.displayName || '',
+        photoURL: currentUser.photoURL || '',
+        createdAt: serverTimestamp(),
+        attempts: increment(1),
+        lastAttempt: serverTimestamp(),
+      }, { merge: true });
+    } catch (e) {
+      console.warn('Erro ao salvar lead:', e.message);
+    }
+  };
+
+  const doLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      await saveLeadToFirestore(result.user);
+      return result.user;
+    } catch (error) {
+      console.error("Erro no login", error);
+      if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
+        alert("O login foi bloqueado. Clique em 'Abrir no Navegador' (Chrome/Safari) para continuar.");
+      } else {
+        alert("Erro de conexão. Tente abrir o site fora do Instagram/Facebook.");
+      }
+      return null;
+    }
+  };
+
   const handleNextStep = async () => {
     if (!user) {
-      if(confirm("Para garantir a segurança da sua identidade e a entrega das fotos em Alta Qualidade, você precisa se identificar rapidamente. Deseja entrar com o Google agora?")) {
-        try {
-          await signInWithPopup(auth, provider);
-        } catch (error) {
-          console.error("Erro no login", error);
-          if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
-             alert("O login foi bloqueado. Por favor, clique nos três pontinhos (...) e escolha 'Abrir no Navegador' (Chrome/Safari) para continuar com segurança.");
-          } else {
-             alert("Erro de conexão. Tente abrir o site fora do Instagram/Facebook.");
-          }
-        }
-      }
+      const loggedUser = await doLogin();
+      if (loggedUser) { setStep(2); window.scrollTo(0, 0); }
       return;
     }
     setStep(2);
@@ -163,16 +189,10 @@ export default function Landing() {
 
   const handleThemeSelect = async (themeId) => {
     if (!user) {
-      try {
-        await signInWithPopup(auth, provider);
-      } catch (error) {
-        console.error("Erro no login", error);
-        alert("O login foi impedido pelo navegador do App. Procure a opção 'Abrir no Navegador' ou tente pelo Safari/Chrome.");
-        return;
-      }
+      await doLogin();
+      return;
     }
     setSelectedTheme(themeId);
-    // Só limpa o texto se o tema atual NÃO for sonhos ou custom, para não perder o que escreveu
     if (themeId !== 'sonhos' && themeId !== 'custom') {
       setCustomTheme("");
     }
@@ -181,11 +201,27 @@ export default function Landing() {
   const handleUpload = async (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      
+
+      // ── Verificação localStorage (camada extra contra troca de IP/4G) ──
+      const VYX_LIMIT = 3;
+      const VYX_COOLDOWN_MS = 15 * 60 * 1000;
+      const storedCount = parseInt(localStorage.getItem('vyx_attempt_count') || '0');
+      const storedLast = parseInt(localStorage.getItem('vyx_attempt_last') || '0');
+      const elapsed = Date.now() - storedLast;
+
+      if (storedCount >= VYX_LIMIT && elapsed < VYX_COOLDOWN_MS) {
+        navigate('/planos');
+        return;
+      }
+      // Reset contador se cooldown passou
+      if (elapsed >= VYX_COOLDOWN_MS) {
+        localStorage.setItem('vyx_attempt_count', '0');
+      }
+
       setIsGenerating(true);
-      setCountdown(60); // Cronômetro de 60s solicitado pelo usuário
-      setGeneratedImage(null); // Limpa gerações antigas
-      setStep(3); // Mostra as telas rodando
+      setCountdown(60);
+      setGeneratedImage(null);
+      setStep(3);
       window.scrollTo(0, 0);
 
       try {
@@ -193,7 +229,13 @@ export default function Landing() {
         formData.append('selfieFile', file);
         formData.append('theme', selectedTheme);
         formData.append('customTheme', customTheme);
-        formData.append('gender', gender); // Envia o gênero selecionado pelo usuário
+        formData.append('gender', gender);
+        if (user) {
+          formData.append('uid', user.uid);
+          formData.append('userEmail', user.email || '');
+          formData.append('userName', user.displayName || '');
+          formData.append('userPhoto', user.photoURL || '');
+        }
 
         const BASE_API_URL = import.meta.env.VITE_API_URL || 'https://vyxfotos-backend.onrender.com';
 
@@ -201,38 +243,39 @@ export default function Landing() {
           method: 'POST',
           body: formData
         });
-        
-        const result = await response.json();
-        
-        if(result.success) {
-           console.log("Sucesso no Processamento Neural: ", result.data);
-           
-           setOrderId(result.data.orderId);
-           setGeneratedImage(result.data.output_url); 
-           
-           localStorage.setItem('vyx_generated_image', result.data.output_url);
-           localStorage.setItem('vyx_order_id', result.data.orderId);
-           localStorage.setItem('vyx_theme', selectedTheme);
-           
-           setHasImageArrival(true); 
-        } else {
-           console.error("Backend Error:", result.error);
-           setIsGenerating(false);
-           
-           if (response.status === 429) {
-             // Redirecionamento comercial para página dedicada de planos
-             setIsGenerating(false);
-             navigate('/planos');
-             return; 
-           }
 
-           const errorMsg = result.detail || result.error || "Erro desconhecido";
-           alert(`Erro no Motor de Imagens:\n${errorMsg}`);
+        const result = await response.json();
+
+        if (result.success) {
+          // Incrementa contador localStorage
+          const newCount = parseInt(localStorage.getItem('vyx_attempt_count') || '0') + 1;
+          localStorage.setItem('vyx_attempt_count', String(newCount));
+          localStorage.setItem('vyx_attempt_last', String(Date.now()));
+
+          setOrderId(result.data.orderId);
+          setGeneratedImage(result.data.output_url);
+
+          localStorage.setItem('vyx_generated_image', result.data.output_url);
+          localStorage.setItem('vyx_order_id', result.data.orderId);
+          localStorage.setItem('vyx_theme', selectedTheme);
+
+          setHasImageArrival(true);
+        } else {
+          setIsGenerating(false);
+
+          if (response.status === 429) {
+            localStorage.setItem('vyx_attempt_count', String(VYX_LIMIT));
+            localStorage.setItem('vyx_attempt_last', String(Date.now()));
+            navigate('/planos');
+            return;
+          }
+
+          const errorMsg = result.detail || result.error || "Erro desconhecido";
+          alert(`Erro no Motor de Imagens:\n${errorMsg}`);
         }
 
       } catch (error) {
-        console.error("Erro ao chamar o servidor Backend (Ele pode estar desligado):", error);
-        // Desbloqueia para os testes continuarem caso o backend n esteja rodando direito
+        console.error("Erro ao chamar o servidor Backend:", error);
         setIsGenerating(false);
       }
     }

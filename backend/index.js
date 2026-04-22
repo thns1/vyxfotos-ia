@@ -8,8 +8,25 @@ const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
 const nodemailer = require('nodemailer');
+const admin = require('firebase-admin');
 
 dotenv.config();
+
+// ─────────────────────────────────────────────
+// FIREBASE ADMIN (Firestore para leads)
+// ─────────────────────────────────────────────
+let firestoreDb = null;
+try {
+  const serviceAccount = require('./firebase-admin-key.json');
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    projectId: 'vyxfotos',
+  });
+  firestoreDb = admin.firestore();
+  console.log('[Firebase] Admin inicializado com sucesso.');
+} catch (e) {
+  console.warn('[Firebase] Admin não inicializado:', e.message);
+}
 
 const app = express();
 app.use(cors());
@@ -38,10 +55,28 @@ const { getPrompt } = require('./constants/themePrompts');
 // ─────────────────────────────────────────────
 const LIMIT_ATTEMPTS = 3;
 const COOLDOWN_MINUTES = 15;
-const freeTrialLimits = {};
+const freeTrialLimits = {};       // por IP (fallback)
+const freeTrialLimitsByUID = {};  // por Firebase UID (primário)
 const chatLimits = {};
 const CHAT_LIMIT_PER_HOUR = 20;
 const CHAT_COOLDOWN_MS = 60 * 60 * 1000;
+
+// Salva lead no Firestore (sem duplicar por UID)
+async function saveLead({ uid, email, name, photoURL }) {
+  if (!firestoreDb || !uid || !email) return;
+  try {
+    const ref = firestoreDb.collection('leads').doc(uid);
+    const existing = await ref.get();
+    const now = admin.firestore.FieldValue.serverTimestamp();
+    if (!existing.exists) {
+      await ref.set({ uid, email, name: name || '', photoURL: photoURL || '', createdAt: now, attempts: 1, lastAttempt: now });
+    } else {
+      await ref.update({ attempts: admin.firestore.FieldValue.increment(1), lastAttempt: now });
+    }
+  } catch (e) {
+    console.warn('[Firebase] Erro ao salvar lead:', e.message);
+  }
+}
 
 // ─────────────────────────────────────────────
 // 1. DETECÇÃO AUTOMÁTICA DE GÊNERO PELA SELFIE
@@ -429,14 +464,18 @@ app.post('/api/parse-dreams', async (req, res) => {
 // ─────────────────────────────────────────────
 app.post('/api/generate', upload.single('selfieFile'), async (req, res) => {
   try {
-    const { theme, customTheme } = req.body;
+    const { theme, customTheme, uid, userEmail, userName, userPhoto } = req.body;
     if (!req.file) return res.status(400).json({ success: false, error: 'Selfie obrigatória.' });
 
     const clientIp = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.ip || 'unknown';
     const now = Date.now();
 
-    if (!freeTrialLimits[clientIp]) freeTrialLimits[clientIp] = { count: 0, lastAttempt: 0 };
-    const userLimit = freeTrialLimits[clientIp];
+    // Rate limit: UID tem prioridade sobre IP
+    const limitKey = uid || clientIp;
+    const limitMap = uid ? freeTrialLimitsByUID : freeTrialLimits;
+
+    if (!limitMap[limitKey]) limitMap[limitKey] = { count: 0, lastAttempt: 0 };
+    const userLimit = limitMap[limitKey];
     const diffMinutes = (now - userLimit.lastAttempt) / (1000 * 60);
 
     if (userLimit.count >= LIMIT_ATTEMPTS && diffMinutes < COOLDOWN_MINUTES) {
@@ -451,6 +490,9 @@ app.post('/api/generate', upload.single('selfieFile'), async (req, res) => {
     if (diffMinutes >= COOLDOWN_MINUTES) userLimit.count = 0;
     userLimit.count += 1;
     userLimit.lastAttempt = now;
+
+    // Salva/atualiza lead no Firestore
+    if (uid) saveLead({ uid, email: userEmail, name: userName, photoURL: userPhoto });
 
     const imageBase64 = req.file.buffer.toString('base64');
     const gender = await detectGender(imageBase64);
@@ -654,6 +696,32 @@ app.post('/api/webhooks/instagram', async (req, res) => {
     }
   } else {
     res.sendStatus(404);
+  }
+});
+
+// ─────────────────────────────────────────────
+// ADMIN: Exportar leads como CSV
+// GET /api/admin/leads?secret=SUA_SENHA
+// ─────────────────────────────────────────────
+app.get('/api/admin/leads', async (req, res) => {
+  const ADMIN_SECRET = process.env.ADMIN_SECRET || 'vyxadmin2026';
+  if (req.query.secret !== ADMIN_SECRET) return res.status(401).send('Não autorizado.');
+  if (!firestoreDb) return res.status(500).send('Firestore não disponível.');
+
+  try {
+    const snapshot = await firestoreDb.collection('leads').orderBy('createdAt', 'desc').get();
+    const rows = [['UID', 'Email', 'Nome', 'Tentativas', 'Cadastrado em']];
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      const date = d.createdAt?.toDate ? d.createdAt.toDate().toISOString().split('T')[0] : '';
+      rows.push([d.uid || '', d.email || '', d.name || '', d.attempts || 1, date]);
+    });
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="leads_vyxfotos.csv"');
+    res.send('﻿' + csv); // BOM para Excel abrir com acentos corretos
+  } catch (e) {
+    res.status(500).send('Erro ao buscar leads: ' + e.message);
   }
 });
 
