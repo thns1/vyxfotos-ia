@@ -164,8 +164,16 @@ export default function Landing() {
   const doLogin = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
-      await saveLeadToFirestore(result.user);
-      return result.user;
+      const u = result.user;
+      // Salva no Firestore (frontend) e no Google Sheets (via backend)
+      await saveLeadToFirestore(u);
+      const BASE_API_URL = import.meta.env.VITE_API_URL || 'https://vyxfotos-backend.onrender.com';
+      fetch(`${BASE_API_URL}/api/register-lead`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: u.uid, email: u.email, name: u.displayName || '', photoURL: u.photoURL || '' }),
+      }).catch(() => {});
+      return u;
     } catch (error) {
       console.error("Erro no login", error);
       if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {

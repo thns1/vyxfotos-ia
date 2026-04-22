@@ -107,13 +107,21 @@ async function saveLead({ uid, email, name, photoURL }) {
     }
   }
 
-  // Google Sheets — só adiciona se for novo (não estava na sessão atual)
+    // Google Sheets — só adiciona se for a primeira vez (verifica flag no Firestore)
   if (leadsRegistrados.has(uid)) return;
-  leadsRegistrados.add(uid);
 
   try {
     const sheets = getSheetsClient();
     if (!sheets) return;
+
+    // Verifica se já foi adicionado ao Sheets em sessões anteriores
+    if (firestoreDb) {
+      const ref = firestoreDb.collection('leads').doc(uid);
+      const snap = await ref.get();
+      if (snap.exists && snap.data().addedToSheets) return;
+    }
+
+    leadsRegistrados.add(uid);
 
     const dataBR = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
 
@@ -124,17 +132,22 @@ async function saveLead({ uid, email, name, photoURL }) {
         spreadsheetId: SHEET_ID,
         range: 'A1:E1',
         valueInputOption: 'RAW',
-        requestBody: { values: [['UID', 'Email', 'Nome', 'Data de Cadastro', 'Foto']] },
+        requestBody: { values: [['Email', 'Nome', 'Data de Cadastro', 'UID']] },
       });
     }
 
     await sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID,
-      range: 'A:E',
+      range: 'A:D',
       valueInputOption: 'RAW',
       insertDataOption: 'INSERT_ROWS',
-      requestBody: { values: [[uid, email, name || '', dataBR, photoURL || '']] },
+      requestBody: { values: [[email, name || '', dataBR, uid]] },
     });
+
+    // Marca no Firestore que já foi adicionado ao Sheets
+    if (firestoreDb) {
+      await firestoreDb.collection('leads').doc(uid).set({ addedToSheets: true }, { merge: true });
+    }
 
     console.log(`[Sheets] Lead adicionado: ${email}`);
   } catch (e) {
@@ -761,6 +774,16 @@ app.post('/api/webhooks/instagram', async (req, res) => {
   } else {
     res.sendStatus(404);
   }
+});
+
+// ─────────────────────────────────────────────
+// ROTA: /api/register-lead (chamada no login)
+// ─────────────────────────────────────────────
+app.post('/api/register-lead', async (req, res) => {
+  const { uid, email, name, photoURL } = req.body;
+  if (!uid || !email) return res.status(400).json({ success: false });
+  await saveLead({ uid, email, name, photoURL });
+  res.json({ success: true });
 });
 
 // ─────────────────────────────────────────────
