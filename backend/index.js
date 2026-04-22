@@ -17,11 +17,17 @@ dotenv.config();
 // ─────────────────────────────────────────────
 let firestoreDb = null;
 try {
-  const serviceAccount = require('./firebase-admin-key.json');
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    projectId: 'vyxfotos',
-  });
+  let credential;
+  if (process.env.FIREBASE_SERVICE_ACCOUNT_JSON) {
+    // Produção (Render): credencial vem de variável de ambiente
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+    credential = admin.credential.cert(serviceAccount);
+  } else {
+    // Local: lê do arquivo
+    const serviceAccount = require('./firebase-admin-key.json');
+    credential = admin.credential.cert(serviceAccount);
+  }
+  admin.initializeApp({ credential, projectId: 'vyxfotos' });
   firestoreDb = admin.firestore();
   console.log('[Firebase] Admin inicializado com sucesso.');
 } catch (e) {
