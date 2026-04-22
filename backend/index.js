@@ -432,7 +432,7 @@ app.post('/api/generate', upload.single('selfieFile'), async (req, res) => {
     const { theme, customTheme } = req.body;
     if (!req.file) return res.status(400).json({ success: false, error: 'Selfie obrigatória.' });
 
-    const clientIp = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+    const clientIp = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.ip || 'unknown';
     const now = Date.now();
 
     if (!freeTrialLimits[clientIp]) freeTrialLimits[clientIp] = { count: 0, lastAttempt: 0 };
