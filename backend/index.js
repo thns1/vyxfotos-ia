@@ -88,31 +88,68 @@ const SHEET_ID = process.env.GOOGLE_SHEET_ID || '1qL9oHPvK7mZ0XHp0EFwXE95Fk3uYmR
 const leadsRegistrados = new Set(); // evita duplicar na mesma sessão do servidor
 
 // Cria aba de Dashboard profissional
+const MESES_NOMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+// Cria aba do mês se não existir e retorna o sheetId
+async function getOrCreateMonthTab(sheets, monthIndex) {
+  const tabName = MESES_NOMES[monthIndex];
+  const meta = await sheets.spreadsheets.get({ spreadsheetId: SHEET_ID });
+  const existing = meta.data.sheets.find(s => s.properties.title === tabName);
+  if (existing) return { sheetId: existing.properties.sheetId, tabName };
+
+  const addRes = await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: SHEET_ID,
+    requestBody: { requests: [{ addSheet: { properties: { title: tabName } } }] },
+  });
+  const sheetId = addRes.data.replies[0].addSheet.properties.sheetId;
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: SHEET_ID, range: `'${tabName}'!A1:F1`, valueInputOption: 'RAW',
+    requestBody: { values: [['📧 Email', '👤 Nome', '📅 Data & Hora', '🔖 Status', '🌐 Origem', '🆔 UID']] },
+  });
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: SHEET_ID,
+    requestBody: { requests: [
+      { repeatCell: { range: { sheetId, startRowIndex: 0, endRowIndex: 1 },
+        cell: { userEnteredFormat: {
+          backgroundColor: { red: 0.11, green: 0.37, blue: 0.22 },
+          textFormat: { foregroundColor: { red: 1, green: 1, blue: 1 }, bold: true, fontSize: 11 },
+          horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE',
+        }}, fields: 'userEnteredFormat' }},
+      { updateSheetProperties: { properties: { sheetId, gridProperties: { frozenRowCount: 1 } }, fields: 'gridProperties.frozenRowCount' }},
+      { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 0, endIndex: 1 }, properties: { pixelSize: 260 }, fields: 'pixelSize' }},
+      { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 1, endIndex: 2 }, properties: { pixelSize: 180 }, fields: 'pixelSize' }},
+      { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 2, endIndex: 3 }, properties: { pixelSize: 175 }, fields: 'pixelSize' }},
+      { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 3, endIndex: 4 }, properties: { pixelSize: 120 }, fields: 'pixelSize' }},
+      { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 4, endIndex: 5 }, properties: { pixelSize: 100 }, fields: 'pixelSize' }},
+      { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 5, endIndex: 6 }, properties: { pixelSize: 260 }, fields: 'pixelSize' }},
+      { updateDimensionProperties: { range: { sheetId, dimension: 'ROWS', startIndex: 0, endIndex: 1 }, properties: { pixelSize: 40 }, fields: 'pixelSize' }},
+    ]},
+  });
+  return { sheetId, tabName };
+}
+
 async function createDashboardSheet(sheets) {
   try {
-    // Adiciona nova aba "📊 Dashboard"
     const addSheetRes = await sheets.spreadsheets.batchUpdate({
       spreadsheetId: SHEET_ID,
-      requestBody: { requests: [{ addSheet: { properties: { title: '📊 Dashboard', index: 1 } } }] },
+      requestBody: { requests: [{ addSheet: { properties: { title: '📊 Dashboard', index: 0 } } }] },
     });
     const dashSheetId = addSheetRes.data.replies[0].addSheet.properties.sheetId;
 
-    // Conteúdo: título, meses com fórmulas COUNTIF (usa ; pois planilha está em português)
-    const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
     const anoAtual = new Date().getFullYear();
     const rows = [
       ['📊 DASHBOARD — Vyxfotos IA', '', ''],
       ['', '', ''],
       ['📅 Mês', `📈 Leads ${anoAtual}`, ''],
     ];
-    meses.forEach((mes, i) => {
-      const mesNum = String(i + 1).padStart(2, '0');
-      const formula = `=COUNTIF('🟢 Leads Vyxfotos'!C:C;"*/${mesNum}/${anoAtual}*")`;
-      rows.push([mes, formula, '']);
+    MESES_NOMES.forEach(mes => {
+      // Conta linhas na aba do mês (A2:A = ignora cabeçalho). SEERRO evita erro se aba não existe ainda
+      rows.push([mes, `=SEERRO(CONT.VALORES(${mes}!A2:A);0)`, '']);
     });
     rows.push(['', '', '']);
     rows.push(['🏆 TOTAL GERAL', `=SOMA(B4:B15)`, '']);
-    rows.push(['📆 Este mês', `=COUNTIF('🟢 Leads Vyxfotos'!C:C;"*/"&TEXTO(HOJE();"MM/AAAA")&"*")`, '']);
+    rows.push(['📆 Este mês', `=ÍNDICE(B4:B15;MÊS(HOJE()))`, '']);
 
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
@@ -219,58 +256,10 @@ async function createDashboardSheet(sheets) {
   }
 }
 
-// Cria 12 abas mensais com QUERY filtrando leads por mês
+// Pré-cria todas as 12 abas mensais com cabeçalho
 async function createMonthlyTabs(sheets) {
-  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-  const anoAtual = new Date().getFullYear();
-
   for (let i = 0; i < 12; i++) {
-    try {
-      const mes = meses[i];
-      const mesNum = String(i + 1).padStart(2, '0');
-
-      const addRes = await sheets.spreadsheets.batchUpdate({
-        spreadsheetId: SHEET_ID,
-        requestBody: { requests: [{ addSheet: { properties: { title: mes } } }] },
-      });
-      const sheetId = addRes.data.replies[0].addSheet.properties.sheetId;
-
-      // Cabeçalho + fórmula QUERY filtrando pelo mês
-      await sheets.spreadsheets.values.update({
-        spreadsheetId: SHEET_ID,
-        range: `'${mes}'!A1`,
-        valueInputOption: 'USER_ENTERED',
-        requestBody: { values: [
-          [`=QUERY('🟢 Leads Vyxfotos'!A:F;"SELECT * WHERE C CONTAINS '/${mesNum}/${anoAtual}'";1)`],
-        ]},
-      });
-
-      // Formata cabeçalho (linha 1 vinda do QUERY já traz o header)
-      await sheets.spreadsheets.batchUpdate({
-        spreadsheetId: SHEET_ID,
-        requestBody: { requests: [
-          { repeatCell: {
-            range: { sheetId, startRowIndex: 0, endRowIndex: 1 },
-            cell: { userEnteredFormat: {
-              backgroundColor: { red: 0.11, green: 0.37, blue: 0.22 },
-              textFormat: { foregroundColor: { red: 1, green: 1, blue: 1 }, bold: true, fontSize: 11 },
-              horizontalAlignment: 'CENTER',
-            }},
-            fields: 'userEnteredFormat',
-          }},
-          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 0, endIndex: 1 }, properties: { pixelSize: 250 }, fields: 'pixelSize' }},
-          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 1, endIndex: 2 }, properties: { pixelSize: 170 }, fields: 'pixelSize' }},
-          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 2, endIndex: 3 }, properties: { pixelSize: 170 }, fields: 'pixelSize' }},
-          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 3, endIndex: 4 }, properties: { pixelSize: 120 }, fields: 'pixelSize' }},
-          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 4, endIndex: 5 }, properties: { pixelSize: 100 }, fields: 'pixelSize' }},
-          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 5, endIndex: 6 }, properties: { pixelSize: 250 }, fields: 'pixelSize' }},
-        ]},
-      });
-
-      console.log(`[Sheets] ✅ Aba mensal criada: ${mes}`);
-    } catch (e) {
-      console.warn(`[Sheets] Erro ao criar aba mensal:`, e.message);
-    }
+    await getOrCreateMonthTab(sheets, i);
   }
 }
 
@@ -310,59 +299,27 @@ async function saveLead({ uid, email, name, photoURL }) {
     leadsRegistrados.add(uid);
 
     const dataBR = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+    const monthIndex = new Date().getMonth(); // 0-11
 
-    // Verifica se é a primeira linha (precisa criar o cabeçalho profissional)
-    const headerCheck = await sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'A1' });
-    const isFirstTime = !headerCheck.data.values?.length;
-
-    if (isFirstTime) {
-      // Cabeçalho com dados
-      await sheets.spreadsheets.values.update({
-        spreadsheetId: SHEET_ID, range: 'A1:F1', valueInputOption: 'RAW',
-        requestBody: { values: [['📧 Email', '👤 Nome', '📅 Data & Hora', '🔖 Status', '🌐 Origem', '🆔 UID']] },
-      });
-
-      // Formatação profissional via batchUpdate
-      const sheetId = 0;
-      await sheets.spreadsheets.batchUpdate({
-        spreadsheetId: SHEET_ID,
-        requestBody: { requests: [
-          // Cor verde escuro no cabeçalho
-          { repeatCell: { range: { sheetId, startRowIndex: 0, endRowIndex: 1 },
-            cell: { userEnteredFormat: {
-              backgroundColor: { red: 0.11, green: 0.37, blue: 0.22 },
-              textFormat: { foregroundColor: { red: 1, green: 1, blue: 1 }, bold: true, fontSize: 11 },
-              horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE',
-            }}, fields: 'userEnteredFormat' }},
-          // Congela a linha do cabeçalho
-          { updateSheetProperties: { properties: { sheetId, gridProperties: { frozenRowCount: 1 } }, fields: 'gridProperties.frozenRowCount' }},
-          // Larguras das colunas
-          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 0, endIndex: 1 }, properties: { pixelSize: 260 }, fields: 'pixelSize' }},
-          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 1, endIndex: 2 }, properties: { pixelSize: 180 }, fields: 'pixelSize' }},
-          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 2, endIndex: 3 }, properties: { pixelSize: 175 }, fields: 'pixelSize' }},
-          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 3, endIndex: 4 }, properties: { pixelSize: 120 }, fields: 'pixelSize' }},
-          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 4, endIndex: 5 }, properties: { pixelSize: 100 }, fields: 'pixelSize' }},
-          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 5, endIndex: 6 }, properties: { pixelSize: 260 }, fields: 'pixelSize' }},
-          // Altura do cabeçalho
-          { updateDimensionProperties: { range: { sheetId, dimension: 'ROWS', startIndex: 0, endIndex: 1 }, properties: { pixelSize: 40 }, fields: 'pixelSize' }},
-          // Renomeia a aba
-          { updateSheetProperties: { properties: { sheetId, title: '🟢 Leads Vyxfotos' }, fields: 'title' }},
-        ]},
-      });
-      console.log('[Sheets] Cabeçalho profissional criado.');
+    // Verifica se o Dashboard já existe; se não, cria tudo pela primeira vez
+    const metaCheck = await sheets.spreadsheets.get({ spreadsheetId: SHEET_ID });
+    const hasDashboard = metaCheck.data.sheets.some(s => s.properties.title === '📊 Dashboard');
+    if (!hasDashboard) {
+      await createDashboardSheet(sheets);
+      await createMonthlyTabs(sheets);
     }
 
-    // Se for a primeira vez, cria o dashboard também
-    if (isFirstTime) await createDashboardSheet(sheets);
+    // Garante que a aba do mês existe e obtém o sheetId
+    const { sheetId: monthSheetId, tabName } = await getOrCreateMonthTab(sheets, monthIndex);
 
-    // Adiciona o lead
+    // Adiciona o lead na aba do mês correto
     const appendRes = await sheets.spreadsheets.values.append({
-      spreadsheetId: SHEET_ID, range: "'🟢 Leads Vyxfotos'!A:F",
+      spreadsheetId: SHEET_ID, range: `'${tabName}'!A:F`,
       valueInputOption: 'USER_ENTERED', insertDataOption: 'INSERT_ROWS',
       requestBody: { values: [[email, name || '—', dataBR, '🟢 Novo Lead', 'Google', uid]] },
     });
 
-    // Descobre qual linha foi inserida e formata com texto escuro + fundo alternado
+    // Formata a linha inserida com cores alternadas
     const updatedRange = appendRes.data.updates?.updatedRange || '';
     const rowMatch = updatedRange.match(/(\d+)$/);
     if (rowMatch) {
@@ -371,11 +328,9 @@ async function saveLead({ uid, email, name, photoURL }) {
       await sheets.spreadsheets.batchUpdate({
         spreadsheetId: SHEET_ID,
         requestBody: { requests: [{ repeatCell: {
-          range: { sheetId: 0, startRowIndex: rowIndex, endRowIndex: rowIndex + 1 },
+          range: { sheetId: monthSheetId, startRowIndex: rowIndex, endRowIndex: rowIndex + 1 },
           cell: { userEnteredFormat: {
-            backgroundColor: isEven
-              ? { red: 0.88, green: 0.96, blue: 0.90 }
-              : { red: 1, green: 1, blue: 1 },
+            backgroundColor: isEven ? { red: 0.88, green: 0.96, blue: 0.90 } : { red: 1, green: 1, blue: 1 },
             textFormat: { foregroundColor: { red: 0.13, green: 0.13, blue: 0.13 }, fontSize: 10 },
           }},
           fields: 'userEnteredFormat(backgroundColor,textFormat)',
@@ -383,12 +338,11 @@ async function saveLead({ uid, email, name, photoURL }) {
       });
     }
 
-    // Marca no Firestore que já foi adicionado ao Sheets
     if (firestoreDb) {
       await firestoreDb.collection('leads').doc(uid).set({ addedToSheets: true }, { merge: true });
     }
 
-    console.log(`[Sheets] ✅ Lead adicionado com sucesso: ${email}`);
+    console.log(`[Sheets] ✅ Lead adicionado em ${tabName}: ${email}`);
   } catch (e) {
     console.warn('[Sheets] Erro ao salvar lead:', e.message, e.stack?.split('\n')[1]);
   }
@@ -1052,7 +1006,7 @@ app.get('/api/admin/leads', async (req, res) => {
   }
 });
 
-// GET /api/admin/rebuild-dashboard?secret=SUA_SENHA — apaga e recria Dashboard + abas mensais
+// GET /api/admin/rebuild-dashboard?secret=SUA_SENHA — migra leads para abas mensais e recria tudo
 app.get('/api/admin/rebuild-dashboard', async (req, res) => {
   const ADMIN_SECRET = process.env.ADMIN_SECRET || 'vyxadmin2026';
   if (req.query.secret !== ADMIN_SECRET) return res.status(401).send('Não autorizado.');
@@ -1060,25 +1014,72 @@ app.get('/api/admin/rebuild-dashboard', async (req, res) => {
     const sheets = getSheetsClient();
     if (!sheets) return res.status(500).send('Sheets client indisponível.');
 
-    // Busca abas existentes
     const meta = await sheets.spreadsheets.get({ spreadsheetId: SHEET_ID });
     const allSheets = meta.data.sheets || [];
 
-    // Apaga Dashboard e abas mensais existentes (mantém apenas a de Leads)
-    const mesesNomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro','📊 Dashboard'];
-    const toDelete = allSheets.filter(s => mesesNomes.includes(s.properties.title));
-    if (toDelete.length > 0) {
-      await sheets.spreadsheets.batchUpdate({
-        spreadsheetId: SHEET_ID,
-        requestBody: { requests: toDelete.map(s => ({ deleteSheet: { sheetId: s.properties.sheetId } })) },
+    // Lê leads da aba "🟢 Leads Vyxfotos" ou "Leads Vyxfotos" se existir (para migração)
+    let leadsParaMigrar = [];
+    const leadsTab = allSheets.find(s => s.properties.title.includes('Leads Vyxfotos'));
+    if (leadsTab) {
+      const leadsData = await sheets.spreadsheets.values.get({
+        spreadsheetId: SHEET_ID, range: `'${leadsTab.properties.title}'!A2:F`,
       });
+      leadsParaMigrar = leadsData.data.values || [];
     }
 
-    // Recria Dashboard e abas mensais
+    // Apaga Dashboard, abas mensais e aba de Leads centralizada
+    const toDelete = allSheets.filter(s =>
+      MESES_NOMES.includes(s.properties.title) ||
+      s.properties.title === '📊 Dashboard' ||
+      s.properties.title.includes('Leads Vyxfotos')
+    );
+    if (toDelete.length > 0) {
+      // Não pode deletar a única aba — verifica se sobra alguma
+      const sobram = allSheets.length - toDelete.length;
+      const deleteList = sobram > 0 ? toDelete : toDelete.slice(0, toDelete.length - 1);
+      if (deleteList.length > 0) {
+        await sheets.spreadsheets.batchUpdate({
+          spreadsheetId: SHEET_ID,
+          requestBody: { requests: deleteList.map(s => ({ deleteSheet: { sheetId: s.properties.sheetId } })) },
+        });
+      }
+    }
+
+    // Recria Dashboard + 12 abas mensais
     await createDashboardSheet(sheets);
     await createMonthlyTabs(sheets);
 
-    res.send('✅ Dashboard e abas mensais recriados com sucesso!');
+    // Migra leads antigos para as abas mensais corretas
+    let migrados = 0;
+    for (const row of leadsParaMigrar) {
+      const [email, nome, dataHora, status, origem, uid] = row;
+      if (!dataHora) continue;
+      // Extrai o mês da data no formato "DD/MM/YYYY, HH:MM:SS"
+      const match = dataHora.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+      if (!match) continue;
+      const mesIndex = parseInt(match[2]) - 1; // 0-indexed
+      if (mesIndex < 0 || mesIndex > 11) continue;
+      const { tabName } = await getOrCreateMonthTab(sheets, mesIndex);
+      await sheets.spreadsheets.values.append({
+        spreadsheetId: SHEET_ID, range: `'${tabName}'!A:F`,
+        valueInputOption: 'USER_ENTERED', insertDataOption: 'INSERT_ROWS',
+        requestBody: { values: [[email || '', nome || '—', dataHora || '', status || '🟢 Novo Lead', origem || 'Google', uid || '']] },
+      });
+      migrados++;
+    }
+
+    // Limpa a aba padrão "Página1" se existir e estiver vazia
+    const metaFinal = await sheets.spreadsheets.get({ spreadsheetId: SHEET_ID });
+    const page1 = metaFinal.data.sheets.find(s => s.properties.title === 'Página1' || s.properties.title === 'Sheet1');
+    if (page1 && metaFinal.data.sheets.length > 1) {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: SHEET_ID,
+        requestBody: { requests: [{ deleteSheet: { sheetId: page1.properties.sheetId } }] },
+      });
+    }
+
+    leadsRegistrados.clear();
+    res.send(`✅ Rebuild concluído! Dashboard + 12 abas mensais criadas. ${migrados} leads migrados para as abas corretas.`);
   } catch (e) {
     res.status(500).send('Erro: ' + e.message);
   }
