@@ -194,7 +194,7 @@ async function buildPrompt(themeId, subthemeId, customTheme, gender, photoIndex 
 
   const baseGuard = `
 [CRITICAL IDENTITY RULES]
-FACE (non-negotiable): Keep 100% identical — same eyes, same nose, same mouth, same eyebrows, same skin tone, same hair color and texture, ${genderLine}
+FACE (non-negotiable): Keep 100% identical — same eyes, same nose, same mouth, same eyebrows, same skin tone, same hair color and texture, ${genderLine} FACE STRUCTURE (absolute): Preserve EXACTLY the facial bone structure from the reference — same jawline width, same cheekbone prominence, same face shape (round, square, oval, etc.). Do NOT make the face thinner, wider, more angular, or rounder than in the reference photo. The face weight and proportions must match the reference precisely. If the person has a round face in the reference, keep it round. If they have a slim face, keep it slim. Zero alterations to facial geometry.
 SKIN RETOUCHING (professional studio standard): Apply high-end retouching as a professional photographer would in post-production: (1) completely eliminate dark circles and puffiness under the eyes while preserving natural eye depth; (2) remove all visible blemishes, acne spots, blackheads, and redness; (3) smooth uneven skin texture and enlarged pores; (4) correct any skin discoloration or blotchy patches; (5) soften fine lines without erasing natural facial structure. The result must look like a professional studio session with expert retouching — healthy, luminous, magazine-quality skin. Do NOT make it plastic, AI-filtered, or unrealistically smooth. The person must look like the best version of themselves, not a different person.
 ${clothingOverride}
 EXPRESSION: ${expressionGuide}
