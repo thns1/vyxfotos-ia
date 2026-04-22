@@ -9,6 +9,7 @@ const path = require('path');
 const nodemailer = require('nodemailer');
 
 dotenv.config();
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -21,7 +22,6 @@ const upload = multer({
 const PORT = process.env.PORT || 3001;
 const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Configuração do Transportador de E-mail (SMTP)
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -31,13 +31,16 @@ const transporter = nodemailer.createTransport({
 });
 
 const { getPrompt } = require('./constants/themePrompts');
+
 // ─────────────────────────────────────────────
-// CONFIGURAÇÕES DE TRAVA E ECONOMIA
+// RATE LIMITING (preview gratuito)
 // ─────────────────────────────────────────────
-const MODO_ECONOMIA = false; // AGORA EM MODO PRODUÇÃO = Custos reais de IA ativos
 const LIMIT_ATTEMPTS = 3;
 const COOLDOWN_MINUTES = 15;
-const freeTrialLimits = {}; // { [ip]: { count: number, lastAttempt: timestamp } }
+const freeTrialLimits = {};
+const chatLimits = {};
+const CHAT_LIMIT_PER_HOUR = 20;
+const CHAT_COOLDOWN_MS = 60 * 60 * 1000;
 
 // ─────────────────────────────────────────────
 // 1. DETECÇÃO AUTOMÁTICA DE GÊNERO PELA SELFIE
@@ -54,16 +57,16 @@ Reply with ONLY one word — no explanation, no punctuation:
     ]);
     const result = response.response.text().trim().toLowerCase();
     const detected = result.includes('feminino') ? 'feminino' : 'masculino';
-    console.log(`[VYX] Gênero detectado automaticamente: ${detected}`);
+    console.log(`[VYX] Gênero detectado: ${detected}`);
     return detected;
   } catch (error) {
-    console.error('[VYX] Erro na detecção de gênero — usando masculino como fallback:', error.message);
+    console.error('[VYX] Erro na detecção de gênero — fallback masculino:', error.message);
     return 'masculino';
   }
 }
 
 // ─────────────────────────────────────────────
-// 2. INTERPRETADOR DE SONHOS (entende qualquer escrita)
+// 2. INTERPRETADOR DE SONHOS
 // ─────────────────────────────────────────────
 async function parseDreamsWithAI(rawText) {
   try {
@@ -93,7 +96,6 @@ Examples:
 
     const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const response = await model.generateContent(aiPrompt);
-
     const raw = response.response.text().trim().replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) && parsed.length > 0 ? parsed : [rawText];
@@ -135,17 +137,35 @@ STRICT RULES:
 }
 
 // ─────────────────────────────────────────────
-// 4. MONTADOR DE PROMPT FINAL (tema + subtema + gênero + índice)
+// 4. GERAÇÃO DE IMAGEM VIA GEMINI
+// ─────────────────────────────────────────────
+async function generateImage(imageBase64, prompt) {
+  const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash-preview-image-generation' });
+  const response = await model.generateContent({
+    contents: [{
+      role: 'user',
+      parts: [
+        { inlineData: { mimeType: 'image/jpeg', data: imageBase64 } },
+        { text: prompt }
+      ]
+    }],
+    generationConfig: { responseModalities: ['IMAGE'] }
+  });
+  const imagePart = response.response.candidates[0]?.content?.parts?.find(p => p.inlineData);
+  return imagePart?.inlineData?.data || null;
+}
+
+// ─────────────────────────────────────────────
+// 5. MONTADOR DE PROMPT FINAL
 // ─────────────────────────────────────────────
 async function buildPrompt(themeId, subthemeId, customTheme, gender, photoIndex = 0) {
   const isFemale = gender === 'feminino';
   const isExecutive = themeId === 'executivo';
+  const isLuxo = themeId === 'luxo';
 
   const genderLine = isFemale
     ? `same jawline, no facial hair, smooth natural skin texture. GENDER: FEMALE subject.`
     : `same jawline, EXACT same facial hair. If the person has a goatee and mustache only, strictly maintain ONLY the goatee and mustache. DO NOT add a full beard. GENDER: MALE subject.`;
-
-  const isLuxo = themeId === 'luxo';
 
   const expressionMood = {
     executivo:   `professional authority and composed confidence`,
@@ -154,7 +174,7 @@ async function buildPrompt(themeId, subthemeId, customTheme, gender, photoIndex 
     sonhos:      `adventurous confidence matching the fantasy role`,
   }[themeId] || `natural composed confidence`;
 
-  const expressionGuide = `CRITICAL: Reproduce EXACTLY the facial expression from the reference photo. If the person is NOT smiling in the reference, DO NOT add a smile. If the person is smiling in the reference, preserve that smile. NEVER invent, add, or remove any expression element that is not present in the reference. The only adjustment allowed is to channel the mood of ${expressionMood} through the eyes and overall presence — without changing what the mouth is doing.`;
+  const expressionGuide = `CRITICAL: Reproduce EXACTLY the facial expression from the reference photo. If the person is NOT smiling in the reference, DO NOT add a smile. If the person is smiling in the reference, preserve that smile. NEVER invent, add, or remove any expression element not present in the reference. The only adjustment allowed is to channel the mood of ${expressionMood} through the eyes and overall presence — without changing what the mouth is doing.`;
 
   let clothingOverride;
   if (isExecutive) {
@@ -166,7 +186,6 @@ async function buildPrompt(themeId, subthemeId, customTheme, gender, photoIndex 
       ? `CLOTHING (MANDATORY): The subject is FEMALE. The prompt describes luxury masculine attire (suit/tuxedo). Adapt it to the feminine equivalent: an elegant floor-length gown, fitted evening dress, or luxury ensemble in the SAME color palette and prestige level. Do NOT apply a masculine suit to a female subject.`
       : `CLOTHING: Apply exactly the luxury menswear described. Completely replace all clothing from the reference image.`;
   } else {
-    // Aniversário e Sonhos — os prompts já são gender-specific via getPrompt
     clothingOverride = `CLOTHING (MANDATORY): Apply EXACTLY the outfit described in the prompt above. Completely replace ALL clothing from the reference image. Do NOT carry over any clothing from the reference photo — apply only what is described.`;
   }
 
@@ -182,7 +201,7 @@ OUTPUT: RAW photographic quality. Only the face is preserved from the reference.
 `;
 
   if (themeId === 'sonhos' || themeId === 'custom') {
-    console.log(`✨ Elaborando Sonho/Fantasia: "${customTheme}"...`);
+    console.log(`✨ Elaborando Sonho: "${customTheme}"...`);
     const expandedStyle = await expandCustomTheme(customTheme, gender);
     return `${expandedStyle}\n${baseGuard}`;
   }
@@ -192,7 +211,7 @@ OUTPUT: RAW photographic quality. Only the face is preserved from the reference.
 }
 
 // ─────────────────────────────────────────────
-// 5. MARCA D'ÁGUA
+// 6. MARCA D'ÁGUA
 // ─────────────────────────────────────────────
 async function addWatermark(imageBuffer) {
   try {
@@ -215,32 +234,74 @@ async function addWatermark(imageBuffer) {
       .composite([{ input: Buffer.from(watermarkSvg), gravity: 'center' }])
       .jpeg({ quality: 85 })
       .toBuffer();
-  } catch (e) { return imageBuffer; }
+  } catch {
+    return imageBuffer;
+  }
 }
 
 // ─────────────────────────────────────────────
-// CHATBOT: ROTA /api/chat (com proteção de IP)
+// 7. ENVIO DE E-MAIL COM FOTOS FINAIS
 // ─────────────────────────────────────────────
-const chatLimits = {}; // { [ip]: { count: number, resetTime: timestamp } }
-const CHAT_LIMIT_PER_HOUR = 20;
-const CHAT_COOLDOWN_MS = 60 * 60 * 1000;
+async function sendPhotosEmail(email, orderId, images) {
+  try {
+    const attachments = images.map((imgBase64, i) => ({
+      filename: `vyxfotos_${String(i + 1).padStart(2, '0')}.jpg`,
+      content: Buffer.from(imgBase64, 'base64'),
+      contentType: 'image/jpeg',
+    }));
 
+    await transporter.sendMail({
+      from: `"Vyxfotos IA" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: `📸 Seu Ensaio Vyxfotos.IA está pronto! (Pedido ${orderId})`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
+          <div style="background-color: #000; padding: 25px; text-align: center;">
+            <h1 style="color: #C9A84C; margin: 0; font-size: 28px; letter-spacing: 3px;">VYXFOTOS IA</h1>
+            <p style="color: #fff; margin: 8px 0 0; font-size: 13px; letter-spacing: 2px; opacity: 0.7;">ESTÚDIO DE INTELIGÊNCIA ARTIFICIAL</p>
+          </div>
+          <div style="padding: 35px; background-color: #fcfcfc;">
+            <h2 style="color: #111; margin-top: 0;">Seu ensaio está pronto! ✨</h2>
+            <p style="font-size: 16px; line-height: 1.7; color: #444;">
+              Suas <strong>${images.length} fotos profissionais</strong> foram geradas com sucesso e estão anexadas neste e-mail em alta qualidade, sem marca d'água.
+            </p>
+            <div style="background: #000; border-radius: 8px; padding: 20px; margin: 25px 0; text-align: center;">
+              <p style="color: #C9A84C; font-size: 22px; font-weight: bold; margin: 0;">${images.length} Fotos em Alta Qualidade</p>
+              <p style="color: #aaa; font-size: 13px; margin: 6px 0 0;">Pedido: ${orderId}</p>
+            </div>
+            <p style="font-size: 14px; color: #777; border-top: 1px solid #eee; padding-top: 20px; margin-top: 25px;">
+              Obrigado por confiar na Vyxfotos.IA para transformar sua imagem.<br>
+              <br>
+              <i>Atenciosamente,<br><strong>Equipe Vyxfotos.IA</strong></i>
+            </p>
+          </div>
+        </div>
+      `,
+      attachments,
+    });
+
+    console.log(`📧 E-mail com ${images.length} fotos enviado para ${email}`);
+  } catch (error) {
+    console.error('[VYX] Erro ao enviar e-mail com fotos:', error.message);
+    throw error;
+  }
+}
+
+// ─────────────────────────────────────────────
+// ROTA: /api/chat
+// ─────────────────────────────────────────────
 app.post('/api/chat', async (req, res) => {
   try {
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || req.ip || 'unknown';
     const now = Date.now();
 
-    // Rate limiting para o Chat
-    if (!chatLimits[clientIp]) {
-      chatLimits[clientIp] = { count: 0, resetTime: now + CHAT_COOLDOWN_MS };
-    }
-    
+    if (!chatLimits[clientIp]) chatLimits[clientIp] = { count: 0, resetTime: now + CHAT_COOLDOWN_MS };
     if (now > chatLimits[clientIp].resetTime) {
       chatLimits[clientIp] = { count: 1, resetTime: now + CHAT_COOLDOWN_MS };
     } else {
       chatLimits[clientIp].count += 1;
       if (chatLimits[clientIp].count > CHAT_LIMIT_PER_HOUR) {
-        return res.status(429).json({ error: 'Limite de mensagens atingido. Para segurança do sistema, aguarde.' });
+        return res.status(429).json({ error: 'Limite de mensagens atingido. Aguarde um momento.' });
       }
     }
 
@@ -253,18 +314,18 @@ app.post('/api/chat', async (req, res) => {
 Sua missão é resolver dúvidas rapidamente, ser direto, educado e passar extrema confiança para converter vendas.
 Seja conciso e profissional em português do Brasil. Nunca diga que é um robô do Google ou mencione o modelo Gemini.
 
-Conhecimento Base (Regras de Negócio):
-- Plataforma: Vyxfotos.IA (Ensaios fotográficos de altíssima qualidade gerados por IA).
-- Teste Gratuito: O usuário pode gerar até 3 amostras gratuitas na página inicial (estas possuem marca d'água e baixa resolução).
-- Bloqueio: Após 3 testes, o cliente é redirecionado para comprar um plano na página "/planos".
-- Preços: 
+Conhecimento Base:
+- Plataforma: Vyxfotos.IA — Ensaios fotográficos de altíssima qualidade gerados por IA.
+- Teste Gratuito: O usuário pode gerar até 3 amostras gratuitas na página inicial (com marca d'água).
+- Bloqueio: Após 3 testes, o cliente é redirecionado para comprar um plano.
+- Preços:
   * Essencial (10 fotos) por R$ 34,90
   * Performance (20 fotos, Mais Vendido) por R$ 69,90
   * Premium (30 fotos) por R$ 119,90
-- Múltiplos Temas: O cliente pode escolher cenários variados antes de confirmar o pagamento na própria página de Planos (Ex: Executivo, Luxo, Aniversário).
-- Qualidade Real: As fotos finais entregues no painel são de "Altíssima Qualidade", realistas e sem marca d'água.
-- Prazo de Entrega: Imediato / Pós-produção instantânea (liberadas instantes após a confirmação do pagamento via Kiwify).
-- Segurança: Pagamento processado pela plataforma segura Kiwify. Não exigimos nenhuma senha pessoal do usuário.`;
+- Temas: Executivo, Luxo, Aniversário, Sonhos & Fantasia.
+- Qualidade: As fotos finais são entregues em alta qualidade, sem marca d'água, por e-mail.
+- Prazo: Entrega imediata após confirmação do pagamento via Kiwify.
+- Segurança: Pagamento processado pela plataforma segura Kiwify.`;
 
     const formattedContents = history
       .filter(m => m.role !== 'system')
@@ -273,92 +334,74 @@ Conhecimento Base (Regras de Negócio):
         parts: [{ text: m.content }]
       }));
 
-    const model = ai.getGenerativeModel({ 
-      model: 'gemini-2.5-flash',
-      systemInstruction: systemInstruction
-    });
-
+    const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash', systemInstruction });
     const response = await model.generateContent({
       contents: formattedContents,
-      generationConfig: {
-        temperature: 0.5
-      }
+      generationConfig: { temperature: 0.5 }
     });
 
     res.json({ success: true, reply: response.response.text() });
   } catch (error) {
-    console.error('[CHAT ERROR]', error);
-    res.status(500).json({ success: false, error: 'Erro de conexão com nossos servidores de chat.' });
+    console.error('[CHAT ERROR]', error.message);
+    res.status(500).json({ success: false, error: 'Erro de conexão com o chat.' });
   }
 });
 
 // ─────────────────────────────────────────────
-// ROTA: /api/contact (Envio de e-mail real)
+// ROTA: /api/contact
 // ─────────────────────────────────────────────
 app.post('/api/contact', async (req, res) => {
   const { name, email, subject, message } = req.body;
-
   if (!name || !email || !message) {
     return res.status(400).json({ success: false, error: 'Campos obrigatórios faltando.' });
   }
 
   try {
-    // 1. Enviar e-mail para o ADMINISTRADOR
-    const adminMailOptions = {
+    await transporter.sendMail({
       from: `"Suporte Vyxfotos" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
       subject: `[CONTATO] ${subject} - ${name}`,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; padding: 20px; border: 1px solid #eee;">
-          <h2 style="color: #FFD700; background: #000; padding: 10px; text-align: center;">Novo Contato Recebido</h2>
+          <h2 style="color: #C9A84C; background: #000; padding: 10px; text-align: center;">Novo Contato Recebido</h2>
           <p><strong>Nome:</strong> ${name}</p>
           <p><strong>E-mail:</strong> ${email}</p>
           <p><strong>Assunto:</strong> ${subject}</p>
           <p><strong>Mensagem:</strong></p>
-          <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; border-left: 4px solid #FFD700;">${message}</div>
+          <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; border-left: 4px solid #C9A84C;">${message}</div>
         </div>
       `
-    };
+    });
 
-    // 2. Enviar e-mail de AUTO-CONFIRMAÇÃO para o CLIENTE (Padrão Vyxfotos)
-    const clientMailOptions = {
+    await transporter.sendMail({
       from: `"Vyxfotos IA" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: `📸 Estúdio Vyxfotos - Recebemos sua mensagem!`,
+      subject: `📸 Vyxfotos - Recebemos sua mensagem!`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; border: 1px solid #eee; border-radius: 10px; overflow: hidden;">
-            <div style="background-color: #000; padding: 20px; text-align: center;">
-                <h1 style="color: #FFD700; margin: 0; font-size: 24px; letter-spacing: 2px;">VYXFOTOS IA</h1>
-            </div>
-            
-            <div style="padding: 30px; background-color: #fcfcfc;">
-                <h2 style="color: #111;">Olá, ${name}! 🎉</h2>
-                <p style="font-size: 16px; line-height: 1.6; color: #444;">
-                    Recebemos sua dúvida sobre <strong>"${subject}"</strong> através do nosso formulário oficial. 
-                    Nossa equipe de especialistas já foi notificada e entraremos em contato o mais breve possível para te ajudar.
-                </p>
-                
-                <p style="font-size: 14px; color: #777; margin-top: 30px;">
-                    Agradecemos o seu contato e interesse em transformar sua imagem com a nossa inteligência artificial.<br>
-                    <br>
-                    <i>Atenciosamente,<br><strong>Time de Suporte - Vyxfotos IA</strong></i>
-                </p>
-            </div>
+          <div style="background-color: #000; padding: 20px; text-align: center;">
+            <h1 style="color: #C9A84C; margin: 0; font-size: 24px; letter-spacing: 2px;">VYXFOTOS IA</h1>
+          </div>
+          <div style="padding: 30px; background-color: #fcfcfc;">
+            <h2 style="color: #111;">Olá, ${name}!</h2>
+            <p style="font-size: 16px; line-height: 1.6; color: #444;">
+              Recebemos sua mensagem sobre <strong>"${subject}"</strong>.
+              Nossa equipe entrará em contato em breve.
+            </p>
+            <p style="font-size: 14px; color: #777; margin-top: 25px;">
+              <i>Atenciosamente,<br><strong>Equipe Vyxfotos.IA</strong></i>
+            </p>
+          </div>
         </div>
       `
-    };
+    });
 
-    // Executa os disparos
-    await transporter.sendMail(adminMailOptions);
-    await transporter.sendMail(clientMailOptions);
-
-    console.log(`[CONTACT] Mensagem enviada por ${name} (${email})`);
+    console.log(`[CONTACT] Mensagem de ${name} (${email})`);
     res.json({ success: true });
   } catch (error) {
-    console.error('[CONTACT ERROR]', error);
-    // Mesmo com erro de e-mail, logamos no servidor os dados apenas para não perder o lead
-    console.log('DADOS DO LEAD (ERRO SMTP):', { name, email, subject, message });
-    res.status(500).json({ success: false, error: 'Erro ao processar o envio.' });
+    console.error('[CONTACT ERROR]', error.message);
+    console.log('LEAD (ERRO SMTP):', { name, email, subject, message });
+    res.status(500).json({ success: false, error: 'Erro ao enviar mensagem.' });
   }
 });
 
@@ -379,105 +422,61 @@ app.post('/api/parse-dreams', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// ROTA: /api/generate (gera a amostra com marca d'água)
+// ROTA: /api/generate (preview com marca d'água)
 // ─────────────────────────────────────────────
 app.post('/api/generate', upload.single('selfieFile'), async (req, res) => {
   try {
     const { theme, customTheme } = req.body;
     if (!req.file) return res.status(400).json({ success: false, error: 'Selfie obrigatória.' });
 
-    const imageBase64 = req.file.buffer.toString('base64');
     const clientIp = req.ip || req.headers['x-forwarded-for'] || 'unknown';
     const now = Date.now();
 
-    // 1. VERIFICAÇÃO DE TRAVA ANTI-SPAM
-    if (!freeTrialLimits[clientIp]) {
-      freeTrialLimits[clientIp] = { count: 0, lastAttempt: 0 };
-    }
-
+    if (!freeTrialLimits[clientIp]) freeTrialLimits[clientIp] = { count: 0, lastAttempt: 0 };
     const userLimit = freeTrialLimits[clientIp];
     const diffMinutes = (now - userLimit.lastAttempt) / (1000 * 60);
 
-    // Se já fez 3 tentativas e ainda não passou o tempo de espera
     if (userLimit.count >= LIMIT_ATTEMPTS && diffMinutes < COOLDOWN_MINUTES) {
       const waitRemaining = Math.ceil(COOLDOWN_MINUTES - diffMinutes);
-      return res.status(429).json({ 
-        success: false, 
-        error: `Limite de 3 testes gratuitos atingido.`,
-        detail: `Por favor, aguarde ${waitRemaining} minutos para testar novamente ou adquira um de nossos pacotes para gerações ilimitadas.`
+      return res.status(429).json({
+        success: false,
+        error: `Limite de ${LIMIT_ATTEMPTS} testes gratuitos atingido.`,
+        detail: `Aguarde ${waitRemaining} minutos ou adquira um pacote para gerações ilimitadas.`
       });
     }
 
-    // Se passou do tempo de espera, reseta o contador
-    if (diffMinutes >= COOLDOWN_MINUTES) {
-      userLimit.count = 0;
-    }
-
-    // Incrementa tentativa
+    if (diffMinutes >= COOLDOWN_MINUTES) userLimit.count = 0;
     userLimit.count += 1;
     userLimit.lastAttempt = now;
 
-    // Detecta gênero automaticamente pela foto — sem depender do cliente
+    const imageBase64 = req.file.buffer.toString('base64');
     const gender = await detectGender(imageBase64);
 
-    // Subtema padrão por tema (preview usa sempre o primeiro subtema do tema correto)
     const defaultSubtheme = {
-      executivo: 'classico',
-      luxo: 'classico',
+      executivo:   'classico',
+      luxo:        'classico',
       aniversario: 'vip',
-      sonhos: 'fantasia',
+      sonhos:      'fantasia',
     };
     const subtheme = defaultSubtheme[theme] || 'classico';
 
     const prompt = await buildPrompt(theme, subtheme, customTheme, gender, 0);
-    console.log(`[VYX] ${MODO_ECONOMIA ? 'SIMULANDO' : 'GERANDO'} amostra | tema: ${theme} | subtema: ${subtheme} | gênero: ${gender} | IP: ${clientIp} (Tentativa ${userLimit.count}/3)`);
+    console.log(`[VYX] Gerando preview | tema: ${theme} | subtema: ${subtheme} | gênero: ${gender} | IP: ${clientIp} (${userLimit.count}/${LIMIT_ATTEMPTS})`);
 
-    let generatedImageBase64;
-
-    if (MODO_ECONOMIA) {
-      // MODO ECONOMIA: Gera uma imagem preta sólida de 512x512
-      const blackBuffer = await sharp({
-        create: {
-          width: 512,
-          height: 512,
-          channels: 3,
-          background: { r: 5, g: 5, b: 8 } // Cor obsidian do site
-        }
-      }).jpeg().toBuffer();
-      generatedImageBase64 = blackBuffer.toString('base64');
-    } else {
-      // GERAÇÃO REAL IA
-      const response = await ai.models.generateContent({
-        model: 'gemini-3.1-flash-image-preview',
-        contents: [{
-          role: 'user',
-          parts: [
-            { inlineData: { mimeType: 'image/jpeg', data: imageBase64 } },
-            { text: prompt }
-          ]
-        }],
-        config: { responseModalities: ['IMAGE'] }
-      });
-      generatedImageBase64 = response.candidates[0]?.content?.parts[0]?.inlineData?.data;
-    }
-
+    const generatedImageBase64 = await generateImage(imageBase64, prompt);
     if (!generatedImageBase64) throw new Error('API não retornou imagem.');
 
     const watermarkedBuffer = await addWatermark(Buffer.from(generatedImageBase64, 'base64'));
     const orderId = 'Vyx_' + Math.floor(Math.random() * 999999);
 
-    // Salva selfie + metadados para uso no webhook após pagamento
     const bkpDir = path.join(__dirname, 'temp_orders');
     if (!fs.existsSync(bkpDir)) fs.mkdirSync(bkpDir);
 
     fs.writeFileSync(path.join(bkpDir, `${orderId}.json`), JSON.stringify({
-      orderId,
-      gender,   // detectado automaticamente pela IA
-      theme,
-      customTheme,
-      imageBase64
+      orderId, gender, theme, customTheme, imageBase64
     }));
-    console.log(`[VYX] Pedido ${orderId} salvo | gênero detectado: ${gender}`);
+
+    console.log(`[VYX] Pedido ${orderId} salvo | gênero: ${gender}`);
 
     res.json({
       success: true,
@@ -490,71 +489,58 @@ app.post('/api/generate', upload.single('selfieFile'), async (req, res) => {
 
   } catch (error) {
     console.error('[VYX] Erro em /api/generate:', error.message);
-    res.status(500).json({ success: false, error: 'Falha na geração.' });
+    res.status(500).json({ success: false, error: 'Falha na geração da imagem.' });
   }
 });
 
 // ─────────────────────────────────────────────
-// GERAÇÃO EM LOTE (chamada pelo webhook após pagamento)
+// GERAÇÃO EM LOTE (pós-pagamento via webhook)
 // ─────────────────────────────────────────────
 async function processApprovedOrder(email, orderId, distributionVars) {
-  try {
-    console.log(`\n${'='.repeat(54)}`);
-    console.log(`[PAID] FÁBRICA DE RETRATOS INICIADA`);
-    console.log(`  Cliente : ${email}`);
-    console.log(`  Pedido  : ${orderId}`);
-    console.log(`  Fotos   :`, distributionVars);
+  console.log(`\n${'='.repeat(54)}`);
+  console.log(`[PAID] INICIANDO FÁBRICA DE RETRATOS`);
+  console.log(`  Cliente : ${email}`);
+  console.log(`  Pedido  : ${orderId}`);
+  console.log(`  Fotos   :`, distributionVars);
 
+  try {
     const bkpPath = path.join(__dirname, 'temp_orders', `${orderId}.json`);
     if (!fs.existsSync(bkpPath)) {
-      console.error(`❌ Selfie do pedido ${orderId} não encontrada.`);
+      console.error(`❌ Dados do pedido ${orderId} não encontrados.`);
       return;
     }
 
-    const orderData = JSON.parse(fs.readFileSync(bkpPath, 'utf8'));
-    const { theme, customTheme, gender, imageBase64 } = orderData;
-
+    const { theme, customTheme, gender, imageBase64 } = JSON.parse(fs.readFileSync(bkpPath, 'utf8'));
     const finalImages = [];
     let globalPhotoIndex = 0;
 
     for (const [subthemeId, entry] of Object.entries(distributionVars)) {
       const { quantity, dreamText } = entry;
-
       for (let i = 0; i < quantity; i++) {
         console.log(`[GERANDO] Foto ${globalPhotoIndex + 1} | subtema: ${subthemeId} | índice: ${i}`);
 
-        // Para sonhos, usa o texto exato do subtema; para fixos, usa o índice sequencial
         const promptCustomTheme = theme === 'sonhos' ? dreamText : customTheme;
         const prompt = await buildPrompt(theme, subthemeId, promptCustomTheme, gender, i);
+        const imgData = await generateImage(imageBase64, prompt);
 
-        const response = await ai.models.generateContent({
-          model: 'gemini-3.1-flash-image-preview',
-          contents: [{
-            role: 'user',
-            parts: [
-              { inlineData: { mimeType: 'image/jpeg', data: imageBase64 } },
-              { text: prompt }
-            ]
-          }],
-          config: { responseModalities: ['IMAGE'] }
-        });
-
-        const imgData = response.candidates[0]?.content?.parts[0]?.inlineData?.data;
         if (imgData) {
           finalImages.push(imgData);
           console.log(`✅ Foto ${globalPhotoIndex + 1} concluída.`);
         } else {
-          console.warn(`⚠️ Foto ${globalPhotoIndex + 1} não gerada — API retornou vazio.`);
+          console.warn(`⚠️ Foto ${globalPhotoIndex + 1} não gerada.`);
         }
         globalPhotoIndex++;
       }
     }
 
     console.log(`🎯 ENSAIO CONCLUÍDO! ${finalImages.length} fotos geradas.`);
-    console.log(`📧 TODO: Enviar ${finalImages.length} fotos para ${email}`);
-    console.log(`${'='.repeat(54)}\n`);
+
+    if (finalImages.length > 0 && email) {
+      await sendPhotosEmail(email, orderId, finalImages);
+    }
 
     fs.unlinkSync(bkpPath);
+    console.log(`${'='.repeat(54)}\n`);
 
   } catch (err) {
     console.error('[VYX] Erro fatal no lote:', err.message);
@@ -563,11 +549,11 @@ async function processApprovedOrder(email, orderId, distributionVars) {
 
 // ─────────────────────────────────────────────
 // WEBHOOK KIWIFY
-// Formato SRC: "Vyx_123_vars_classico:2,moderno:3"
-// Formato SRC (sonhos): "Vyx_123_vars_sonho_0[policial]:2,sonho_1[bombeiro]:3"
+// SRC format: "Vyx_123_vars_classico:2,moderno:3"
+// SRC sonhos: "Vyx_123_vars_sonho_0[policial]:2"
 // ─────────────────────────────────────────────
 app.post('/api/webhook/kiwify', (req, res) => {
-  res.status(200).send('OK'); // Responde rápido para não dar timeout na Kiwify
+  res.status(200).send('OK');
 
   const payload = req.body;
   if (payload.order_status !== 'paid') return;
@@ -580,19 +566,15 @@ app.post('/api/webhook/kiwify', (req, res) => {
     const [idPart, varsPart] = srcRaw.split('_vars_');
     orderId = idPart;
 
-    // Cada par pode ser: "classico:2" ou "sonho_0[texto%20aqui]:3"
-    const kvPairs = varsPart.split(',');
-    kvPairs.forEach(pair => {
+    varsPart.split(',').forEach(pair => {
       const dreamMatch = pair.match(/^(.+?)\[(.+?)\]:(\d+)$/);
       if (dreamMatch) {
-        // Par com texto de sonho: sonho_0[policial]:2
         const [, subId, encodedText, qty] = dreamMatch;
         distributionVars[subId] = {
           quantity: parseInt(qty) || 0,
           dreamText: decodeURIComponent(encodedText)
         };
       } else {
-        // Par simples: classico:2
         const colonIdx = pair.lastIndexOf(':');
         if (colonIdx > 0) {
           const subId = pair.substring(0, colonIdx);
@@ -608,15 +590,15 @@ app.post('/api/webhook/kiwify', (req, res) => {
   if (orderId) {
     processApprovedOrder(payload.Customer?.email, orderId, distributionVars);
   } else {
-    console.log(`⚠️ Pagamento aprovado de ${payload.Customer?.email} sem OrderID Vyxfotos no SRC.`);
+    console.log(`⚠️ Pagamento aprovado de ${payload.Customer?.email} sem OrderID no SRC.`);
   }
 });
+
 // ─────────────────────────────────────────────
-// ROTA: Healthcheck para o Render
+// HEALTHCHECK
 // ─────────────────────────────────────────────
-app.get('/', (req, res) => {
-  res.status(200).send('Vyxfotos.IA Backend Operacional - Recebendo Tráfego!');
+app.get('/', (_req, res) => {
+  res.status(200).send('Vyxfotos.IA Backend Operacional');
 });
 
 app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Vyxfotos.IA rodando na porta ${PORT}`));
-

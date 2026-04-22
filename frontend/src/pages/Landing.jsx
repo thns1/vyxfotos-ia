@@ -195,12 +195,8 @@ export default function Landing() {
         formData.append('customTheme', customTheme);
         formData.append('gender', gender); // Envia o gênero selecionado pelo usuário
 
-        // Detecção de Ambiente (Localhouse vs Produção na Nuvem)
-        const BASE_API_URL = window.location.hostname === 'localhost' 
-          ? 'http://localhost:3001' 
-          : 'https://vyxfotos-backend.onrender.com';
+        const BASE_API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-        // Comunicação Real com a nova API Backend
         const response = await fetch(`${BASE_API_URL}/api/generate`, {
           method: 'POST',
           body: formData
