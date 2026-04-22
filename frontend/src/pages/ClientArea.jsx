@@ -11,9 +11,16 @@ export default function ClientArea() {
 
   // Escutar autenticação e buscar dados caso logado
   useEffect(() => {
+    const BASE_API_URL = import.meta.env.VITE_API_URL || 'https://vyxfotos-backend.onrender.com';
     const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
+        // Registra lead na planilha
+        fetch(`${BASE_API_URL}/api/register-lead`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ uid: currentUser.uid, email: currentUser.email, name: currentUser.displayName || '', photoURL: currentUser.photoURL || '' }),
+        }).catch(() => {});
         // Buscar fotos do cliente no Realtime Database
         fetchClientOrders(currentUser.email);
       } else {
