@@ -42,7 +42,7 @@ export default function Landing() {
   const [isThankYouScreen, setIsThankYouScreen] = useState(false);
   const [generatedImage, setGeneratedImage] = useState(null); // Imagem REAL gerada pela IA
   const [user, setUser] = useState(null);
-  const [countdown, setCountdown] = useState(30);
+  const [countdown, setCountdown] = useState(60);
   const [gender, setGender] = useState('masculino'); // 'masculino' ou 'feminino'
   const [hasImageArrival, setHasImageArrival] = useState(false);
   // Lógica de Suspense: Só libera quando contador chegar a 0 E a imagem chegar
@@ -183,7 +183,7 @@ export default function Landing() {
       const file = e.target.files[0];
       
       setIsGenerating(true);
-      setCountdown(30); // Cronômetro de 30s solicitado pelo usuário
+      setCountdown(60); // Cronômetro de 60s solicitado pelo usuário
       setGeneratedImage(null); // Limpa gerações antigas
       setStep(3); // Mostra as telas rodando
       window.scrollTo(0, 0);
