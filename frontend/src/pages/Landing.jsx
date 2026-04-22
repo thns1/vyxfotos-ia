@@ -340,7 +340,7 @@ export default function Landing() {
             </svg>
             Instagram
           </a>
-          <button onClick={() => navigate('/cliente')} className="text-[10px] md:text-sm font-mono tracking-widest uppercase text-ivory/60 hover:text-champagne transition-colors relative z-10">
+          <button onClick={() => { ScrollTrigger.killAll(); navigate('/cliente'); }} className="text-[10px] md:text-sm font-mono tracking-widest uppercase text-ivory/60 hover:text-champagne transition-colors relative z-10">
             Área do Cliente
           </button>
         </div>
@@ -621,8 +621,8 @@ export default function Landing() {
                 <p className="font-bold text-ivory text-xl mb-1 font-drama italic">Vyxfotos.IA</p>
                 <div className="flex flex-col items-center gap-6">
                   <p className="text-[10px] font-mono uppercase tracking-[0.3em]">A Revolução Digital</p>
-                  <button 
-                    onClick={() => navigate('/contato')}
+                  <button
+                    onClick={() => { ScrollTrigger.killAll(); navigate('/contato'); }}
                     className="px-6 py-2 rounded-full border border-white/10 text-[10px] font-mono uppercase tracking-widest hover:bg-white/5 hover:border-champagne/50 hover:text-champagne transition-all"
                   >
                     Fale Conosco
