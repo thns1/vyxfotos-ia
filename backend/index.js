@@ -161,7 +161,7 @@ async function generateImage(imageBase64, prompt) {
 // ─────────────────────────────────────────────
 // 5. MONTADOR DE PROMPT FINAL
 // ─────────────────────────────────────────────
-async function buildPrompt(themeId, subthemeId, customTheme, gender, photoIndex = 0) {
+async function buildPrompt(themeId, subthemeId, customTheme, gender, photoIndex = 0, isPreview = false) {
   const isFemale = gender === 'feminino';
   const isExecutive = themeId === 'executivo';
   const isLuxo = themeId === 'luxo';
@@ -198,7 +198,7 @@ FACE (non-negotiable): Keep 100% identical — same eyes, same nose, same mouth,
 SKIN RETOUCHING (professional studio standard): Apply high-end retouching as a professional photographer would in post-production: (1) completely eliminate dark circles and puffiness under the eyes while preserving natural eye depth; (2) remove all visible blemishes, acne spots, blackheads, and redness; (3) smooth uneven skin texture and enlarged pores; (4) correct any skin discoloration or blotchy patches; (5) soften fine lines without erasing natural facial structure. The result must look like a professional studio session with expert retouching — healthy, luminous, magazine-quality skin. Do NOT make it plastic, AI-filtered, or unrealistically smooth. The person must look like the best version of themselves, not a different person.
 ${clothingOverride}
 EXPRESSION: ${expressionGuide}
-FRAMING (ABSOLUTE RULE — ZERO EXCEPTIONS): Wide waist-up portrait shot. The camera MUST be zoomed out enough so the top of the skull and every strand of hair has at least 30% of empty background space above it before reaching the top edge of the image. Imagine placing a closed fist of empty space above the top of the head — that much room. NEVER let the head touch or approach the top edge. Bottom frame cuts at hip level. Arms crossed on chest. When in doubt, zoom out further.
+FRAMING (ABSOLUTE RULE — ZERO EXCEPTIONS): Wide waist-up portrait shot. The camera MUST be zoomed out enough so the top of the skull and every strand of hair has at least 30% of empty background space above it before reaching the top edge of the image. Imagine placing a closed fist of empty space above the top of the head — that much room. NEVER let the head touch or approach the top edge. Bottom frame cuts at hip level. ${isPreview ? 'Arms crossed on chest — confident signature pose.' : 'Natural confident pose appropriate to the scene — standing, hands relaxed, or as fits the setting.'} When in doubt, zoom out further.
 OUTPUT: RAW photographic quality. Only the face is preserved from the reference. Everything else — clothing, background, lighting — is replaced entirely as described.
 [/END IDENTITY RULES]
 `;
@@ -463,7 +463,7 @@ app.post('/api/generate', upload.single('selfieFile'), async (req, res) => {
     };
     const subtheme = defaultSubtheme[theme] || 'classico';
 
-    const prompt = await buildPrompt(theme, subtheme, customTheme, gender, 0);
+    const prompt = await buildPrompt(theme, subtheme, customTheme, gender, 0, true);
     console.log(`[VYX] Gerando preview | tema: ${theme} | subtema: ${subtheme} | gênero: ${gender} | IP: ${clientIp} (${userLimit.count}/${LIMIT_ATTEMPTS})`);
 
     const generatedImageBase64 = await generateImage(imageBase64, prompt);
