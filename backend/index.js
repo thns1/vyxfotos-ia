@@ -140,7 +140,7 @@ STRICT RULES:
 // 4. GERAÇÃO DE IMAGEM VIA GEMINI
 // ─────────────────────────────────────────────
 async function generateImage(imageBase64, prompt) {
-  const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash-preview-image-generation' });
+  const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
   const response = await model.generateContent({
     contents: [{
       role: 'user',
