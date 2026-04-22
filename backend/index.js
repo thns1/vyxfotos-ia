@@ -253,17 +253,6 @@ async function saveLead({ uid, email, name, photoURL }) {
       return;
     }
 
-    // Verifica se já foi adicionado ao Sheets em sessões anteriores
-    if (firestoreDb) {
-      const ref = firestoreDb.collection('leads').doc(uid);
-      const snap = await ref.get();
-      if (snap.exists && snap.data().addedToSheets) {
-        console.log(`[Sheets] Lead já registrado anteriormente: ${email}`);
-        leadsRegistrados.add(uid);
-        return;
-      }
-    }
-
     leadsRegistrados.add(uid);
 
     const dataBR = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
@@ -1006,6 +995,23 @@ app.get('/api/admin/leads', async (req, res) => {
     res.send('﻿' + csv); // BOM para Excel abrir com acentos corretos
   } catch (e) {
     res.status(500).send('Erro ao buscar leads: ' + e.message);
+  }
+});
+
+// GET /api/admin/reset-sheets?secret=SUA_SENHA — limpa flag addedToSheets de todos os leads
+app.get('/api/admin/reset-sheets', async (req, res) => {
+  const ADMIN_SECRET = process.env.ADMIN_SECRET || 'vyxadmin2026';
+  if (req.query.secret !== ADMIN_SECRET) return res.status(401).send('Não autorizado.');
+  if (!firestoreDb) return res.status(500).send('Firestore não disponível.');
+  try {
+    leadsRegistrados.clear(); // limpa cache de sessão
+    const snapshot = await firestoreDb.collection('leads').get();
+    const batch = firestoreDb.batch();
+    snapshot.forEach(doc => batch.update(doc.ref, { addedToSheets: false }));
+    await batch.commit();
+    res.send(`✅ Flag resetada para ${snapshot.size} leads. Próximos logins serão registrados na nova planilha.`);
+  } catch (e) {
+    res.status(500).send('Erro: ' + e.message);
   }
 });
 
