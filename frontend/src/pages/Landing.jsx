@@ -92,6 +92,13 @@ export default function Landing() {
     }
   }, []);
 
+  // Limpa todos os ScrollTriggers ao sair da Landing (evita tela preta nas outras páginas)
+  useEffect(() => {
+    return () => {
+      ScrollTrigger.killAll();
+    };
+  }, []);
+
   const containerRef = useRef(null);
   const heroTextRef = useRef(null);
   const philosophyRef = useRef(null);
