@@ -1,3 +1,7 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { auth } from '../firebase';
+import { PACKAGES } from '../constants/packages';
 import { SUBTHEMES_MAP } from '../constants/themes';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
