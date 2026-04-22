@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, MessageCircle, Send, ArrowLeft, CheckCircle2, Loader2, Phone, MapPin } from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL || 'https://vyxfotos-backend.onrender.com';
 
 export default function Contact() {
   const navigate = useNavigate();

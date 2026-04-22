@@ -195,7 +195,7 @@ export default function Landing() {
         formData.append('customTheme', customTheme);
         formData.append('gender', gender); // Envia o gênero selecionado pelo usuário
 
-        const BASE_API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const BASE_API_URL = import.meta.env.VITE_API_URL || 'https://vyxfotos-backend.onrender.com';
 
         const response = await fetch(`${BASE_API_URL}/api/generate`, {
           method: 'POST',

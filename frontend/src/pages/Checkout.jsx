@@ -4,7 +4,7 @@ import { auth } from '../firebase';
 import { PACKAGES } from '../constants/packages';
 import { SUBTHEMES_MAP } from '../constants/themes';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL || 'https://vyxfotos-backend.onrender.com';
 
 export default function Checkout() {
   const navigate = useNavigate();
