@@ -97,7 +97,7 @@ async function createDashboardSheet(sheets) {
     });
     const dashSheetId = addSheetRes.data.replies[0].addSheet.properties.sheetId;
 
-    // Conteúdo: título, meses com fórmulas COUNTIF
+    // Conteúdo: título, meses com fórmulas COUNTIF (usa ; pois planilha está em português)
     const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
     const anoAtual = new Date().getFullYear();
     const rows = [
@@ -107,13 +107,12 @@ async function createDashboardSheet(sheets) {
     ];
     meses.forEach((mes, i) => {
       const mesNum = String(i + 1).padStart(2, '0');
-      // COUNTIF verifica se a data na coluna C contém "/MM/" do mês
-      const formula = `=COUNTIF('🟢 Leads Vyxfotos'!C:C,"*/${mesNum}/${anoAtual}*")`;
+      const formula = `=COUNTIF('🟢 Leads Vyxfotos'!C:C;"*/${mesNum}/${anoAtual}*")`;
       rows.push([mes, formula, '']);
     });
     rows.push(['', '', '']);
-    rows.push(['🏆 TOTAL GERAL', `=SUM(B4:B15)`, '']);
-    rows.push(['📆 Este mês', `=COUNTIF('🟢 Leads Vyxfotos'!C:C,"*/"&TEXT(TODAY(),"MM/YYYY")&"*")`, '']);
+    rows.push(['🏆 TOTAL GERAL', `=SOMA(B4:B15)`, '']);
+    rows.push(['📆 Este mês', `=COUNTIF('🟢 Leads Vyxfotos'!C:C;"*/"&TEXTO(HOJE();"MM/AAAA")&"*")`, '']);
 
     await sheets.spreadsheets.values.update({
       spreadsheetId: SHEET_ID,
@@ -217,6 +216,61 @@ async function createDashboardSheet(sheets) {
     console.log('[Sheets] ✅ Dashboard criado com sucesso.');
   } catch (e) {
     console.warn('[Sheets] Erro ao criar dashboard:', e.message);
+  }
+}
+
+// Cria 12 abas mensais com QUERY filtrando leads por mês
+async function createMonthlyTabs(sheets) {
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const anoAtual = new Date().getFullYear();
+
+  for (let i = 0; i < 12; i++) {
+    try {
+      const mes = meses[i];
+      const mesNum = String(i + 1).padStart(2, '0');
+
+      const addRes = await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: SHEET_ID,
+        requestBody: { requests: [{ addSheet: { properties: { title: mes } } }] },
+      });
+      const sheetId = addRes.data.replies[0].addSheet.properties.sheetId;
+
+      // Cabeçalho + fórmula QUERY filtrando pelo mês
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: SHEET_ID,
+        range: `'${mes}'!A1`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: { values: [
+          [`=QUERY('🟢 Leads Vyxfotos'!A:F;"SELECT * WHERE C CONTAINS '/${mesNum}/${anoAtual}'";1)`],
+        ]},
+      });
+
+      // Formata cabeçalho (linha 1 vinda do QUERY já traz o header)
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: SHEET_ID,
+        requestBody: { requests: [
+          { repeatCell: {
+            range: { sheetId, startRowIndex: 0, endRowIndex: 1 },
+            cell: { userEnteredFormat: {
+              backgroundColor: { red: 0.11, green: 0.37, blue: 0.22 },
+              textFormat: { foregroundColor: { red: 1, green: 1, blue: 1 }, bold: true, fontSize: 11 },
+              horizontalAlignment: 'CENTER',
+            }},
+            fields: 'userEnteredFormat',
+          }},
+          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 0, endIndex: 1 }, properties: { pixelSize: 250 }, fields: 'pixelSize' }},
+          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 1, endIndex: 2 }, properties: { pixelSize: 170 }, fields: 'pixelSize' }},
+          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 2, endIndex: 3 }, properties: { pixelSize: 170 }, fields: 'pixelSize' }},
+          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 3, endIndex: 4 }, properties: { pixelSize: 120 }, fields: 'pixelSize' }},
+          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 4, endIndex: 5 }, properties: { pixelSize: 100 }, fields: 'pixelSize' }},
+          { updateDimensionProperties: { range: { sheetId, dimension: 'COLUMNS', startIndex: 5, endIndex: 6 }, properties: { pixelSize: 250 }, fields: 'pixelSize' }},
+        ]},
+      });
+
+      console.log(`[Sheets] ✅ Aba mensal criada: ${mes}`);
+    } catch (e) {
+      console.warn(`[Sheets] Erro ao criar aba mensal:`, e.message);
+    }
   }
 }
 
@@ -995,6 +1049,38 @@ app.get('/api/admin/leads', async (req, res) => {
     res.send('﻿' + csv); // BOM para Excel abrir com acentos corretos
   } catch (e) {
     res.status(500).send('Erro ao buscar leads: ' + e.message);
+  }
+});
+
+// GET /api/admin/rebuild-dashboard?secret=SUA_SENHA — apaga e recria Dashboard + abas mensais
+app.get('/api/admin/rebuild-dashboard', async (req, res) => {
+  const ADMIN_SECRET = process.env.ADMIN_SECRET || 'vyxadmin2026';
+  if (req.query.secret !== ADMIN_SECRET) return res.status(401).send('Não autorizado.');
+  try {
+    const sheets = getSheetsClient();
+    if (!sheets) return res.status(500).send('Sheets client indisponível.');
+
+    // Busca abas existentes
+    const meta = await sheets.spreadsheets.get({ spreadsheetId: SHEET_ID });
+    const allSheets = meta.data.sheets || [];
+
+    // Apaga Dashboard e abas mensais existentes (mantém apenas a de Leads)
+    const mesesNomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro','📊 Dashboard'];
+    const toDelete = allSheets.filter(s => mesesNomes.includes(s.properties.title));
+    if (toDelete.length > 0) {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId: SHEET_ID,
+        requestBody: { requests: toDelete.map(s => ({ deleteSheet: { sheetId: s.properties.sheetId } })) },
+      });
+    }
+
+    // Recria Dashboard e abas mensais
+    await createDashboardSheet(sheets);
+    await createMonthlyTabs(sheets);
+
+    res.send('✅ Dashboard e abas mensais recriados com sucesso!');
+  } catch (e) {
+    res.status(500).send('Erro: ' + e.message);
   }
 });
 
