@@ -87,6 +87,139 @@ function getSheetsClient() {
 const SHEET_ID = process.env.GOOGLE_SHEET_ID || '1qL9oHPvK7mZ0XHp0EFwXE95Fk3uYmRqn8kTzcqPW2E4';
 const leadsRegistrados = new Set(); // evita duplicar na mesma sessão do servidor
 
+// Cria aba de Dashboard profissional
+async function createDashboardSheet(sheets) {
+  try {
+    // Adiciona nova aba "📊 Dashboard"
+    const addSheetRes = await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: SHEET_ID,
+      requestBody: { requests: [{ addSheet: { properties: { title: '📊 Dashboard', index: 1 } } }] },
+    });
+    const dashSheetId = addSheetRes.data.replies[0].addSheet.properties.sheetId;
+
+    // Conteúdo: título, meses com fórmulas COUNTIF
+    const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    const anoAtual = new Date().getFullYear();
+    const rows = [
+      ['📊 DASHBOARD — Vyxfotos IA', '', ''],
+      ['', '', ''],
+      ['📅 Mês', `📈 Leads ${anoAtual}`, ''],
+    ];
+    meses.forEach((mes, i) => {
+      const mesNum = String(i + 1).padStart(2, '0');
+      // COUNTIF verifica se a data na coluna C contém "/MM/" do mês
+      const formula = `=COUNTIF('🟢 Leads Vyxfotos'!C:C,"*/${mesNum}/${anoAtual}*")`;
+      rows.push([mes, formula, '']);
+    });
+    rows.push(['', '', '']);
+    rows.push(['🏆 TOTAL GERAL', `=SUM(B4:B15)`, '']);
+    rows.push(['📆 Este mês', `=COUNTIF('🟢 Leads Vyxfotos'!C:C,"*/"&TEXT(TODAY(),"MM/YYYY")&"*")`, '']);
+
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: SHEET_ID,
+      range: `'📊 Dashboard'!A1:C${rows.length}`,
+      valueInputOption: 'USER_ENTERED',
+      requestBody: { values: rows },
+    });
+
+    // Formatação do dashboard
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: SHEET_ID,
+      requestBody: { requests: [
+        // Título principal — dark green, large, bold
+        { repeatCell: {
+          range: { sheetId: dashSheetId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 0, endColumnIndex: 3 },
+          cell: { userEnteredFormat: {
+            backgroundColor: { red: 0.07, green: 0.27, blue: 0.16 },
+            textFormat: { foregroundColor: { red: 1, green: 1, blue: 1 }, bold: true, fontSize: 16 },
+            horizontalAlignment: 'CENTER', verticalAlignment: 'MIDDLE',
+          }},
+          fields: 'userEnteredFormat',
+        }},
+        // Merge células do título
+        { mergeCells: { range: { sheetId: dashSheetId, startRowIndex: 0, endRowIndex: 1, startColumnIndex: 0, endColumnIndex: 3 }, mergeType: 'MERGE_ALL' }},
+        // Cabeçalho dos meses — verde médio
+        { repeatCell: {
+          range: { sheetId: dashSheetId, startRowIndex: 2, endRowIndex: 3, startColumnIndex: 0, endColumnIndex: 2 },
+          cell: { userEnteredFormat: {
+            backgroundColor: { red: 0.11, green: 0.37, blue: 0.22 },
+            textFormat: { foregroundColor: { red: 1, green: 1, blue: 1 }, bold: true, fontSize: 11 },
+            horizontalAlignment: 'CENTER',
+          }},
+          fields: 'userEnteredFormat',
+        }},
+        // Linhas dos meses — alternadas
+        ...Array.from({ length: 12 }, (_, i) => ({
+          repeatCell: {
+            range: { sheetId: dashSheetId, startRowIndex: 3 + i, endRowIndex: 4 + i, startColumnIndex: 0, endColumnIndex: 2 },
+            cell: { userEnteredFormat: {
+              backgroundColor: i % 2 === 0
+                ? { red: 0.88, green: 0.96, blue: 0.90 }
+                : { red: 1, green: 1, blue: 1 },
+              textFormat: { foregroundColor: { red: 0.13, green: 0.13, blue: 0.13 }, fontSize: 10 },
+              horizontalAlignment: i === 0 ? 'LEFT' : 'LEFT',
+            }},
+            fields: 'userEnteredFormat',
+          },
+        })),
+        // Linhas de total — dourado
+        { repeatCell: {
+          range: { sheetId: dashSheetId, startRowIndex: 16, endRowIndex: 18, startColumnIndex: 0, endColumnIndex: 2 },
+          cell: { userEnteredFormat: {
+            backgroundColor: { red: 1, green: 0.84, blue: 0.0 },
+            textFormat: { foregroundColor: { red: 0.1, green: 0.1, blue: 0.1 }, bold: true, fontSize: 11 },
+          }},
+          fields: 'userEnteredFormat',
+        }},
+        // Larguras das colunas do dashboard
+        { updateDimensionProperties: { range: { sheetId: dashSheetId, dimension: 'COLUMNS', startIndex: 0, endIndex: 1 }, properties: { pixelSize: 180 }, fields: 'pixelSize' }},
+        { updateDimensionProperties: { range: { sheetId: dashSheetId, dimension: 'COLUMNS', startIndex: 1, endIndex: 2 }, properties: { pixelSize: 140 }, fields: 'pixelSize' }},
+        { updateDimensionProperties: { range: { sheetId: dashSheetId, dimension: 'COLUMNS', startIndex: 2, endIndex: 3 }, properties: { pixelSize: 100 }, fields: 'pixelSize' }},
+        // Altura do título
+        { updateDimensionProperties: { range: { sheetId: dashSheetId, dimension: 'ROWS', startIndex: 0, endIndex: 1 }, properties: { pixelSize: 52 }, fields: 'pixelSize' }},
+        // Congela linha de cabeçalho
+        { updateSheetProperties: { properties: { sheetId: dashSheetId, gridProperties: { frozenRowCount: 3 } }, fields: 'gridProperties.frozenRowCount' }},
+      ]},
+    });
+
+    // Adiciona gráfico de barras
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId: SHEET_ID,
+      requestBody: { requests: [{
+        addChart: {
+          chart: {
+            spec: {
+              title: `Leads por Mês — ${anoAtual}`,
+              basicChart: {
+                chartType: 'COLUMN',
+                legendPosition: 'BOTTOM_LEGEND',
+                axis: [
+                  { position: 'BOTTOM_AXIS', title: 'Mês' },
+                  { position: 'LEFT_AXIS', title: 'Quantidade de Leads' },
+                ],
+                domains: [{ domain: { sourceRange: { sources: [{ sheetId: dashSheetId, startRowIndex: 3, endRowIndex: 15, startColumnIndex: 0, endColumnIndex: 1 }] } } }],
+                series: [{ series: { sourceRange: { sources: [{ sheetId: dashSheetId, startRowIndex: 3, endRowIndex: 15, startColumnIndex: 1, endColumnIndex: 2 }] } }, targetAxis: 'LEFT_AXIS' }],
+                headerCount: 0,
+              },
+            },
+            position: {
+              overlayPosition: {
+                anchorCell: { sheetId: dashSheetId, rowIndex: 2, columnIndex: 3 },
+                offsetXPixels: 0, offsetYPixels: 0,
+                widthPixels: 520, heightPixels: 340,
+              },
+            },
+          },
+        },
+      }]},
+    });
+
+    console.log('[Sheets] ✅ Dashboard criado com sucesso.');
+  } catch (e) {
+    console.warn('[Sheets] Erro ao criar dashboard:', e.message);
+  }
+}
+
 // Salva lead no Firestore + Google Sheets
 async function saveLead({ uid, email, name, photoURL }) {
   if (!uid || !email) return;
@@ -176,25 +309,33 @@ async function saveLead({ uid, email, name, photoURL }) {
       console.log('[Sheets] Cabeçalho profissional criado.');
     }
 
-    // Cor alternada nas linhas (verde claro para linhas pares)
-    const nextRow = (headerCheck.data.values?.length || 0) + 2;
-    const isEvenRow = nextRow % 2 === 0;
+    // Se for a primeira vez, cria o dashboard também
+    if (isFirstTime) await createDashboardSheet(sheets);
 
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: SHEET_ID, range: 'A:F',
+    // Adiciona o lead
+    const appendRes = await sheets.spreadsheets.values.append({
+      spreadsheetId: SHEET_ID, range: "'🟢 Leads Vyxfotos'!A:F",
       valueInputOption: 'USER_ENTERED', insertDataOption: 'INSERT_ROWS',
       requestBody: { values: [[email, name || '—', dataBR, '🟢 Novo Lead', 'Google', uid]] },
     });
 
-    // Aplica cor de fundo alternada na nova linha
-    if (isEvenRow) {
-      const rowIndex = nextRow - 1;
+    // Descobre qual linha foi inserida e formata com texto escuro + fundo alternado
+    const updatedRange = appendRes.data.updates?.updatedRange || '';
+    const rowMatch = updatedRange.match(/(\d+)$/);
+    if (rowMatch) {
+      const rowIndex = parseInt(rowMatch[1]) - 1;
+      const isEven = rowIndex % 2 === 0;
       await sheets.spreadsheets.batchUpdate({
         spreadsheetId: SHEET_ID,
         requestBody: { requests: [{ repeatCell: {
           range: { sheetId: 0, startRowIndex: rowIndex, endRowIndex: rowIndex + 1 },
-          cell: { userEnteredFormat: { backgroundColor: { red: 0.88, green: 0.96, blue: 0.90 } } },
-          fields: 'userEnteredFormat.backgroundColor',
+          cell: { userEnteredFormat: {
+            backgroundColor: isEven
+              ? { red: 0.88, green: 0.96, blue: 0.90 }
+              : { red: 1, green: 1, blue: 1 },
+            textFormat: { foregroundColor: { red: 0.13, green: 0.13, blue: 0.13 }, fontSize: 10 },
+          }},
+          fields: 'userEnteredFormat(backgroundColor,textFormat)',
         }}]},
       });
     }
