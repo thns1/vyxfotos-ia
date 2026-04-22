@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const multer = require('multer');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenAI } = require('@google/genai');
 const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
@@ -140,8 +141,9 @@ STRICT RULES:
 // 4. GERAÇÃO DE IMAGEM VIA GEMINI
 // ─────────────────────────────────────────────
 async function generateImage(imageBase64, prompt) {
-  const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
-  const response = await model.generateContent({
+  const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  const response = await genai.models.generateContent({
+    model: 'gemini-2.0-flash-preview-image-generation',
     contents: [{
       role: 'user',
       parts: [
@@ -149,9 +151,10 @@ async function generateImage(imageBase64, prompt) {
         { text: prompt }
       ]
     }],
-    generationConfig: { responseModalities: ['IMAGE'] }
+    config: { responseModalities: ['IMAGE', 'TEXT'] }
   });
-  const imagePart = response.response.candidates[0]?.content?.parts?.find(p => p.inlineData);
+  const parts = response.candidates?.[0]?.content?.parts || [];
+  const imagePart = parts.find(p => p.inlineData);
   return imagePart?.inlineData?.data || null;
 }
 
