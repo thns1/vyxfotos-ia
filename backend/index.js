@@ -9,6 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const admin = require('firebase-admin');
+const { google } = require('googleapis');
 
 dotenv.config();
 
@@ -67,20 +68,77 @@ const chatLimits = {};
 const CHAT_LIMIT_PER_HOUR = 20;
 const CHAT_COOLDOWN_MS = 60 * 60 * 1000;
 
-// Salva lead no Firestore (sem duplicar por UID)
-async function saveLead({ uid, email, name, photoURL }) {
-  if (!firestoreDb || !uid || !email) return;
+// Cliente Google Sheets (usa mesma service account do Firebase Admin)
+function getSheetsClient() {
   try {
-    const ref = firestoreDb.collection('leads').doc(uid);
-    const existing = await ref.get();
-    const now = admin.firestore.FieldValue.serverTimestamp();
-    if (!existing.exists) {
-      await ref.set({ uid, email, name: name || '', photoURL: photoURL || '', createdAt: now, attempts: 1, lastAttempt: now });
-    } else {
-      await ref.update({ attempts: admin.firestore.FieldValue.increment(1), lastAttempt: now });
-    }
+    const raw = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+    const key = raw ? JSON.parse(raw) : require('./firebase-admin-key.json');
+    const auth = new google.auth.GoogleAuth({
+      credentials: key,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+    return google.sheets({ version: 'v4', auth });
   } catch (e) {
-    console.warn('[Firebase] Erro ao salvar lead:', e.message);
+    console.warn('[Sheets] Erro ao criar cliente:', e.message);
+    return null;
+  }
+}
+
+const SHEET_ID = process.env.GOOGLE_SHEET_ID || '1qL9oHPvK7mZ0XHp0EFwXE95Fk3uYmRqn8kTzcqPW2E4';
+const leadsRegistrados = new Set(); // evita duplicar na mesma sessão do servidor
+
+// Salva lead no Firestore + Google Sheets
+async function saveLead({ uid, email, name, photoURL }) {
+  if (!uid || !email) return;
+
+  // Firestore
+  if (firestoreDb) {
+    try {
+      const ref = firestoreDb.collection('leads').doc(uid);
+      const existing = await ref.get();
+      const now = admin.firestore.FieldValue.serverTimestamp();
+      if (!existing.exists) {
+        await ref.set({ uid, email, name: name || '', photoURL: photoURL || '', createdAt: now, attempts: 1, lastAttempt: now });
+      } else {
+        await ref.update({ attempts: admin.firestore.FieldValue.increment(1), lastAttempt: now });
+      }
+    } catch (e) {
+      console.warn('[Firebase] Erro ao salvar lead:', e.message);
+    }
+  }
+
+  // Google Sheets — só adiciona se for novo (não estava na sessão atual)
+  if (leadsRegistrados.has(uid)) return;
+  leadsRegistrados.add(uid);
+
+  try {
+    const sheets = getSheetsClient();
+    if (!sheets) return;
+
+    const dataBR = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+
+    // Garante cabeçalho na primeira linha
+    const header = await sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: 'A1' });
+    if (!header.data.values?.length) {
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: SHEET_ID,
+        range: 'A1:E1',
+        valueInputOption: 'RAW',
+        requestBody: { values: [['UID', 'Email', 'Nome', 'Data de Cadastro', 'Foto']] },
+      });
+    }
+
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: SHEET_ID,
+      range: 'A:E',
+      valueInputOption: 'RAW',
+      insertDataOption: 'INSERT_ROWS',
+      requestBody: { values: [[uid, email, name || '', dataBR, photoURL || '']] },
+    });
+
+    console.log(`[Sheets] Lead adicionado: ${email}`);
+  } catch (e) {
+    console.warn('[Sheets] Erro ao salvar lead:', e.message);
   }
 }
 
