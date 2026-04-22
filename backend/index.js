@@ -595,10 +595,73 @@ app.post('/api/webhook/kiwify', (req, res) => {
 });
 
 // ─────────────────────────────────────────────
+// INSTAGRAM BOT (Webhook + Polling)
+// ─────────────────────────────────────────────
+const SalesAgentService = require('./services/salesAgent');
+const MetaMessageService = require('./services/metaMessageService');
+const { startPolling } = require('./services/igPoller');
+
+// Verificação do webhook pela Meta (handshake)
+app.get('/api/webhooks/instagram', (req, res) => {
+  const VERIFY_TOKEN = process.env.META_VERIFY_TOKEN || 'vyx_secret_token_2026';
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+  if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+    console.log('[IG] Webhook verificado com sucesso!');
+    return res.status(200).send(challenge);
+  }
+  res.sendStatus(403);
+});
+
+// Recebimento de mensagens em tempo real via webhook
+app.post('/api/webhooks/instagram', async (req, res) => {
+  const body = req.body;
+  if (body.object === 'instagram' || body.object === 'page') {
+    res.status(200).send('EVENT_RECEIVED');
+    for (const entry of body.entry || []) {
+      let senderId = null;
+      let messageText = null;
+
+      if (entry.messaging?.length > 0) {
+        const event = entry.messaging[0];
+        if (event.message && !event.message.is_echo && event.message.text) {
+          senderId = event.sender.id;
+          messageText = event.message.text;
+        }
+      }
+      if (!senderId && entry.changes?.length > 0) {
+        const val = entry.changes[0].value;
+        if (val?.message?.text && !val.message.is_echo) {
+          senderId = val.sender.id;
+          messageText = val.message.text;
+        }
+      }
+
+      if (senderId && messageText) {
+        console.log(`[IG] DM de ${senderId}: "${messageText}"`);
+        try {
+          const reply = await SalesAgentService.generateResponse(messageText);
+          await MetaMessageService.sendTextMessage(senderId, reply);
+          console.log(`[IG] Resposta enviada para ${senderId}`);
+        } catch (err) {
+          console.error('[IG] Erro ao responder:', err.message);
+        }
+      }
+    }
+  } else {
+    res.sendStatus(404);
+  }
+});
+
+// ─────────────────────────────────────────────
 // HEALTHCHECK
 // ─────────────────────────────────────────────
 app.get('/', (_req, res) => {
   res.status(200).send('Vyxfotos.IA Backend Operacional');
 });
 
-app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Vyxfotos.IA rodando na porta ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Vyxfotos.IA rodando na porta ${PORT}`);
+  startPolling();
+});
