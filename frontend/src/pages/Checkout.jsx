@@ -70,9 +70,14 @@ export default function Checkout() {
     return () => unsubscribe();
   }, [navigate]);
 
-  const handleSelectPkg = (pkgId) => {
+  const handleSelectPkg = (pkgId, limit) => {
     setSelectedPkgId(pkgId);
-    setSubThemeCounts({}); // Reseta as contagens se trocar de pacote
+    // Se só tem 1 subtema, aloca tudo automaticamente sem exibir a UI de divisão
+    if (availableSubthemes.length === 1) {
+      setSubThemeCounts({ [availableSubthemes[0].id]: limit });
+    } else {
+      setSubThemeCounts({});
+    }
   };
 
   const updateCount = (subId, delta, limit) => {
@@ -167,7 +172,7 @@ export default function Checkout() {
                 return (
                   <div
                     key={pkg.id}
-                    onClick={() => !isSelected && handleSelectPkg(pkg.id)}
+                    onClick={() => !isSelected && handleSelectPkg(pkg.id, pkg.limit)}
                     className={`p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] flex flex-col justify-between transition-all w-full border cursor-pointer ${isSelected
                         ? 'bg-[#121217] border-champagne shadow-[0_0_30px_rgba(201,168,76,0.15)] scale-100 lg:scale-105 z-10'
                         : 'bg-[#0a0a0e] border-white/5 hover:border-white/20'
@@ -183,8 +188,8 @@ export default function Checkout() {
                       </div>
                     </div>
 
-                    {/* AREA DE ALOCAÇÃO DE SUBTEMAS */}
-                    {isSelected && availableSubthemes.length > 0 && (
+                    {/* AREA DE ALOCAÇÃO DE SUBTEMAS — só mostra quando tem mais de 1 opção */}
+                    {isSelected && availableSubthemes.length > 1 && (
                       <div className="mb-6 p-4 bg-obsidian/50 rounded-xl border border-white/10" onClick={(e) => e.stopPropagation()}>
                         <div className="flex justify-between items-center mb-4">
                           <h5 className="font-bold text-sm tracking-widest text-ivory/80 uppercase">Como quer dividir?</h5>
@@ -225,14 +230,14 @@ export default function Checkout() {
                     )}
 
                     <button
-                      disabled={isSelected && !isComplete}
+                      disabled={isSelected && availableSubthemes.length > 1 && !isComplete}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (!isSelected) {
-                          handleSelectPkg(pkg.id);
+                          handleSelectPkg(pkg.id, pkg.limit);
                           return;
                         }
-                        if (isComplete || availableSubthemes.length === 0) {
+                        if (isComplete || availableSubthemes.length <= 1) {
                           // Para sonhos: inclui o texto do sonho de cada subtema na URL
                           const varsText = Object.entries(subThemeCounts || {}).map(([k, v]) => {
                             if (theme === 'sonhos') {
@@ -255,11 +260,11 @@ export default function Checkout() {
                         }
                       }}
                       className={`w-full py-4 rounded-xl font-bold tracking-wide transition-all uppercase text-xs md:text-sm ${isSelected
-                          ? isComplete || availableSubthemes.length === 0 ? 'bg-champagne text-obsidian hover:bg-ivory shadow-lg' : 'bg-white/10 text-ivory/30 cursor-not-allowed'
+                          ? (isComplete || availableSubthemes.length <= 1) ? 'bg-champagne text-obsidian hover:bg-ivory shadow-lg' : 'bg-white/10 text-ivory/30 cursor-not-allowed'
                           : 'bg-white/5 text-ivory hover:bg-white/10 border border-white/5 hover:border-champagne/40'
                         }`}
                     >
-                      {isSelected && !isComplete ? 'Divida suas fotos acima ↑' : 'Quero esse pacote'}
+                      {isSelected && availableSubthemes.length > 1 && !isComplete ? 'Divida suas fotos acima ↑' : 'Quero esse pacote'}
                     </button>
                   </div>
                 );
