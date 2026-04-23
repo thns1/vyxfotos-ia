@@ -584,38 +584,62 @@ const DREAM_SHOT_TYPES = [
   },
 ];
 
+// Variações de contexto para cada ciclo — garante que 10+10+10 fotos sejam todas distintas
+const CYCLE_VARIATIONS = [
+  // Ciclo 0 (fotos 1-10): condições primárias — o cenário principal no seu estado mais icônico
+  {
+    label: 'primary',
+    context: `Primary conditions: shoot the scenario in its most iconic state. Use the most recognizable version of this setting (peak crowd, best light, prime moment).`,
+  },
+  // Ciclo 1 (fotos 11-20): variação de tempo e atmosfera — mesmo cenário, contexto diferente
+  {
+    label: 'alternate atmosphere',
+    context: `Alternate atmosphere: same scenario, but shift the time of day, weather, or season. If cycle 0 was a packed stadium at night, this could be an empty stadium at golden-hour dawn. If cycle 0 was sunny Paris, this could be rainy Paris with reflections on the pavement. Same dream, completely different mood and light.`,
+  },
+  // Ciclo 2 (fotos 21-30): detalhe e intimidade — zoom em aspectos específicos do mesmo universo
+  {
+    label: 'intimate detail',
+    context: `Intimate & detailed: zoom into a more personal, specific aspect of the same dream world. Focus on the craft, the texture, the close details that make this dream real — the grass stains on the boots, the Eiffel Tower reflected in the car's hood, the astronaut's gloved hand on the controls. Same dream universe, but seen through a different, more personal lens.`,
+  },
+];
+
 async function expandCustomTheme(rawTheme, gender, photoIndex = 0) {
-  const shotType = DREAM_SHOT_TYPES[photoIndex % DREAM_SHOT_TYPES.length];
+  const shotTypeIndex = photoIndex % DREAM_SHOT_TYPES.length;           // 0-9
+  const cycleIndex = Math.floor(photoIndex / DREAM_SHOT_TYPES.length);  // 0, 1, 2...
+  const shotType = DREAM_SHOT_TYPES[shotTypeIndex];
+  const cycleVariation = CYCLE_VARIATIONS[cycleIndex % CYCLE_VARIATIONS.length];
+
   try {
     const genderLabel = gender === 'feminino' ? 'female' : 'male';
-    const aiPrompt = `You are the creative director of the world's most prestigious AI portrait studio. You are shooting a ${genderLabel} client in a series of photos. Each photo in the series must be COMPLETELY DIFFERENT — a unique moment, angle, and mood within the same dream scenario.
+    const aiPrompt = `You are the creative director of the world's most prestigious AI portrait studio. You are producing a full photoshoot series for a ${genderLabel} client. Every single photo in this series must be COMPLETELY DIFFERENT — a unique moment, atmosphere, and visual language.
 
 CLIENT DREAM SCENARIO: "${rawTheme}"
 
-THIS IS PHOTO #${photoIndex + 1} IN THE SERIES.
-SHOT TYPE FOR THIS PHOTO: ${shotType.label}
-
+PHOTO #${photoIndex + 1} — SHOT TYPE: ${shotType.label}
 ${shotType.directive}
 
-YOUR TASK — Write the scene for THIS specific shot type (4 to 6 sentences in English):
-Describe ONLY these four elements, all in service of the shot type above:
-1. WARDROBE: Exact outfit, fabric, colors, fit, accessories — authentic and specific to the scenario (real team jersey and number, actual car model, real location details, etc.).
-2. SETTING: The environment — exact location, time of day, crowd, atmosphere, key props. Make it feel REAL and IMMERSIVE. Stay faithful to what the client described.
-3. LIGHTING: The lighting that best serves THIS specific shot type and moment.
-4. CAMERA: Angle, lens, framing, depth of field — chosen specifically to serve this shot type.
+SERIES VARIATION FOR THIS BATCH: ${cycleVariation.label.toUpperCase()}
+${cycleVariation.context}
+
+YOUR TASK — Write the scene for this specific photo (4 to 6 sentences in English).
+Describe ONLY these four elements, all serving the shot type AND the series variation above:
+1. WARDROBE: Exact outfit, fabric, colors, accessories — specific and authentic to the scenario.
+2. SETTING: The environment — exact location, time of day, atmosphere, key props — shaped by the series variation.
+3. LIGHTING: The lighting that best serves this shot type and variation.
+4. CAMERA: Angle, lens, framing, depth of field — chosen for this specific shot.
 
 ABSOLUTE RULES:
-- Stay 100% faithful to the client's dream — their words are sacred. Never replace their concept.
+- Stay 100% faithful to the client's dream concept. Never replace or reinvent what they described.
 - NEVER mention face, eyes, skin, smile, expression, or identity — handled separately.
-- This photo must feel DISTINCT from every other photo in the series — different moment, different energy, different framing.
-- Return ONLY the final scene description. No labels, no explanations, no shot type header in the output.`;
+- This photo must feel visually and emotionally DISTINCT from every other in the series.
+- Return ONLY the final scene description. No labels, no headers, no explanations.`;
 
     const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const response = await model.generateContent(aiPrompt);
     return response.response.text().trim();
   } catch (error) {
     console.error('[VYX] Erro no elaborador de sonhos:', error.message);
-    return `Ultra-high quality cinematic portrait. Shot type: ${shotType.label}. The subject is in the following dream scenario: ${rawTheme}. Professional photography with dramatic cinematic lighting, detailed wardrobe matching the scene, and immersive background fully realized. Photorealistic, 8K.`;
+    return `Ultra-high quality cinematic portrait. Shot type: ${shotType.label}. Variation: ${cycleVariation.label}. Dream scenario: ${rawTheme}. Professional photography, dramatic cinematic lighting, detailed wardrobe, immersive background. Photorealistic, 8K.`;
   }
 }
 
