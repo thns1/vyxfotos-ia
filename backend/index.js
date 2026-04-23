@@ -415,30 +415,53 @@ Examples:
 // ─────────────────────────────────────────────
 // 3. ELABORADOR DE SONHOS EM PROMPT CINEMATOGRÁFICO
 // ─────────────────────────────────────────────
-async function expandCustomTheme(rawTheme, gender) {
+
+// Poses universais que funcionam para QUALQUER cenário (luxo, família, aventura, fantasia, viagem)
+const DREAM_POSES = [
+  // 0 — Lifestyle: apoiado no cenário, olhar direto à câmera, totalmente à vontade
+  `POSE: The subject is relaxed and confident, naturally leaning against or resting beside the main element of the scene. One hand lightly touching the surface, weight slightly shifted, body at a casual angle. Looking directly into camera with calm, assured presence. Full-body or three-quarter framing showing both subject and environment clearly.`,
+  // 1 — Ambiental: olhando o cenário ao redor, candidato, imerso no momento
+  `POSE: The subject is captured in a natural, candid-style moment — facing slightly away or gazing toward something beautiful in the scene, as if genuinely living inside this dream. Body relaxed and organic, expression showing wonder, joy, or quiet awe. Wide or medium shot giving full context to the environment around the subject.`,
+  // 2 — Close cinematográfico: busto, rosto em foco, mundo ao redor em bokeh
+  `POSE: Intimate bust or close-up framing. Subject facing camera directly, expression natural and alive — warm, confident, or joyful depending on the scenario. Costume and background environment visible around the face creating total immersion. Dreamy cinematic bokeh in the background.`,
+  // 3 — Momento vivido: interagindo com o cenário, espontâneo e alegre
+  `POSE: The subject is actively engaged with the scene in a natural, joyful way — touching, sitting inside, or interacting with the main element of the environment. Pose feels spontaneous and alive, as if caught mid-experience. Genuine expression, unforced. Medium or full-body framing showing the interaction clearly.`,
+  // 4 — Conquista: de pé, orgulhoso, dono do cenário, sensação de chegada
+  `POSE: Subject standing tall and open, chin slightly lifted, posture radiating quiet confidence and a sense of arrival — as if they just stepped into this dream and own every inch of it. Arms relaxed or one hand in pocket. Full-body framing showing the complete dream environment as a backdrop, epic sense of scale.`,
+];
+
+async function expandCustomTheme(rawTheme, gender, photoIndex = 0) {
+  const poseDirective = DREAM_POSES[photoIndex % DREAM_POSES.length];
   try {
     const genderLabel = gender === 'feminino' ? 'female' : 'male';
-    const aiPrompt = `You are a world-class photography art director and creative director for a luxury AI photo studio.
+    const aiPrompt = `You are a world-class photography art director for a premium AI portrait studio. Your job is to transform a client's dream into a cinematic, photorealistic image prompt — staying 100% faithful to their idea while elevating the quality.
 
-A ${genderLabel} client wants a professional photoshoot with this concept: "${rawTheme}"
+CLIENT (${genderLabel}) DREAM: "${rawTheme}"
 
-Your job is to write a single MASTERCLASS generative image prompt (4 to 6 rich sentences) that will make Gemini AI produce a SPECTACULAR, photorealistic, cinematic portrait.
+STEP 1 — UNDERSTAND THE CORE IDEA:
+Before writing anything, identify: What is the main scenario? (luxury lifestyle, travel landmark, fantasy world, family moment, adventure, career fantasy, etc.) What are the key visual elements the client mentioned? Stay true to these — do NOT replace or reinvent the core concept.
 
-STRICT RULES:
-- Describe ONLY: (1) the exact outfit/costume with precise fabric, color, details and accessories, (2) the background/setting with rich environmental storytelling, (3) the cinematic lighting setup with direction, quality, and mood, (4) camera and photographic style details.
-- DO NOT mention the person's face, eyes, skin, smile, expression, or identity — these are handled separately.
-- Write in English.
-- Use professional photography and film terminology.
-- Make it VIVID, SPECIFIC, and CINEMATIC — never generic.
-- Aim for the quality of a Vogue editorial, a Hollywood production still, or a National Geographic cover.
-- Return ONLY the final prompt string. No explanations, no labels, no quotes.`;
+STEP 2 — WRITE THE SCENE PROMPT (4 to 6 rich sentences in English):
+Describe ONLY these four elements with precision and cinematic richness:
+1. WARDROBE: The exact outfit, fabric, colors, fit, and accessories that perfectly match the scenario. Adapt naturally to the dream context — luxury attire for a luxury dream, adventure gear for an adventure, elegant clothing for a romantic travel scene, etc.
+2. SETTING: The background/environment in rich detail — location, architecture, time of day, atmosphere, key props. Be specific to what the client described. If they said "Ferrari in front of the Eiffel Tower", describe exactly that scene with full environmental detail.
+3. LIGHTING: The cinematic lighting setup — source direction, quality (hard/soft), color temperature, mood. Match it to the emotional tone of the dream.
+4. PHOTOGRAPHY STYLE: Camera angle, lens type, depth of field, overall visual style (editorial, cinematic, lifestyle, adventure photography, etc.).
+
+CRITICAL RULES:
+- NEVER change the core concept — if the client says "Ferrari in Paris", do NOT replace it with a different car or city.
+- NEVER mention face, eyes, skin, smile, expression, or the person's identity — handled separately.
+- NEVER add elements the client did not request.
+- Make it VIVID and SPECIFIC — no generic phrases like "beautiful background" or "nice lighting".
+- Return ONLY the final prompt text. No labels, no explanations, no quotes.`;
 
     const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const response = await model.generateContent(aiPrompt);
-    return response.response.text().trim();
+    const expandedScene = response.response.text().trim();
+    return `${poseDirective}\n\n${expandedScene}`;
   } catch (error) {
     console.error('[VYX] Erro no elaborador de sonhos:', error.message);
-    return `Ultra-high quality cinematic portrait. The subject is styled as: ${rawTheme}. Professional studio photography with dramatic cinematic lighting, detailed costume, and immersive background environment. Photorealistic, 8K.`;
+    return `${poseDirective}\n\nUltra-high quality cinematic portrait. The subject is in the following dream scenario: ${rawTheme}. Professional photography with dramatic cinematic lighting, detailed wardrobe matching the scene, and immersive background fully realized. Photorealistic, 8K.`;
   }
 }
 
@@ -479,7 +502,7 @@ async function buildPrompt(themeId, subthemeId, customTheme, gender, photoIndex 
     executivo:   `professional authority and composed confidence`,
     luxo:        `sophisticated elegance and quiet power`,
     aniversario: `warmth and celebratory ease`,
-    sonhos:      `adventurous confidence matching the fantasy role`,
+    sonhos:      `genuine joy and presence, as if living inside their biggest dream`,
   }[themeId] || `natural composed confidence`;
 
   const expressionGuide = `CRITICAL: Reproduce EXACTLY the facial expression from the reference photo. If the person is NOT smiling in the reference, DO NOT add a smile. If the person is smiling in the reference, preserve that smile. NEVER invent, add, or remove any expression element not present in the reference. The only adjustment allowed is to channel the mood of ${expressionMood} through the eyes and overall presence — without changing what the mouth is doing.`;
@@ -509,8 +532,8 @@ OUTPUT: RAW photographic quality. Only the face is preserved from the reference.
 `;
 
   if (themeId === 'sonhos' || themeId === 'custom') {
-    console.log(`✨ Elaborando Sonho: "${customTheme}"...`);
-    const expandedStyle = await expandCustomTheme(customTheme, gender);
+    console.log(`✨ Elaborando Sonho [pose ${photoIndex % 5}]: "${customTheme}"...`);
+    const expandedStyle = await expandCustomTheme(customTheme, gender, photoIndex);
     return `${expandedStyle}\n${baseGuard}`;
   }
 
