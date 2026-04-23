@@ -418,7 +418,45 @@ async function upgradeLeadToCliente(email) {
       }
     }
 
-    console.warn(`[Sheets] ⚠️ Email não encontrado na planilha para upgrade: ${email}`);
+    // Email não estava na planilha — pessoa comprou sem ter feito login antes
+    // Adiciona diretamente como Cliente no mês atual para não perder a venda
+    console.warn(`[Sheets] ⚠️ COMPRA SEM LEAD PRÉVIO — email não encontrado: ${email}`);
+    console.warn(`[Sheets] ⚠️ Possível causa: email diferente do login Google. Adicionando como Cliente direto.`);
+
+    try {
+      const monthIndex = new Date().getMonth();
+      const { sheetId: monthSheetId, tabName } = await getOrCreateMonthTab(sheets, monthIndex);
+      const dataBR = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+
+      const appendRes = await sheets.spreadsheets.values.append({
+        spreadsheetId: SHEET_ID,
+        range: `'${tabName}'!A:F`,
+        valueInputOption: 'USER_ENTERED',
+        insertDataOption: 'INSERT_ROWS',
+        requestBody: { values: [[email, '—', dataBR, '🏆 Cliente', 'Kiwify (sem login)', '—']] },
+      });
+
+      const updatedRange = appendRes.data.updates?.updatedRange || '';
+      const rowMatch = updatedRange.match(/(\d+)$/);
+      if (rowMatch) {
+        const rowIndex = parseInt(rowMatch[1]) - 1;
+        await sheets.spreadsheets.batchUpdate({
+          spreadsheetId: SHEET_ID,
+          requestBody: { requests: [{ repeatCell: {
+            range: { sheetId: monthSheetId, startRowIndex: rowIndex, endRowIndex: rowIndex + 1 },
+            cell: { userEnteredFormat: {
+              backgroundColor: { red: 1.0, green: 0.87, blue: 0.27 },
+              textFormat: { foregroundColor: { red: 0.15, green: 0.10, blue: 0.0 }, fontSize: 10, bold: true },
+            }},
+            fields: 'userEnteredFormat(backgroundColor,textFormat)',
+          }}]},
+        });
+      }
+
+      console.log(`[Sheets] ✅ Cliente sem login adicionado em ${tabName}: ${email}`);
+    } catch (innerErr) {
+      console.error(`[Sheets] ❌ Falha ao adicionar cliente sem login: ${email} — ${innerErr.message}`);
+    }
   } catch (e) {
     console.warn('[Sheets] Erro ao promover lead:', e.message);
   }
