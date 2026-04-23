@@ -603,14 +603,47 @@ const CYCLE_VARIATIONS = [
   },
 ];
 
-async function expandCustomTheme(rawTheme, gender, photoIndex = 0) {
-  const shotTypeIndex = photoIndex % DREAM_SHOT_TYPES.length;           // 0-9
-  const cycleIndex = Math.floor(photoIndex / DREAM_SHOT_TYPES.length);  // 0, 1, 2...
+async function expandCustomTheme(rawTheme, gender, photoIndex = 0, isPreview = false) {
+  const shotTypeIndex = photoIndex % DREAM_SHOT_TYPES.length;
+  const cycleIndex = Math.floor(photoIndex / DREAM_SHOT_TYPES.length);
   const shotType = DREAM_SHOT_TYPES[shotTypeIndex];
   const cycleVariation = CYCLE_VARIATIONS[cycleIndex % CYCLE_VARIATIONS.length];
 
   try {
     const genderLabel = gender === 'feminino' ? 'female' : 'male';
+
+    // Preview: hero shot — a IA escolhe a pose mais natural e icônica para ESSE cenário específico
+    if (isPreview) {
+      const aiPrompt = `You are the creative director of the world's most prestigious AI portrait studio. You need to create the HERO SHOT — the single most visually stunning and naturally iconic image for this dream scenario. This photo will be the client's first impression.
+
+CLIENT (${genderLabel}) DREAM: "${rawTheme}"
+
+YOUR TASK: Identify the most NATURAL and ICONIC way this person would be photographed in this specific dream.
+
+Think about it this way:
+- A footballer in their team jersey → the classic team photo pose, arms crossed or ball at feet, standing tall on the pitch — that's natural for football.
+- An astronaut in a spacesuit → hands on the cockpit controls, galaxy visible through the window — NOT arms crossed, that looks wrong in a spacesuit.
+- Someone leaning on a Ferrari in Paris → naturally leaning on the hood, one hand on the car, relaxed and confident — that's the natural pose for this dream.
+- A princess in a castle → elegant stance at the top of the grand staircase, gown flowing — standing regally, not arms crossed.
+- A child superhero → standing strong with fists on hips or cape billowing in the wind.
+
+The pose must feel NATURAL and AUTHENTIC to the specific scenario — as if the client was actually there and this is how they'd naturally stand/sit/pose in that world.
+
+Write the scene description (4 to 6 sentences in English):
+1. WARDROBE: Exact outfit, authentic and specific to the scenario.
+2. SETTING: The most iconic version of this environment — fully realized, immersive.
+3. POSE DIRECTION: Describe explicitly the most natural, scenario-appropriate pose (this is critical — make it specific to this dream, not generic).
+4. LIGHTING: Cinematic and flattering for this scene.
+5. CAMERA: The framing that best captures this hero shot.
+
+RULES: Stay 100% faithful to the client's dream. NEVER mention face, eyes, skin, or expression. Return ONLY the scene description.`;
+
+      const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
+      const response = await model.generateContent(aiPrompt);
+      return response.response.text().trim();
+    }
+
+    // Fotos da série completa: shot types rotativos com variações de ciclo
     const aiPrompt = `You are the creative director of the world's most prestigious AI portrait studio. You are producing a full photoshoot series for a ${genderLabel} client. Every single photo in this series must be COMPLETELY DIFFERENT — a unique moment, atmosphere, and visual language.
 
 CLIENT DREAM SCENARIO: "${rawTheme}"
@@ -639,7 +672,8 @@ ABSOLUTE RULES:
     return response.response.text().trim();
   } catch (error) {
     console.error('[VYX] Erro no elaborador de sonhos:', error.message);
-    return `Ultra-high quality cinematic portrait. Shot type: ${shotType.label}. Variation: ${cycleVariation.label}. Dream scenario: ${rawTheme}. Professional photography, dramatic cinematic lighting, detailed wardrobe, immersive background. Photorealistic, 8K.`;
+    const label = isPreview ? 'HERO SHOT' : `${shotType.label} / ${cycleVariation.label}`;
+    return `Ultra-high quality cinematic portrait. ${label}. Dream scenario: ${rawTheme}. Natural scenario-appropriate pose. Professional photography, dramatic cinematic lighting, detailed wardrobe, immersive background. Photorealistic, 8K.`;
   }
 }
 
@@ -704,14 +738,15 @@ FACE (non-negotiable): Keep 100% identical — same eyes, same nose, same mouth,
 SKIN RETOUCHING (professional studio standard): Apply high-end retouching as a professional photographer would in post-production: (1) completely eliminate dark circles and puffiness under the eyes while preserving natural eye depth; (2) remove all visible blemishes, acne spots, blackheads, and redness; (3) smooth uneven skin texture and enlarged pores; (4) correct any skin discoloration or blotchy patches; (5) soften fine lines without erasing natural facial structure. The result must look like a professional studio session with expert retouching — healthy, luminous, magazine-quality skin. Do NOT make it plastic, AI-filtered, or unrealistically smooth. The person must look like the best version of themselves, not a different person.
 ${clothingOverride}
 EXPRESSION: ${expressionGuide}
-FRAMING (ABSOLUTE RULE — ZERO EXCEPTIONS): Wide waist-up portrait shot. The camera MUST be zoomed out enough so the top of the skull and every strand of hair has at least 30% of empty background space above it before reaching the top edge of the image. Imagine placing a closed fist of empty space above the top of the head — that much room. NEVER let the head touch or approach the top edge. Bottom frame cuts at hip level. ${isPreview ? 'Arms crossed on chest — confident signature pose.' : 'Natural confident pose appropriate to the scene — standing, hands relaxed, or as fits the setting.'} When in doubt, zoom out further.
+FRAMING (ABSOLUTE RULE — ZERO EXCEPTIONS): Wide waist-up portrait shot. The camera MUST be zoomed out enough so the top of the skull and every strand of hair has at least 30% of empty background space above it before reaching the top edge of the image. Imagine placing a closed fist of empty space above the top of the head — that much room. NEVER let the head touch or approach the top edge. Bottom frame cuts at hip level. ${(isPreview && themeId !== 'sonhos' && themeId !== 'custom') ? 'Arms crossed on chest — confident signature pose.' : 'Natural pose fully consistent with the scene described above — let the scenario dictate the pose (e.g. hands on cockpit controls for astronaut, leaning on car for luxury, arms wide for celebration, elegant stance for royalty). Never default to arms crossed unless it genuinely fits the scene.'} When in doubt, zoom out further.
 OUTPUT: RAW photographic quality. Only the face is preserved from the reference. Everything else — clothing, background, lighting — is replaced entirely as described.
 [/END IDENTITY RULES]
 `;
 
   if (themeId === 'sonhos' || themeId === 'custom') {
-    console.log(`✨ Elaborando Sonho [pose ${photoIndex % 5}]: "${customTheme}"...`);
-    const expandedStyle = await expandCustomTheme(customTheme, gender, photoIndex);
+    const shotLabel = isPreview ? 'PREVIEW/HERO' : `shot ${photoIndex + 1}`;
+    console.log(`✨ Elaborando Sonho [${shotLabel}]: "${customTheme}"...`);
+    const expandedStyle = await expandCustomTheme(customTheme, gender, photoIndex, isPreview);
     return `${expandedStyle}\n${baseGuard}`;
   }
 
