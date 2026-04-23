@@ -611,9 +611,25 @@ function getPrompt(theme, subtheme, customText = '', photoIndex = 0, gender = 'f
     prompts = fallbackKey ? themePrompts[fallbackKey] : themePrompts['executivo_classico'];
   }
 
-  // Sonhos/fantasia: usa o texto livre do cliente
+  // Sonhos/fantasia: usa o texto livre do cliente com poses diversificadas por índice
   if (key === 'sonhos_fantasia' && customText) {
-    return `Ultra-high quality cinematic fantasy portrait photograph. The subject is depicted as: ${customText}. The scene is rendered with cinematic quality, perfect lighting, and photorealistic detail. Wardrobe, setting, and atmosphere are all tailored to this fantasy. Photorealistic, 8K.`;
+    const fantasyPoses = [
+      // Pose 0 — Herói épico: olhar ao horizonte, braço estendido com poder
+      `Ultra-high quality cinematic fantasy portrait. SCENE: ${customText}. POSE: heroic three-quarter stance, one arm boldly extended forward or upward as if commanding or reaching for something powerful, chin slightly lifted, gaze fixed toward a distant horizon with fierce determination. Body angled 30 degrees to camera. ATMOSPHERE: dramatic volumetric lighting, epic fantasy environment fully realized in the background. Cinematic depth of field. Photorealistic, 8K.`,
+
+      // Pose 1 — Misterioso: sobre o ombro, ambiente ao redor
+      `Ultra-high quality cinematic fantasy portrait. SCENE: ${customText}. POSE: subject glancing dramatically back over the shoulder, body turned away from camera at 45 degrees, face partially visible in a compelling over-the-shoulder look. One hand resting lightly on a surface or weapon hilt. Expression: intense, secretive, alluring. ATMOSPHERE: rich fantasy environment enveloping the figure, moody cinematic rim lighting from behind. Photorealistic, 8K.`,
+
+      // Pose 2 — Close épico: rosto em destaque, ambiente imersivo
+      `Ultra-high quality cinematic fantasy portrait. SCENE: ${customText}. POSE: close-up portrait framing, face centered and dominant, eyes locked directly into camera with raw intensity and character. Slight head tilt. Costume details and fantasy environment fill the periphery with depth. ATMOSPHERE: soft key light sculpting the face dramatically, bokeh fantasy background. Cinematic color grading. Photorealistic, 8K.`,
+
+      // Pose 3 — Majestoso: sentado ou apoiado em trono/estrutura
+      `Ultra-high quality cinematic fantasy portrait. SCENE: ${customText}. POSE: commanding seated or leaning pose, subject resting with one elbow on a throne, rock, console, or relevant prop of the scene, legs relaxed, posture radiating authority and ease. Slight forward lean, gaze straight to camera with calm power. ATMOSPHERE: grand fantasy environment surrounding with rich atmospheric depth. Epic lighting. Photorealistic, 8K.`,
+
+      // Pose 4 — Dinâmico: em movimento, capturado no instante da ação
+      `Ultra-high quality cinematic fantasy portrait. SCENE: ${customText}. POSE: dynamic mid-action freeze frame, subject caught in movement — striding forward, turning with energy, or mid-gesture — creating a sense of momentum and life. Hair or costume elements show motion. ATMOSPHERE: action-frozen cinematic moment, motion blur subtly present in background, dramatic angular lighting. Photorealistic, 8K.`,
+    ];
+    return fantasyPoses[photoIndex % fantasyPoses.length];
   }
 
   const index = photoIndex % prompts.length;

@@ -1103,13 +1103,32 @@ app.get('/api/admin/reset-sheets', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// HEALTHCHECK
+// HEALTHCHECK / PING
 // ─────────────────────────────────────────────
 app.get('/', (_req, res) => {
   res.status(200).send('Vyxfotos.IA Backend Operacional');
 });
 
+app.get('/ping', (_req, res) => {
+  res.status(200).json({ status: 'ok', ts: Date.now() });
+});
+
+// ─────────────────────────────────────────────
+// SELF-PING — mantém o Render acordado a cada 10 min
+// ─────────────────────────────────────────────
+function selfPing() {
+  const url = process.env.BACKEND_URL || 'https://vyxfotos-backend.onrender.com';
+  const mod = url.startsWith('https') ? require('https') : require('http');
+  mod.get(`${url}/ping`, (res) => {
+    console.log(`[SelfPing] ${res.statusCode} - servidor ativo`);
+  }).on('error', (err) => {
+    console.warn('[SelfPing] Falha:', err.message);
+  });
+}
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Vyxfotos.IA rodando na porta ${PORT}`);
   startPolling();
+  // Inicia self-ping a cada 10 minutos (600000ms)
+  setInterval(selfPing, 10 * 60 * 1000);
 });

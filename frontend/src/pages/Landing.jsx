@@ -59,6 +59,7 @@ export default function Landing() {
        localStorage.setItem('vyx_order_id', orderId);
        setIsGenerating(false);
        setHasImageArrival(false);
+       ScrollTrigger.killAll();
        navigate('/checkout');
     }
     return () => clearInterval(timer);
@@ -238,6 +239,7 @@ export default function Landing() {
       const elapsed = Date.now() - storedLast;
 
       if (storedCount >= VYX_LIMIT && elapsed < VYX_COOLDOWN_MS) {
+        ScrollTrigger.killAll();
         navigate('/planos');
         return;
       }
@@ -294,6 +296,7 @@ export default function Landing() {
           if (response.status === 429) {
             localStorage.setItem('vyx_attempt_count', String(VYX_LIMIT));
             localStorage.setItem('vyx_attempt_last', String(Date.now()));
+            ScrollTrigger.killAll();
             navigate('/planos');
             return;
           }
