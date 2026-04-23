@@ -349,6 +349,82 @@ async function saveLead({ uid, email, name, photoURL }) {
 }
 
 // ─────────────────────────────────────────────
+// ATUALIZA STATUS DO LEAD PARA CLIENTE NA PLANILHA
+// ─────────────────────────────────────────────
+async function upgradeLeadToCliente(email) {
+  if (!email) return;
+  try {
+    const sheets = getSheetsClient();
+    if (!sheets) return;
+
+    // Busca metadados da planilha para listar todas as abas de meses
+    const meta = await sheets.spreadsheets.get({ spreadsheetId: SHEET_ID });
+    const monthTabs = meta.data.sheets.filter(s =>
+      MESES_NOMES.includes(s.properties.title)
+    );
+
+    for (const tab of monthTabs) {
+      const tabName = tab.properties.title;
+      const sheetId = tab.properties.sheetId;
+
+      // Lê coluna A (emails) da aba
+      const readRes = await sheets.spreadsheets.values.get({
+        spreadsheetId: SHEET_ID,
+        range: `'${tabName}'!A:F`,
+      });
+
+      const rows = readRes.data.values || [];
+      for (let i = 1; i < rows.length; i++) { // i=0 é header
+        if ((rows[i][0] || '').toLowerCase().trim() === email.toLowerCase().trim()) {
+          const rowIndex = i; // 0-based já (header é linha 0)
+
+          // Atualiza coluna D (status) para Cliente
+          await sheets.spreadsheets.values.update({
+            spreadsheetId: SHEET_ID,
+            range: `'${tabName}'!D${rowIndex + 1}`,
+            valueInputOption: 'USER_ENTERED',
+            requestBody: { values: [['🏆 Cliente']] },
+          });
+
+          // Aplica formatação dourada na linha inteira
+          await sheets.spreadsheets.batchUpdate({
+            spreadsheetId: SHEET_ID,
+            requestBody: { requests: [{ repeatCell: {
+              range: { sheetId, startRowIndex: rowIndex, endRowIndex: rowIndex + 1 },
+              cell: { userEnteredFormat: {
+                backgroundColor: { red: 1.0, green: 0.87, blue: 0.27 }, // dourado
+                textFormat: {
+                  foregroundColor: { red: 0.15, green: 0.10, blue: 0.0 },
+                  fontSize: 10,
+                  bold: true,
+                },
+              }},
+              fields: 'userEnteredFormat(backgroundColor,textFormat)',
+            }}]},
+          });
+
+          console.log(`[Sheets] ⭐ Lead promovido a Cliente: ${email} (${tabName}, linha ${rowIndex + 1})`);
+
+          // Atualiza Firestore também
+          if (firestoreDb) {
+            const snap = await firestoreDb.collection('leads').where('email', '==', email).limit(1).get();
+            if (!snap.empty) {
+              await snap.docs[0].ref.update({ status: 'cliente', upgradedAt: admin.firestore.FieldValue.serverTimestamp() });
+            }
+          }
+
+          return; // Encontrou e atualizou — sai
+        }
+      }
+    }
+
+    console.warn(`[Sheets] ⚠️ Email não encontrado na planilha para upgrade: ${email}`);
+  } catch (e) {
+    console.warn('[Sheets] Erro ao promover lead:', e.message);
+  }
+}
+
+// ─────────────────────────────────────────────
 // 1. DETECÇÃO AUTOMÁTICA DE GÊNERO PELA SELFIE
 // ─────────────────────────────────────────────
 async function detectGender(imageBase64) {
@@ -933,10 +1009,17 @@ app.post('/api/webhook/kiwify', (req, res) => {
     orderId = srcRaw;
   }
 
+  const customerEmail = payload.Customer?.email;
+
+  // Promove o lead para Cliente na planilha imediatamente ao pagamento
+  if (customerEmail) {
+    upgradeLeadToCliente(customerEmail);
+  }
+
   if (orderId) {
-    processApprovedOrder(payload.Customer?.email, orderId, distributionVars);
+    processApprovedOrder(customerEmail, orderId, distributionVars);
   } else {
-    console.log(`⚠️ Pagamento aprovado de ${payload.Customer?.email} sem OrderID no SRC.`);
+    console.log(`⚠️ Pagamento aprovado de ${customerEmail} sem OrderID no SRC.`);
   }
 });
 
