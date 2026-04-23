@@ -530,60 +530,92 @@ Examples:
 // 3. ELABORADOR DE SONHOS EM PROMPT CINEMATOGRÁFICO
 // ─────────────────────────────────────────────
 
-// Poses universais que funcionam para QUALQUER cenário (luxo, família, aventura, fantasia, viagem)
-const DREAM_POSES = [
-  // 0 — Lifestyle: apoiado no cenário, olhar direto à câmera, totalmente à vontade
-  `POSE: The subject is relaxed and confident, naturally leaning against or resting beside the main element of the scene. One hand lightly touching the surface, weight slightly shifted, body at a casual angle. Looking directly into camera with calm, assured presence. Full-body or three-quarter framing showing both subject and environment clearly.`,
-  // 1 — Ambiental: olhando o cenário ao redor, candidato, imerso no momento
-  `POSE: The subject is captured in a natural, candid-style moment — facing slightly away or gazing toward something beautiful in the scene, as if genuinely living inside this dream. Body relaxed and organic, expression showing wonder, joy, or quiet awe. Wide or medium shot giving full context to the environment around the subject.`,
-  // 2 — Close cinematográfico: busto, rosto em foco, mundo ao redor em bokeh
-  `POSE: Intimate bust or close-up framing. Subject facing camera directly, expression natural and alive — warm, confident, or joyful depending on the scenario. Costume and background environment visible around the face creating total immersion. Dreamy cinematic bokeh in the background.`,
-  // 3 — Momento vivido: interagindo com o cenário, espontâneo e alegre
-  `POSE: The subject is actively engaged with the scene in a natural, joyful way — touching, sitting inside, or interacting with the main element of the environment. Pose feels spontaneous and alive, as if caught mid-experience. Genuine expression, unforced. Medium or full-body framing showing the interaction clearly.`,
-  // 4 — Conquista: de pé, orgulhoso, dono do cenário, sensação de chegada
-  `POSE: Subject standing tall and open, chin slightly lifted, posture radiating quiet confidence and a sense of arrival — as if they just stepped into this dream and own every inch of it. Arms relaxed or one hand in pocket. Full-body framing showing the complete dream environment as a backdrop, epic sense of scale.`,
+// 10 tipos de shot que garantem fotos completamente diferentes entre si numa mesma série
+const DREAM_SHOT_TYPES = [
+  // 0 — O Momento Épico: a cena mais emocionante e icônica do sonho
+  {
+    label: 'THE EPIC MOMENT',
+    directive: `SHOT TYPE: THE EPIC MOMENT — This is the single most thrilling, peak-emotion scene of this entire dream. For a footballer: the goal celebration sprinting to the corner flag, arms wide, stadium exploding. For an astronaut: the first step onto another planet. For a princess: the grand entrance down the staircase. Capture the absolute PEAK of this dream. Wide or medium shot. Maximum emotional impact.`,
+  },
+  // 1 — Close Emocional: rosto em destaque, emoção pura no olhar
+  {
+    label: 'EMOTIONAL CLOSE-UP',
+    directive: `SHOT TYPE: EMOTIONAL CLOSE-UP — An intimate portrait capturing pure, raw emotion on the subject's face in the context of this dream. For a footballer: tears of joy right after scoring, face flushed, stadium lights reflecting in the eyes. For a luxury scenario: serene confidence, the look of someone who has arrived. Tight close-up or bust shot. The environment is visible but blurred — the FACE is everything here.`,
+  },
+  // 2 — Editorial/Pose Icônica: composição de capa de revista, confiança total
+  {
+    label: 'EDITORIAL / ICONIC POSE',
+    directive: `SHOT TYPE: EDITORIAL / ICONIC POSE — A strong, composed, magazine-cover-worthy pose. The subject owns the frame completely. For a footballer: standing tall at the center of the pitch, ball under one foot, jersey perfectly fitted, stadium empty and majestic behind them. For a luxury scenario: leaning on the car with absolute ease. Think Sports Illustrated cover or Vogue editorial. Full-body or three-quarter. Confident, direct gaze into camera.`,
+  },
+  // 3 — Ação em Movimento: capturado em plena ação, pose dinâmica
+  {
+    label: 'ACTION IN MOTION',
+    directive: `SHOT TYPE: ACTION IN MOTION — The subject is frozen mid-action, full of energy and movement. For a footballer: sprinting with the ball at full speed, leaning into a turn, or striking a shot — boot connecting with ball, muscles engaged, hair and kit in motion. For a dancer: mid-spin. For a pilot: hands on controls in turbulence. Freeze-frame of peak physical action. Dynamic angle, motion blur in background, sharp on subject.`,
+  },
+  // 4 — Escala Épica: sujeito no ambiente grandioso, sensação de pertencimento
+  {
+    label: 'EPIC SCALE & ENVIRONMENT',
+    directive: `SHOT TYPE: EPIC SCALE & ENVIRONMENT — Pull back to reveal the full grandeur of the dream world around the subject. The subject is part of something MASSIVE. For a footballer: standing at the center circle of Camp Nou, 90,000 fans roaring in the background, the sheer scale of the stadium dwarfing everything. For a luxury dream: the full panorama of Paris at golden hour. Wide establishing shot. The environment is the star — the subject is perfectly placed within it.`,
+  },
+  // 5 — Preparo/Concentração: antes da ação, foco total, tensão dramática
+  {
+    label: 'PREPARATION & FOCUS',
+    directive: `SHOT TYPE: PREPARATION & FOCUS — The calm before the storm. The subject is in a state of total focus and preparation before the big moment. For a footballer: in the tunnel about to walk out, eyes locked forward, fists clenched, stadium noise building. For an astronaut: helmet in hand, looking at the rocket. For a musician: backstage before the concert. Medium or close shot. Dramatic shadows. Pure concentration.`,
+  },
+  // 6 — Conquista/Vitória: o momento após o sucesso, celebração ou orgulho
+  {
+    label: 'VICTORY & TRIUMPH',
+    directive: `SHOT TYPE: VICTORY & TRIUMPH — The aftermath of success. The subject has won, achieved, arrived. For a footballer: lifting a trophy, champagne raining down, teammates celebrating around them. For a businessperson: signing the big deal. For a traveler: standing at the summit. The expression is pure, earned joy — not just happiness but the specific feeling of having fought for something and won it.`,
+  },
+  // 7 — Lifestyle Autêntico: sujeito à vontade, humanizado, no ambiente
+  {
+    label: 'AUTHENTIC LIFESTYLE',
+    directive: `SHOT TYPE: AUTHENTIC LIFESTYLE — A relaxed, human, candid-feeling moment. The subject is completely at ease in their dream, not performing for the camera. For a footballer: sitting on the grass after training, jersey slightly disheveled, laughing at something. For a luxury scenario: lounging by the pool of the penthouse suite, drink in hand, city below. Feels like a private moment caught on camera. Natural, warm, real.`,
+  },
+  // 8 — Maestria/Técnica: demonstrando habilidade, detalhe da execução perfeita
+  {
+    label: 'SKILL & MASTERY',
+    directive: `SHOT TYPE: SKILL & MASTERY — A shot that highlights the subject's mastery of their craft within this dream. For a footballer: perfect technique — a flawless first touch, a delicate chip, the precision of a free kick setup. For a chef: plating a dish with surgical precision. For a musician: fingers on the instrument. Focus on the detail of the action — hands, feet, the tool of the trade. Close or medium shot emphasizing craft and expertise.`,
+  },
+  // 9 — Drama Cinematográfico: ângulo inusitado, iluminação épica, arte pura
+  {
+    label: 'CINEMATIC DRAMA',
+    directive: `SHOT TYPE: CINEMATIC DRAMA — A purely cinematic, visually striking composition that feels like a movie poster or a scene from an epic film. Unexpected angle — low ground shot looking up at the subject against the sky, silhouette against stadium lights, dramatic fog, rim lighting only, extreme close-up of a single detail. For a footballer: silhouette against floodlights, fog rolling across the pitch, ball at feet. Pure visual poetry. This shot is about MOOD and ATMOSPHERE above all.`,
+  },
 ];
 
 async function expandCustomTheme(rawTheme, gender, photoIndex = 0) {
-  const poseDirective = DREAM_POSES[photoIndex % DREAM_POSES.length];
+  const shotType = DREAM_SHOT_TYPES[photoIndex % DREAM_SHOT_TYPES.length];
   try {
     const genderLabel = gender === 'feminino' ? 'female' : 'male';
-    const aiPrompt = `You are the creative director of the world's most prestigious AI portrait studio. Your skill is reading a person's dream and instantly knowing the ONE image that will make them say "YES — that's exactly what I wanted to see of myself."
+    const aiPrompt = `You are the creative director of the world's most prestigious AI portrait studio. You are shooting a ${genderLabel} client in a series of photos. Each photo in the series must be COMPLETELY DIFFERENT — a unique moment, angle, and mood within the same dream scenario.
 
-CLIENT (${genderLabel}) DREAM: "${rawTheme}"
+CLIENT DREAM SCENARIO: "${rawTheme}"
 
-YOUR PROCESS — think like a visionary director, not a description writer:
+THIS IS PHOTO #${photoIndex + 1} IN THE SERIES.
+SHOT TYPE FOR THIS PHOTO: ${shotType.label}
 
-STEP 1 — FIND THE ICONIC MOMENT:
-Ask yourself: what is the single most thrilling, emotional, or aspirational IMAGE within this dream? Not just "the scene" — the PEAK MOMENT of that scene.
+${shotType.directive}
 
-Examples of this thinking:
-- "footballer at Barcelona" → not standing in a jersey. It's a GOAL CELEBRATION — sprinting toward the corner flag, arms wide open, stadium erupting, confetti in the air, tears of joy, close-up of pure euphoria.
-- "Ferrari in front of the Eiffel Tower" → not just parked there. It's the owner leaning on the hood at golden hour, jacket over the shoulder, Paris glowing behind them — like a magazine cover.
-- "astronaut in a spaceship" → not standing in a suit. It's at the cockpit controls, galaxy visible through the window, dramatic instrument-panel glow lighting the face from below, the vast cosmos stretching behind.
-- "princess in a magical castle" → not posing in a hallway. It's at the top of the grand staircase, gown flowing, golden chandelier light cascading down, the entire fairytale world visible below.
-- "child superhero" → not arms crossed. It's mid-flight or landing pose, cape billowing, city skyline behind, dramatic backlighting like a movie poster.
-
-STEP 2 — WRITE THE SCENE AROUND THAT MOMENT (4 to 6 sentences in English):
-Now describe ONLY these four elements — in service of the iconic moment you identified:
-1. WARDROBE: Exact outfit, fabric, colors, fit, accessories — perfectly matched to the dream and the moment. Authentic and specific (real team jersey with name and number, actual Ferrari model, real castle architecture, etc.).
-2. SETTING: The environment in rich cinematic detail — exact location, time of day, weather, crowd, key props, atmosphere. Make it feel REAL and IMMERSIVE.
-3. LIGHTING: The lighting that serves the emotional peak — stadium floodlights for the goal celebration, golden sunset for the Paris moment, cockpit glow for the spaceship scene, etc.
-4. CAMERA: Angle, lens, framing, depth of field that captures the peak moment best — close-up for raw emotion, wide for epic scale, low angle for power.
+YOUR TASK — Write the scene for THIS specific shot type (4 to 6 sentences in English):
+Describe ONLY these four elements, all in service of the shot type above:
+1. WARDROBE: Exact outfit, fabric, colors, fit, accessories — authentic and specific to the scenario (real team jersey and number, actual car model, real location details, etc.).
+2. SETTING: The environment — exact location, time of day, crowd, atmosphere, key props. Make it feel REAL and IMMERSIVE. Stay faithful to what the client described.
+3. LIGHTING: The lighting that best serves THIS specific shot type and moment.
+4. CAMERA: Angle, lens, framing, depth of field — chosen specifically to serve this shot type.
 
 ABSOLUTE RULES:
-- NEVER deviate from the core concept the client described. Their words are sacred — amplify them, never replace them.
-- NEVER mention face, eyes, skin, smile, expression, or the person's identity — handled separately.
-- The goal is the image that makes someone gasp and say "that's ME in my dream" — not just a technically correct scene.
-- Return ONLY the final prompt text. No labels, no explanations, no quotes, no "Step 1/2" in the output.`;
+- Stay 100% faithful to the client's dream — their words are sacred. Never replace their concept.
+- NEVER mention face, eyes, skin, smile, expression, or identity — handled separately.
+- This photo must feel DISTINCT from every other photo in the series — different moment, different energy, different framing.
+- Return ONLY the final scene description. No labels, no explanations, no shot type header in the output.`;
 
     const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const response = await model.generateContent(aiPrompt);
-    const expandedScene = response.response.text().trim();
-    return `${poseDirective}\n\n${expandedScene}`;
+    return response.response.text().trim();
   } catch (error) {
     console.error('[VYX] Erro no elaborador de sonhos:', error.message);
-    return `${poseDirective}\n\nUltra-high quality cinematic portrait. The subject is in the following dream scenario: ${rawTheme}. Professional photography with dramatic cinematic lighting, detailed wardrobe matching the scene, and immersive background fully realized. Photorealistic, 8K.`;
+    return `Ultra-high quality cinematic portrait. Shot type: ${shotType.label}. The subject is in the following dream scenario: ${rawTheme}. Professional photography with dramatic cinematic lighting, detailed wardrobe matching the scene, and immersive background fully realized. Photorealistic, 8K.`;
   }
 }
 
