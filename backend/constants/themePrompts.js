@@ -612,22 +612,28 @@ function getPrompt(theme, subtheme, customText = '', photoIndex = 0, gender = 'f
   }
 
   // Sonhos/fantasia: usa o texto livre do cliente com poses diversificadas por índice
+  // Funciona para qualquer cenário: aventura, luxo, família, viagem, fantasia infantil etc.
   if (key === 'sonhos_fantasia' && customText) {
     const fantasyPoses = [
-      // Pose 0 — Herói épico: olhar ao horizonte, braço estendido com poder
-      `Ultra-high quality cinematic fantasy portrait. SCENE: ${customText}. POSE: heroic three-quarter stance, one arm boldly extended forward or upward as if commanding or reaching for something powerful, chin slightly lifted, gaze fixed toward a distant horizon with fierce determination. Body angled 30 degrees to camera. ATMOSPHERE: dramatic volumetric lighting, epic fantasy environment fully realized in the background. Cinematic depth of field. Photorealistic, 8K.`,
+      // Pose 0 — Lifestyle relaxado: apoiado no cenário, olhar direto à câmera
+      // Funciona para: carro de luxo, monumento, nave, qualquer ambiente
+      `Ultra-high quality cinematic lifestyle portrait. DREAM SCENARIO: ${customText}. POSE: subject relaxed and fully at ease, naturally leaning against or resting on the main element of the scene (a car, a wall, a railing, a spaceship console, or whatever fits the context). One hand lightly resting on the surface, body slightly angled, weight shifted to one side. Gaze: confident and direct into camera, a subtle natural smile or calm assured expression. FRAMING: full body or three-quarter shot showing both the subject and the environment. ATMOSPHERE: golden hour or cinematic ambient light, scene fully realized with rich environmental detail. Photorealistic, 8K.`,
 
-      // Pose 1 — Misterioso: sobre o ombro, ambiente ao redor
-      `Ultra-high quality cinematic fantasy portrait. SCENE: ${customText}. POSE: subject glancing dramatically back over the shoulder, body turned away from camera at 45 degrees, face partially visible in a compelling over-the-shoulder look. One hand resting lightly on a surface or weapon hilt. Expression: intense, secretive, alluring. ATMOSPHERE: rich fantasy environment enveloping the figure, moody cinematic rim lighting from behind. Photorealistic, 8K.`,
+      // Pose 1 — Retrato ambiental: sujeito imerso no mundo, olhando ao redor
+      // Funciona para: viagens, lugares icônicos, cenários mágicos, família
+      `Ultra-high quality cinematic environmental portrait. DREAM SCENARIO: ${customText}. POSE: subject captured in a natural candid-style moment, facing slightly away from camera or looking toward something beautiful in the scene — a landmark, a view, a light source — as if genuinely living inside this dream. Body relaxed and organic, one arm possibly pointing or gesturing toward the environment. Expression: wonder, joy, or quiet awe. FRAMING: wide or medium shot that gives full context to the magical setting around the subject. ATMOSPHERE: soft natural lighting, immersive background in full detail. Photorealistic, 8K.`,
 
-      // Pose 2 — Close épico: rosto em destaque, ambiente imersivo
-      `Ultra-high quality cinematic fantasy portrait. SCENE: ${customText}. POSE: close-up portrait framing, face centered and dominant, eyes locked directly into camera with raw intensity and character. Slight head tilt. Costume details and fantasy environment fill the periphery with depth. ATMOSPHERE: soft key light sculpting the face dramatically, bokeh fantasy background. Cinematic color grading. Photorealistic, 8K.`,
+      // Pose 2 — Close cinematográfico: rosto em foco, mundo ao redor
+      // Universal — funciona para qualquer tema
+      `Ultra-high quality cinematic close portrait. DREAM SCENARIO: ${customText}. POSE: intimate close-up or bust shot, subject facing camera directly. Expression is the hero: warm, confident, or joyful — whatever fits the dream scenario. Eyes alive and expressive. The costume, styling, and background environment are fully realized and visible around the face, creating a sense of total immersion without needing a wide shot. ATMOSPHERE: flattering cinematic key light on the face, dreamy bokeh background showing the fantasy world. Photorealistic, 8K.`,
 
-      // Pose 3 — Majestoso: sentado ou apoiado em trono/estrutura
-      `Ultra-high quality cinematic fantasy portrait. SCENE: ${customText}. POSE: commanding seated or leaning pose, subject resting with one elbow on a throne, rock, console, or relevant prop of the scene, legs relaxed, posture radiating authority and ease. Slight forward lean, gaze straight to camera with calm power. ATMOSPHERE: grand fantasy environment surrounding with rich atmospheric depth. Epic lighting. Photorealistic, 8K.`,
+      // Pose 3 — Momento vivido: interagindo com algo no cenário
+      // Funciona para: criança brincando, adulto dirigindo, casal, família
+      `Ultra-high quality cinematic moment portrait. DREAM SCENARIO: ${customText}. POSE: subject actively interacting with the scene in a natural and joyful way — touching, holding, sitting inside, or engaging with the main element of the environment. Pose feels spontaneous and alive, as if caught mid-experience rather than posed. Expression: genuine happiness or excitement, natural and unforced. FRAMING: medium or full body, showing the interaction clearly. ATMOSPHERE: warm lifestyle lighting, vibrant and colorful environment. Photorealistic, 8K.`,
 
-      // Pose 4 — Dinâmico: em movimento, capturado no instante da ação
-      `Ultra-high quality cinematic fantasy portrait. SCENE: ${customText}. POSE: dynamic mid-action freeze frame, subject caught in movement — striding forward, turning with energy, or mid-gesture — creating a sense of momentum and life. Hair or costume elements show motion. ATMOSPHERE: action-frozen cinematic moment, motion blur subtly present in background, dramatic angular lighting. Photorealistic, 8K.`,
+      // Pose 4 — Conquista: postura de chegada, orgulho, realização do sonho
+      // Funciona para: topo de montanha, frente de monumento, saída de nave, chegada em destino
+      `Ultra-high quality cinematic achievement portrait. DREAM SCENARIO: ${customText}. POSE: subject standing tall and proud, facing camera or slightly angled, chin lifted with quiet confidence and a sense of arrival — as if they just stepped into their dream and own every inch of it. Arms relaxed at sides or one hand in pocket, posture open and grounded. Expression: calm triumph, deep satisfaction, or radiant joy. FRAMING: full body showing the complete dream environment behind the subject. ATMOSPHERE: dramatic wide establishing light, epic sense of scale between the subject and the world around them. Photorealistic, 8K.`,
     ];
     return fantasyPoses[photoIndex % fantasyPoses.length];
   }
