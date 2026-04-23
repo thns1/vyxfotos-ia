@@ -434,26 +434,34 @@ async function expandCustomTheme(rawTheme, gender, photoIndex = 0) {
   const poseDirective = DREAM_POSES[photoIndex % DREAM_POSES.length];
   try {
     const genderLabel = gender === 'feminino' ? 'female' : 'male';
-    const aiPrompt = `You are a world-class photography art director for a premium AI portrait studio. Your job is to transform a client's dream into a cinematic, photorealistic image prompt — staying 100% faithful to their idea while elevating the quality.
+    const aiPrompt = `You are the creative director of the world's most prestigious AI portrait studio. Your skill is reading a person's dream and instantly knowing the ONE image that will make them say "YES — that's exactly what I wanted to see of myself."
 
 CLIENT (${genderLabel}) DREAM: "${rawTheme}"
 
-STEP 1 — UNDERSTAND THE CORE IDEA:
-Before writing anything, identify: What is the main scenario? (luxury lifestyle, travel landmark, fantasy world, family moment, adventure, career fantasy, etc.) What are the key visual elements the client mentioned? Stay true to these — do NOT replace or reinvent the core concept.
+YOUR PROCESS — think like a visionary director, not a description writer:
 
-STEP 2 — WRITE THE SCENE PROMPT (4 to 6 rich sentences in English):
-Describe ONLY these four elements with precision and cinematic richness:
-1. WARDROBE: The exact outfit, fabric, colors, fit, and accessories that perfectly match the scenario. Adapt naturally to the dream context — luxury attire for a luxury dream, adventure gear for an adventure, elegant clothing for a romantic travel scene, etc.
-2. SETTING: The background/environment in rich detail — location, architecture, time of day, atmosphere, key props. Be specific to what the client described. If they said "Ferrari in front of the Eiffel Tower", describe exactly that scene with full environmental detail.
-3. LIGHTING: The cinematic lighting setup — source direction, quality (hard/soft), color temperature, mood. Match it to the emotional tone of the dream.
-4. PHOTOGRAPHY STYLE: Camera angle, lens type, depth of field, overall visual style (editorial, cinematic, lifestyle, adventure photography, etc.).
+STEP 1 — FIND THE ICONIC MOMENT:
+Ask yourself: what is the single most thrilling, emotional, or aspirational IMAGE within this dream? Not just "the scene" — the PEAK MOMENT of that scene.
 
-CRITICAL RULES:
-- NEVER change the core concept — if the client says "Ferrari in Paris", do NOT replace it with a different car or city.
+Examples of this thinking:
+- "footballer at Barcelona" → not standing in a jersey. It's a GOAL CELEBRATION — sprinting toward the corner flag, arms wide open, stadium erupting, confetti in the air, tears of joy, close-up of pure euphoria.
+- "Ferrari in front of the Eiffel Tower" → not just parked there. It's the owner leaning on the hood at golden hour, jacket over the shoulder, Paris glowing behind them — like a magazine cover.
+- "astronaut in a spaceship" → not standing in a suit. It's at the cockpit controls, galaxy visible through the window, dramatic instrument-panel glow lighting the face from below, the vast cosmos stretching behind.
+- "princess in a magical castle" → not posing in a hallway. It's at the top of the grand staircase, gown flowing, golden chandelier light cascading down, the entire fairytale world visible below.
+- "child superhero" → not arms crossed. It's mid-flight or landing pose, cape billowing, city skyline behind, dramatic backlighting like a movie poster.
+
+STEP 2 — WRITE THE SCENE AROUND THAT MOMENT (4 to 6 sentences in English):
+Now describe ONLY these four elements — in service of the iconic moment you identified:
+1. WARDROBE: Exact outfit, fabric, colors, fit, accessories — perfectly matched to the dream and the moment. Authentic and specific (real team jersey with name and number, actual Ferrari model, real castle architecture, etc.).
+2. SETTING: The environment in rich cinematic detail — exact location, time of day, weather, crowd, key props, atmosphere. Make it feel REAL and IMMERSIVE.
+3. LIGHTING: The lighting that serves the emotional peak — stadium floodlights for the goal celebration, golden sunset for the Paris moment, cockpit glow for the spaceship scene, etc.
+4. CAMERA: Angle, lens, framing, depth of field that captures the peak moment best — close-up for raw emotion, wide for epic scale, low angle for power.
+
+ABSOLUTE RULES:
+- NEVER deviate from the core concept the client described. Their words are sacred — amplify them, never replace them.
 - NEVER mention face, eyes, skin, smile, expression, or the person's identity — handled separately.
-- NEVER add elements the client did not request.
-- Make it VIVID and SPECIFIC — no generic phrases like "beautiful background" or "nice lighting".
-- Return ONLY the final prompt text. No labels, no explanations, no quotes.`;
+- The goal is the image that makes someone gasp and say "that's ME in my dream" — not just a technically correct scene.
+- Return ONLY the final prompt text. No labels, no explanations, no quotes, no "Step 1/2" in the output.`;
 
     const model = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
     const response = await model.generateContent(aiPrompt);
