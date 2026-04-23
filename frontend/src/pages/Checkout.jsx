@@ -242,6 +242,15 @@ export default function Checkout() {
                             }
                             return `${k}:${v}`;
                           }).join(',');
+                          // Meta Pixel: rastreia clique no botão de compra
+                          if (window.fbq) {
+                            window.fbq('track', 'InitiateCheckout', {
+                              value: pkg.price,
+                              currency: 'BRL',
+                              content_name: pkg.name,
+                              num_items: pkg.limit,
+                            });
+                          }
                           window.location.href = `${pkg.link}?src=${orderId}_vars_${varsText}`;
                         }
                       }}
