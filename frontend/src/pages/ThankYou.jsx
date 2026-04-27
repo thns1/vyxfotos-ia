@@ -11,6 +11,11 @@ export default function ThankYou() {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
       setUser(currentUser);
     });
+
+    if (window.fbq) {
+      window.fbq('track', 'Purchase', { currency: 'BRL', value: 0 });
+    }
+
     return () => unsubscribe();
   }, []);
 
