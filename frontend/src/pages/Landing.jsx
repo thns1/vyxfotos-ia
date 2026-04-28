@@ -371,7 +371,7 @@ export default function Landing() {
                 <span className="font-drama italic text-champagne">antes de pagar.</span>
               </h2>
               <p className="text-ivory/50 text-sm font-light leading-relaxed">
-                Faça login com o Google e receba <strong className="text-ivory/80">1 foto gerada por IA</strong> de graça antes de qualquer pagamento.
+                Faça login com o Google e veja seu resultado gerado por IA de graça, antes de qualquer pagamento.
               </p>
             </div>
 
