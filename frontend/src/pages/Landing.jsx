@@ -367,11 +367,11 @@ export default function Landing() {
 
             <div className="space-y-3">
               <h2 className="text-2xl md:text-3xl font-black text-ivory leading-tight">
-                Veja seu ensaio<br/>
+                Veja o resultado<br/>
                 <span className="font-drama italic text-champagne">antes de pagar.</span>
               </h2>
               <p className="text-ivory/50 text-sm font-light leading-relaxed">
-                Faça login com o Google para acessar o gerador gratuito de ensaios com IA.
+                Faça login com o Google e receba <strong className="text-ivory/80">1 foto gerada por IA</strong> de graça antes de qualquer pagamento.
               </p>
             </div>
 
